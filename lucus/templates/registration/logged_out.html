@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+  </div>
+{% endblock %}
+
+{% block pretitle %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block content_subtitle %}{% endblock %}
+
+{% block content %}
+  <div class="lucus-empty-state">
+    <div class="lucus-empty-state__icon">✓</div>
+    <div class="lucus-empty-state__text">
+      <p>{% translate "You have been logged out." %}</p>
+    </div>
+    <a href="{% url 'admin:index' %}" class="lucus-btn-primary">
+      {% translate "Log in again" %}
+    </a>
+  </div>
+{% endblock %}
+

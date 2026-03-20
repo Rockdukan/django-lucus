@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-lucus"
+version = "0.1.0"
+description = "Lucus enhances Django Admin with custom templates, static theming, and a multi-column dashboard."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "lucus/LICENSE" }
+authors = [{ name = "Rockdukan" }]
+keywords = ["django", "admin", "dashboard", "templates", "static"]
+classifiers = [
+    "Framework :: Django",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "django>=5.2,<7",
+]
+
+[project.urls]
+Homepage = "https://github.com/Rockdukan/django-lucus"
+Repository = "https://github.com/Rockdukan/django-lucus"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["lucus"]
+
+[tool.setuptools.package-data]
+lucus = [
+    "templates/**/*.html",
+    "static/**/*.css",
+    "static/**/*.js",
+    "static/**/*",
+]
+

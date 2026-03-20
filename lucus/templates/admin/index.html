@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="lucus-dashboard lucus-container">
+    <div class="lucus-row lucus-dashboard__grid">
+      {% for col in lucus_dashboard_columns %}
+        <div class="{{ col.classes }}">
+          {% for sec in col.sections %}
+            <section class="lucus-card">
+              <h2 class="lucus-card__title">{{ sec.title }}</h2>
+              <ul class="lucus-card__list">
+                {% for link in sec.links %}
+                  <li><a class="lucus-card__link" href="{{ link.url }}">{{ link.label }}</a></li>
+                {% endfor %}
+              </ul>
+            </section>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

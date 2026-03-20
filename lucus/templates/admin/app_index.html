@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block bodyclass %}{{ block.super }} app-{{ app_label }}{% endblock %}
+
+{% if not is_popup %}
+{% block nav-breadcrumbs %}
+  <nav aria-label="{% translate 'Breadcrumbs' %}" class="lucus-breadcrumbs">
+    <div class="breadcrumbs">
+      <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+      {% for app in app_list %}
+        &rsaquo; {{ app.name }}
+      {% endfor %}
+    </div>
+  </nav>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+<div class="lucus-dashboard lucus-container">
+  <div class="lucus-row lucus-dashboard__grid">
+    {% for app in app_list %}
+      <div class="lucus-dashboard__col lucus-col lucus-col-3 lucus-col-md-6 lucus-col-sm-12">
+        <section class="lucus-card">
+          <h2 class="lucus-card__title">{{ app.name }}</h2>
+          <ul class="lucus-card__list">
+            {% for model in app.models %}
+              <li>
+                <a class="lucus-card__link" href="{% if model.admin_url %}{{ model.admin_url }}{% else %}#{% endif %}">{{ model.name }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

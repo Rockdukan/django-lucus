@@ -1,0 +1,110 @@
+{% extends "admin/base.html" %}
+{% load i18n static admin_urls admin_list %}
+
+{# ---------- TITLE ---------- #}
+{% block title %}
+  {{ cl.opts.verbose_name_plural|capfirst }} | {{ site_title|default:'' }}
+{% endblock %}
+
+{# ---------- BODY CLASS ---------- #}
+{% block bodyclass %}{{ cl.opts.app_label }}-{{ cl.opts.model_name }} change-list-page{% endblock %}
+
+{# ---------- BREADCRUMBS (в нашем стиле, без имени приложения) ---------- #}
+{% block breadcrumbs %}
+  {% if not is_popup %}
+    <div class="breadcrumbs">
+      <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+      &rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}
+    </div>
+  {% endif %}
+{% endblock %}
+
+{# ---------- CONTENT TITLE ---------- #}
+{% block content_title %}
+  <h1>{{ cl.opts.verbose_name_plural|capfirst }}</h1>
+{% endblock %}
+
+{# ---------- OBJECT TOOLS (кнопка "Добавить") ---------- #}
+{% block object-tools %}
+  {% if has_add_permission %}
+    <ul class="object-tools">
+      <li>
+        {% url cl.opts|admin_urlname:'add' as add_url %}
+        <a href="{% add_preserved_filters add_url is_popup to_field %}" class="addlink">
+          {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
+        </a>
+      </li>
+    </ul>
+  {% endif %}
+{% endblock %}
+
+{# ---------- CONTENT ---------- #}
+{% block content %}
+  <div id="content-main" class="lucus-content">
+    <div class="module lucus-changelist">
+      <form id="changelist-form"
+            method="post"
+            novalidate
+            {% if cl.formset and cl.formset.is_multipart %}enctype="multipart/form-data"{% endif %}>
+        {% csrf_token %}
+
+        {% if is_popup %}
+          <input type="hidden" name="_popup" value="1">
+        {% endif %}
+        {% if to_field %}
+          <input type="hidden" name="_to_field" value="{{ to_field }}">
+        {% endif %}
+
+        {# ---------- SEARCH & FILTERS (стандартные теги Django) ---------- #}
+        {% if cl.search_fields or cl.has_filters or cl.date_hierarchy %}
+          <div class="lucus-changelist__filters-bar">
+            {% if cl.search_fields %}
+              <div class="lucus-changelist__search">
+                {% search_form cl %}
+              </div>
+            {% endif %}
+            {% if cl.has_filters %}
+              <div class="lucus-changelist__filters">
+                {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+              </div>
+            {% endif %}
+            {% if cl.date_hierarchy %}
+              <div class="lucus-changelist__date-hierarchy">
+                {% date_hierarchy cl %}
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {# ---------- ACTIONS / TOP PAGINATION ---------- #}
+        {% if action_form or cl.result_count or show_all_url %}
+          <div class="lucus-changelist__topbar">
+            {% if action_form %}
+              <div class="lucus-changelist__actions">
+                {% admin_actions %}
+              </div>
+            {% endif %}
+            <div class="lucus-changelist__pagination-top">
+              {% pagination cl %}
+            </div>
+          </div>
+        {% endif %}
+
+        {# ---------- RESULTS TABLE ---------- #}
+        <div class="results">
+          {% block result_list %}
+            {% result_list cl %}
+          {% endblock %}
+        </div>
+
+        {# ---------- BOTTOM PAGINATION ---------- #}
+        {% if cl.result_count %}
+          <div class="lucus-changelist__bottombar">
+            {% pagination cl %}
+          </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+{% endblock %}
+

@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate 'Server error (500)' %}{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; {% translate 'Server error' %}
+  </div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main" class="lucus-content">
+  <h1>{% translate 'Server Error (500)' %}</h1>
+  <p>{% translate 'There’s been an error. It’s been reported to the site administrators via email and should be fixed shortly. Thanks for your patience.' %}</p>
+</div>
+{% endblock %}
