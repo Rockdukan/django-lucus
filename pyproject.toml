@@ -44,5 +44,7 @@ lucus = [
     "static/**/*.css",
     "static/**/*.js",
     "static/**/*",
+    "locale/**/*.po",
+    "locale/**/*.mo",
 ]
 

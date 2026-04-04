@@ -1914,3 +1914,28 @@ body.change-list-page .lucus-changelist__search input[type="search"] {
 body.change-list-page #content #toolbar #searchbar {
   padding: 0 15px 0 32px !important;
 }
+
+/* ------------------------------------------------------------------ */
+/* DELETE CONFIRMATION (.cancel-link)                                 */
+/* ------------------------------------------------------------------ */
+/*
+ * Django admin/css/base.css sets .cancel-link height/line-height to 0.9375rem
+ * (single EN line). Long translations wrap and clip. Match submit + cancel layout.
+ */
+body.delete-confirmation form .cancel-link {
+  height: auto !important;
+  min-height: 0 !important;
+  line-height: 1.35 !important;
+  box-sizing: border-box;
+}
+
+body.delete-confirmation form > div:has(input[type="submit"]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 10px;
+}
+
+body.delete-confirmation form > div:has(input[type="submit"]) .cancel-link {
+  margin: 0 !important;
+}
