@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-#
-# Builtins
-#
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from typing import Any, Iterable
+from typing import Any
 
-# Third-party
 from django.contrib import admin
 from django.conf import settings
 from django.urls import NoReverseMatch, reverse
@@ -31,16 +28,28 @@ class DashboardColumn:
     classes: str = "lucus-dashboard__col lucus-col lucus-col-3 lucus-col-md-6 lucus-col-sm-12"
 
 
+def _infer_app_label_from_admin_urlname(admin_urlname: str, known_app_labels: frozenset[str]) -> str | None:
+    """
+    Resolve ``app_label`` from ``admin:<app>_<model>_changelist`` against ``known_app_labels``.
+    Longer labels are matched first (e.g. ``foo_bar`` before ``foo``).
+    """
+    if not admin_urlname.startswith("admin:"):
+        return None
+    body = admin_urlname[6:]
+    suf = "_changelist"
+    if not body.endswith(suf):
+        return None
+    prefix = body[: -len(suf)]
+    if not prefix:
+        return None
+    for lab in sorted(known_app_labels, key=len, reverse=True):
+        if prefix == lab or prefix.startswith(f"{lab}_"):
+            return lab
+    return None
+
+
 def safe_reverse(admin_urlname: str) -> str | None:
-    """
-    Безопасно получает URL по имени админского URL.
-
-    Args:
-        admin_urlname: Имя URL для админки, например `admin:app_model_changelist`.
-
-    Returns:
-        URL, если он существует, иначе `None`.
-    """
+    """Return reversed admin URL or ``None`` if the name does not resolve."""
     try:
         return reverse(admin_urlname)
     except NoReverseMatch:
@@ -48,15 +57,7 @@ def safe_reverse(admin_urlname: str) -> str | None:
 
 
 def normalize_config(raw: Iterable[dict[str, Any]]) -> tuple[DashboardColumn, ...]:
-    """
-    Нормализует конфигурацию dashboard в колонке/секциях/линках.
-
-    Args:
-        raw: Входная конфигурация (обычно из `settings.LUCUS_DASHBOARD`).
-
-    Returns:
-        Колонки dashboard в едином формате.
-    """
+    """Normalize layout-style ``LUCUS_DASHBOARD`` into ``DashboardColumn`` tuples."""
     raw_list = list(raw)
     has_explicit_columns = any(isinstance(col, dict) and ("column" in col) for col in raw_list)
 
@@ -69,11 +70,8 @@ def normalize_config(raw: Iterable[dict[str, Any]]) -> tuple[DashboardColumn, ..
         except (TypeError, ValueError):
             return None
 
-    # Если задано column: 1..4, сортируем и оставляем пустые колонки,
-    # чтобы UI был предсказуемым.
-
     if has_explicit_columns:
-        by_col: dict[int, dict[str, Any]] = {}
+        by_col: dict[int, list[dict[str, Any]]] = {}
         max_col = 1
         for col in raw_list:
             if not isinstance(col, dict):
@@ -81,19 +79,16 @@ def normalize_config(raw: Iterable[dict[str, Any]]) -> tuple[DashboardColumn, ..
             c = parse_column_value(col)
             if c is None:
                 continue
-            c = max(1, c)
-            by_col[c] = col
+            c = max(1, min(c, 4))
+            by_col.setdefault(c, []).append(col)
             max_col = max(max_col, c)
 
-        # В UI везде подразумевается сетка 1..4.
         max_col = 4
         cols: list[DashboardColumn] = []
-        for col_idx in range(1, max_col + 1):
-            col = by_col.get(col_idx) or {"sections": [], "classes": DashboardColumn.classes, "column": col_idx}
-            classes = col.get("classes") or DashboardColumn.classes
 
-            sections: list[DashboardSection] = []
-            for sec in col.get("sections", []):
+        def build_sections(merged_section_dicts: list[dict[str, Any]]) -> list[DashboardSection]:
+            out: list[DashboardSection] = []
+            for sec in merged_section_dicts:
                 links: list[DashboardLink] = []
                 for link in sec.get("links", []):
                     url = link.get("url")
@@ -103,13 +98,25 @@ def normalize_config(raw: Iterable[dict[str, Any]]) -> tuple[DashboardColumn, ..
                         continue
                     links.append(DashboardLink(label=link.get("label", ""), url=url))
                 if links:
-                    sections.append(DashboardSection(title=sec.get("title", ""), links=tuple(links)))
+                    out.append(DashboardSection(title=sec.get("title", ""), links=tuple(links)))
+            return out
 
+        for col_idx in range(1, max_col + 1):
+            col_dicts = by_col.get(col_idx, [])
+            if not col_dicts:
+                merged_raw: list[dict[str, Any]] = []
+                classes = DashboardColumn.classes
+            else:
+                merged_raw = []
+                for cd in col_dicts:
+                    merged_raw.extend(cd.get("sections", []))
+                classes = col_dicts[0].get("classes") or DashboardColumn.classes
+
+            sections = build_sections(merged_raw)
             cols.append(DashboardColumn(sections=tuple(sections), classes=classes))
 
         return tuple(cols)
 
-    # Иначе работаем как раньше: порядок в списке = порядок колонок.
     cols: list[DashboardColumn] = []
     for col in raw_list:
         if not isinstance(col, dict):
@@ -134,25 +141,20 @@ def normalize_config(raw: Iterable[dict[str, Any]]) -> tuple[DashboardColumn, ..
 
 def links_for_apps(
     app_list: list[dict[str, Any]],
-    app_labels: set[str],
+    app_labels: set[str] | Sequence[str] | frozenset[str],
     *,
     label_overrides: dict[tuple[str, str], Any] | None = None,
 ) -> tuple[DashboardLink, ...]:
     """
-    Строит набор линков для app_labels на основе списка моделей из админки.
+    Build dashboard links for the given ``app_labels`` using admin ``app_list``.
 
-    Args:
-        app_list: Список приложений из `admin.site.get_app_list(request)`.
-        app_labels: Множество app_label для отбора моделей.
-        label_overrides: Опциональные переопределения заголовков по (app_label, object_name).
-
-    Returns:
-        Кортеж `DashboardLink`.
+    For ``list`` / ``tuple``, apps follow config order; for ``set`` / ``frozenset``,
+    order follows ``app_list``. ``label_overrides`` maps ``(app_label, object_name)``
+    to display labels.
     """
     links: list[DashboardLink] = []
-    for app_item in app_list:
-        if (app_item.get("app_label") or "") not in app_labels:
-            continue
+
+    def append_models(app_item: dict[str, Any]) -> None:
         for m in (app_item.get("models") or []):
             url = m.get("admin_url")
             if url:
@@ -162,19 +164,32 @@ def links_for_apps(
                 if label_overrides and (app_label, obj_name) in label_overrides:
                     label = label_overrides[(app_label, obj_name)]
                 links.append(DashboardLink(label=label, url=url))
+
+    if isinstance(app_labels, (set, frozenset)):
+        labels_set = app_labels
+        for app_item in app_list:
+            if (app_item.get("app_label") or "") not in labels_set:
+                continue
+            append_models(app_item)
+    else:
+        seen_lab: set[str] = set()
+        order: list[str] = []
+        for lab in app_labels:
+            if not lab or lab in seen_lab:
+                continue
+            seen_lab.add(lab)
+            order.append(lab)
+        by_label = {(a.get("app_label") or ""): a for a in app_list}
+        for lab in order:
+            app_item = by_label.get(lab)
+            if app_item:
+                append_models(app_item)
+
     return tuple(links)
 
 
 def looks_like_dashboard_layout(raw: Any) -> bool:
-    """
-    Проверяет формат LUCUS_DASHBOARD вида `[{ "classes": "...", "sections": [...] }, ...]`.
-
-    Args:
-        raw: Любое значение из настроек.
-
-    Returns:
-        `True`, если формат похож на полный layout-конфиг.
-    """
+    """True if ``raw`` looks like ``[{ "classes"?, "sections": [...] }, ...]``."""
     if not isinstance(raw, (list, tuple)) or not raw:
         return False
     first = raw[0]
@@ -182,15 +197,7 @@ def looks_like_dashboard_layout(raw: Any) -> bool:
 
 
 def looks_like_groups_config(raw: Any) -> bool:
-    """
-    Проверяет формат конфигурации групп.
-
-    Args:
-        raw: Любое значение из настроек.
-
-    Returns:
-        `True`, если формат похож на групповой конфиг.
-    """
+    """True if first entry has ``column`` and ``app_labels`` and/or ``links``."""
     if not isinstance(raw, (list, tuple)) or not raw:
         return False
     first = raw[0]
@@ -202,15 +209,7 @@ def looks_like_groups_config(raw: Any) -> bool:
 
 
 def normalize_group_columns(groups: Iterable[dict[str, Any]]) -> tuple[dict[str, Any], ...]:
-    """
-    Нормализует поле `column` в группах: ожидается 1-based, значения меньше 1 приводятся к 1.
-
-    Args:
-        groups: Итерабельное значение с группами.
-
-    Returns:
-        Кортеж групп, где `column` всегда >= 1.
-    """
+    """Clamp each group's ``column`` to at least 1 (1-based index)."""
     groups_list = list(groups)
     normalized: list[dict[str, Any]] = []
     for g in groups_list:
@@ -221,22 +220,18 @@ def normalize_group_columns(groups: Iterable[dict[str, Any]]) -> tuple[dict[str,
     return tuple(normalized)
 
 
+def _raw_admin_app_list(request):
+    """Return ``get_app_list`` (same grouping as sidebar if patched)."""
+    return admin.site.get_app_list(request)
+
+
 def grouped_dashboard_from_app_list(
     request,
     *,
     groups: Iterable[dict[str, Any]] | None = None,
 ) -> tuple[DashboardColumn, ...]:
-    """
-    Строит dashboard по списку админских приложений и конфигу групп.
-
-    Args:
-        request: Текущий HTTP-запрос (нужен для `admin.site.get_app_list`).
-        groups: Опциональные группы конфигурации (иначе берутся из `settings.LUCUS_DASHBOARD`).
-
-    Returns:
-        Кортеж колонок dashboard.
-    """
-    app_list = admin.site.get_app_list(request)
+    """Build grouped dashboard columns from ``get_app_list`` and optional ``groups``."""
+    app_list = _raw_admin_app_list(request)
 
     groups = (
         groups
@@ -268,32 +263,53 @@ def grouped_dashboard_from_app_list(
         ("constance", "Config"): _("Константы"),
     }
 
-    explicit_links_mode = any(g.get("links") for g in groups)
+    known_labels = frozenset(
+        (a.get("app_label") or "") for a in app_list if (a.get("app_label") or "")
+    )
 
     for g in groups:
-        if g.get("links"):
-            links: list[DashboardLink] = []
-            for link in g.get("links") or []:
-                url = link.get("url")
-                if not url and link.get("admin_urlname"):
-                    url = safe_reverse(link["admin_urlname"])
-                if not url:
-                    continue
-                links.append(DashboardLink(label=link.get("label", ""), url=url))
-            links_tuple = tuple(links)
+        seen_urls: set[str] = set()
+        merged: list[DashboardLink] = []
+        for link in g.get("links") or []:
+            url = link.get("url")
+            if not url and link.get("admin_urlname"):
+                url = safe_reverse(link["admin_urlname"])
+            if not url or url in seen_urls:
+                continue
+            seen_urls.add(url)
+            merged.append(DashboardLink(label=link.get("label", ""), url=url))
+        raw_labels = g.get("app_labels")
+        if raw_labels is None:
+            label_arg: set[str] | Sequence[str] = frozenset()
+        elif isinstance(raw_labels, (set, frozenset)):
+            label_arg = raw_labels
         else:
-            app_labels = set(g.get("app_labels") or [])
-            links_tuple = links_for_apps(app_list, app_labels, label_overrides=label_overrides)
+            label_arg = raw_labels
+        for dl in links_for_apps(app_list, label_arg, label_overrides=label_overrides):
+            if dl.url not in seen_urls:
+                seen_urls.add(dl.url)
+                merged.append(dl)
+        links_tuple = tuple(merged)
 
         if not links_tuple:
             continue
 
-        # column в конфиге 1-based -> индекс в массиве 0-based
         cols[int(g.get("column", 1)) - 1].append(DashboardSection(title=g.get("title", ""), links=links_tuple))
 
-    # Если явно заданы `links`, не добавляем ничего “сверху” автоматически.
-    if not explicit_links_mode:
-        covered = set().union(*(set(g.get("app_labels") or []) for g in groups))
+    if getattr(settings, "LUCUS_DASHBOARD_APPEND_UNCOVERED", True):
+        covered: set[str] = set()
+        for g in groups:
+            raw = g.get("app_labels")
+            if isinstance(raw, (set, frozenset)):
+                covered.update(raw)
+            elif isinstance(raw, (list, tuple)):
+                covered.update(raw)
+            for link in g.get("links") or []:
+                an = link.get("admin_urlname")
+                if an and safe_reverse(an):
+                    lab = _infer_app_label_from_admin_urlname(an, known_labels)
+                    if lab:
+                        covered.add(lab)
 
         for app_item in app_list:
             app_label = (app_item.get("app_label") or "")
@@ -312,25 +328,21 @@ def grouped_dashboard_from_app_list(
 
 def get_dashboard_for_request(request) -> tuple[DashboardColumn, ...]:
     """
-    Конфигурация dashboard для admin index.
+    Build dashboard columns for the admin index.
 
-    Important:
-        Настройка переопределяется через `settings.LUCUS_DASHBOARD`.
-
-    Args:
-        request: Текущий HTTP-запрос.
-
-    Returns:
-        Колонки dashboard.
+    Reads ``settings.LUCUS_DASHBOARD`` (layout or column groups). Groups may mix
+    ``links`` and ``app_labels``; duplicate URLs are omitted. If
+    ``LUCUS_DASHBOARD_APPEND_UNCOVERED`` is true, apps not covered by groups are
+    appended to the last column. If ``LUCUS_DASHBOARD`` is absent, falls back to
+    grouped defaults from ``get_app_list``.
     """
+
     raw = getattr(settings, "LUCUS_DASHBOARD", None)
 
     if raw and looks_like_dashboard_layout(raw):
-        # Полная раскладка дашборда (старый/отдельный формат)
         return normalize_config(raw)
 
     if raw and looks_like_groups_config(raw):
-        # Конфигурация групп приложений для карточек на index
         return grouped_dashboard_from_app_list(request, groups=raw)
 
     return grouped_dashboard_from_app_list(request)

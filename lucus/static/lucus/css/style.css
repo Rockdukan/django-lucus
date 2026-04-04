@@ -22,35 +22,14 @@
 /* ------------------------------------------------------------------ */
 /*                                BASE                                */
 /* ------------------------------------------------------------------ */
+/* Spacing scale. Palette: static/lucus/css/<LUCUS_COLOR_SCHEME>.css */
 :root {
   --phi: 1.618;
   --u: 16px;
   --s: calc(var(--u) / var(--phi));
-  --m: var(--u);                      
+  --m: var(--u);
   --l: calc(var(--u) * var(--phi));
   --xl: calc(var(--l) * var(--phi));
-  --color-bg-page: #F2F4F1;
-  --color-surface: #FFFFFF;
-  --color-surface-secondary: #DDE3DB;
-  --color-brand-primary: #4A6741;
-  --color-text-primary: #2A2C29;
-  --color-text-muted: #6B7068;
-  --color-border: #C8D1C5;
-}
-
-:root {
-  --bg-page: var(--color-bg-page);
-  --bg-module: var(--color-surface);
-  --bg-header: var(--color-surface-secondary);
-  --text-main: var(--color-text-primary);
-  --text-header: #FFFFFF;
-  --color-accent: var(--color-brand-primary);
-  --color-accent-hover: var(--color-brand-primary);
-  --color-link: var(--color-brand-primary);
-}
-
-:root {
-  --lucus-shadow: 0 2px 8px rgba(42, 44, 41, 0.05);
 }
 
 *,
@@ -226,24 +205,6 @@ small {
 /* ------------------------------------------------------------------ */
 /*                        ADMIN THEME / HEADER                        */
 /* ------------------------------------------------------------------ */
-:root,
-html[data-theme="light"] {
-  --button-bg: #4A6741;
-  --button-hover-bg: #3d5636;
-  --default-button-bg: #4A6741;
-  --default-button-hover-bg: #3d5636;
-  --link-fg: #4A6741;
-  --link-hover-color: #3d5636;
-  --link-selected-fg: #4A6741;
-}
-
-html,
-html[data-theme="dark"],
-html[data-theme="auto"] {
-  --body-bg: var(--color-bg-page) !important;
-  --body-fg: var(--color-text-primary) !important;
-  color-scheme: light !important;
-}
 
 #toggle-nav-sidebar,
 .toggle-nav-sidebar {
@@ -307,7 +268,7 @@ html[data-theme="auto"] {
 }
 #header .lucus-header__breadcrumbs .breadcrumbs a,
 .lucus-header__breadcrumbs .breadcrumbs a {
-  color: #4A6741 !important;
+  color: var(--lucus-accent) !important;
   font-weight: 400;
   text-decoration: none !important;
   display: inline !important;
@@ -316,22 +277,22 @@ html[data-theme="auto"] {
   text-decoration: underline !important;
 }
 .lucus-header__breadcrumbs .breadcrumbs {
-  color: #2A2C29;
+  color: var(--color-text-primary);
   font-weight: 400;
 }
 .lucus-header__breadcrumbs .breadcrumbs .lucus-breadcrumb-current {
   font-weight: 600;
-  color: #2A2C29;
+  color: var(--color-text-primary);
 }
 .lucus-header__breadcrumbs .breadcrumbs .lucus-breadcrumb-sep {
-  color: #C8D1C5;
+  color: var(--color-border);
   margin: 0 var(--s);
   font-weight: 400;
   pointer-events: none;
 }
 .lucus-header__breadcrumbs .breadcrumbs .breadcrumb-sep,
 .lucus-header__breadcrumbs .breadcrumbs .rsaquo {
-  color: #C8D1C5;
+  color: var(--color-border);
   margin: 0 var(--s);
   font-weight: 400;
 }
@@ -686,7 +647,7 @@ body {
   line-height: 32px !important;
   padding: 0 10px !important;
   background: var(--color-brand-primary) !important;
-  color: #FFFFFF !important;
+  color: var(--color-surface) !important;
   border: none !important;
   border-radius: 8px !important;
   font-size: var(--m);
@@ -703,7 +664,7 @@ body {
 #content .submit-row input[type="submit"]:focus,
 #content .submit-row input.default:focus {
   background: var(--color-brand-primary) !important;
-  color: #FFFFFF !important;
+  color: var(--color-surface) !important;
 }
 
 /* ------------------------------------------------------------------ */
@@ -722,7 +683,7 @@ body {
   line-height: 32px !important;
   background: var(--color-surface) !important;
   color: var(--color-text-primary) !important;
-  border: 1px solid #C8D1C5 !important;
+  border: 1px solid var(--color-border) !important;
   border-radius: 8px !important;
   box-shadow: none !important;
   font-size: var(--m);
@@ -738,7 +699,7 @@ body {
   line-height: 32px !important;
   background: var(--color-surface) !important;
   color: var(--color-text-primary) !important;
-  border: 1px solid #C8D1C5 !important;
+  border: 1px solid var(--color-border) !important;
   border-radius: 8px !important;
   box-shadow: none !important;
   font-size: var(--m);
@@ -756,7 +717,7 @@ body {
   min-height: 84px !important;
   padding: 10px !important;
   line-height: var(--phi);
-  border: 1px solid #C8D1C5 !important;
+  border: 1px solid var(--color-border) !important;
   border-radius: 8px !important;
   box-shadow: none !important;
   resize: vertical;
@@ -853,7 +814,7 @@ body {
 .form-row .help,
 #content .aligned .form-row div.help,
 #content .aligned .form-row p.help {
-  color: #6B7068 !important;
+  color: var(--color-text-muted) !important;
   font-size: 11px !important;
   margin-top: 4px !important;
   margin-left: 0 !important;
@@ -872,15 +833,15 @@ body {
   width: 16px;
   height: 16px;
   min-width: 16px;
-  border: 1px solid #C8D1C5;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
-  background: #FFFFFF;
+  background: var(--color-surface);
   vertical-align: middle;
   cursor: pointer;
 }
 #content input[type="checkbox"]:checked {
-  background: #4A6741;
-  border-color: #4A6741;
+  background: var(--lucus-accent);
+  border-color: var(--lucus-accent);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' d='M1 4l3 3 5-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
@@ -891,15 +852,15 @@ body {
   width: 16px;
   height: 16px;
   min-width: 16px;
-  border: 1px solid #C8D1C5;
+  border: 1px solid var(--color-border);
   border-radius: 50%;
-  background: #FFFFFF;
+  background: var(--color-surface);
   vertical-align: middle;
   cursor: pointer;
 }
 #content input[type="radio"]:checked {
-  background: #4A6741;
-  border-color: #4A6741;
+  background: var(--lucus-accent);
+  border-color: var(--lucus-accent);
   background-image: radial-gradient(circle, #fff 0, #fff 3px, transparent 3px);
   background-size: 16px 16px;
   background-position: center;
@@ -999,8 +960,8 @@ body.login {
   line-height: 32px !important;
   padding: 0 10px !important;
   border-radius: 8px !important;
-  border: 1px solid #C8D1C5 !important;
-  border-bottom-color: #C8D1C5 !important;
+  border: 1px solid var(--color-border) !important;
+  border-bottom-color: var(--color-border) !important;
   box-shadow: none !important;
   background: var(--color-surface) !important;
   color: var(--color-text-primary) !important;
@@ -1034,7 +995,7 @@ body.login {
   max-width: none !important;
   box-sizing: border-box !important;
   background: var(--color-brand-primary) !important;
-  color: #FFFFFF !important;
+  color: var(--color-surface) !important;
   border: none !important;
   border-radius: 8px !important;
   font-size: var(--m);
@@ -1044,7 +1005,7 @@ body.login {
 }
 .login .submit-row input:hover {
   background: var(--color-brand-primary) !important;
-  color: #FFFFFF !important;
+  color: var(--color-surface) !important;
 }
 
 .login .password-reset-link a {
@@ -1100,9 +1061,9 @@ body.login {
   background-image: none !important;
 }
 #content ul.messagelist li.success {
-  background: #DDE3DB !important;
+  background: var(--color-surface-secondary) !important;
   color: yellow !important;
-  border: 1px solid #4A6741;
+  border: 1px solid var(--lucus-accent);
 }
 
 
@@ -1318,7 +1279,7 @@ body.rosetta-page .lucus-rosetta .object-tools a {
 body.rosetta-page .lucus-rosetta .object-tools li.active a,
 body.rosetta-page .lucus-rosetta .object-tools a:hover {
   background: var(--color-brand-primary) !important;
-  color: #FFFFFF !important;
+  color: var(--color-surface) !important;
   border-color: var(--color-brand-primary);
 }
 body.rosetta-page .lucus-rosetta .module a:not(.object-tools a) {
@@ -1497,7 +1458,7 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
 }
 #content .paginator .this-page {
   background: var(--color-brand-primary) !important;
-  color: #FFFFFF !important;
+  color: var(--color-surface) !important;
   border-color: var(--color-brand-primary);
 }
 #content .paginator a:hover,
@@ -1634,7 +1595,7 @@ body.change-list-page .lucus-changelist__actions .button,
   line-height: 1.25 !important;
   padding: 0 12px !important;
   background: var(--color-brand-primary) !important;
-  color: #FFFFFF !important;
+  color: var(--color-surface) !important;
   border: none !important;
   border-radius: 8px !important;
   font-size: 13px !important;
@@ -1650,7 +1611,7 @@ body.change-list-page button[type="submit"]:hover,
 #content .lucus-changelist__actions button:hover,
 #content #toolbar form input[type="submit"]:hover {
   background: var(--color-brand-primary) !important;
-  color: #FFFFFF !important;
+  color: var(--color-surface) !important;
 }
 
 body.change-list-page .lucus-changelist a,
@@ -1687,21 +1648,6 @@ body.change-list-page .lucus-changelist__date-hierarchy a:hover,
 /* ------------------------------------------------------------------ */
 /*                     MERGED ADMIN OVERRIDES                         */
 /* ------------------------------------------------------------------ */
-/* Lucus: merged from lucus_overrides.css for single entrypoint. */
-:root,
-html[data-theme="light"],
-html[data-theme="dark"] {
-  --button-bg: #4A6741;
-  --button-hover-bg: #3d5636;
-  --default-button-bg: #4A6741;
-  --default-button-hover-bg: #3d5636;
-  --link-fg: #4A6741;
-  --link-hover-color: #3d5636;
-  --link-selected-fg: #4A6741;
-  --hairline-color: #C8D1C5;
-  --border-color: #C8D1C5;
-  --darkened-bg: #F2F4F1;
-}
 
 body.change-list-page input[type="submit"],
 body.change-list-page button[type="submit"],
@@ -1722,7 +1668,7 @@ body.change-list-page .lucus-changelist__actions .button,
   min-height: 32px !important;
   line-height: 1.25 !important;
   padding: 0 12px !important;
-  background: #4A6741 !important;
+  background: var(--lucus-accent) !important;
   color: #fff !important;
   border: none !important;
   border-radius: 8px !important;
@@ -1738,7 +1684,7 @@ body.change-list-page button[type="submit"]:hover,
 #content-main #changelist-form button[type="submit"]:hover,
 #content-main .lucus-changelist__actions input[type="submit"]:hover,
 #content-main .lucus-changelist__actions button:hover {
-  background: #3d5636 !important;
+  background: var(--lucus-accent-hover) !important;
   color: #fff !important;
 }
 
@@ -1750,7 +1696,7 @@ body.change-list-page .lucus-changelist__date-hierarchy a,
 #content-main .lucus-changelist .results a,
 #content-main .lucus-changelist__filters a,
 #content-main .lucus-changelist__date-hierarchy a {
-  color: #4A6741 !important;
+  color: var(--lucus-accent) !important;
 }
 
 body.change-list-page .lucus-changelist a:hover,
@@ -1764,7 +1710,7 @@ body.change-list-page .lucus-changelist .results a:hover,
 
 #content .submit-row,
 body.change-form-page .submit-row {
-  background: var(--color-bg-page, #F2F4F1) !important;
+  background: var(--color-bg-page) !important;
   border: none !important;
   border-radius: 0 !important;
 }
@@ -1779,7 +1725,7 @@ body.change-form-page .submit-row button[type="submit"] {
   min-height: 32px !important;
   line-height: 1.25 !important;
   padding: 0 12px !important;
-  background: #4A6741 !important;
+  background: var(--lucus-accent) !important;
   color: #fff !important;
   border: none !important;
   border-radius: 8px !important;
@@ -1795,15 +1741,15 @@ body.change-form-page .submit-row button[type="submit"] {
 body.change-form-page .submit-row input[type="submit"]:hover,
 body.change-form-page .submit-row input.default:hover,
 body.change-form-page .submit-row button[type="submit"]:hover {
-  background: #3d5636 !important;
+  background: var(--lucus-accent-hover) !important;
   color: #fff !important;
 }
 
 #content .submit-row a.deletelink,
 body.change-form-page .submit-row a.deletelink {
-  color: #4A6741 !important;
+  color: var(--lucus-accent) !important;
   background: transparent !important;
-  border: 1px solid #4A6741 !important;
+  border: 1px solid var(--lucus-accent) !important;
   border-radius: 8px !important;
   padding: 0 12px !important;
   height: 32px !important;
@@ -1825,13 +1771,13 @@ body.change-form-page .submit-row a.deletelink:focus {
 #content .add-row,
 .inline-group div.add-row,
 .inline-group .tabular tr.add-row td {
-  background: var(--color-bg-page, #F2F4F1) !important;
+  background: var(--color-bg-page) !important;
   border-bottom: 1px solid var(--hairline-color) !important;
 }
 
 .inline-group div.add-row a,
 .inline-group .tabular tr.add-row td a {
-  color: #4A6741 !important;
+  color: var(--lucus-accent) !important;
 }
 
 body.change-form-page #content .lucus-form-sections .module:last-child,
@@ -1870,7 +1816,7 @@ body.change-list-page .object-tools a.addlink:visited,
   min-height: 32px !important;
   line-height: 32px !important;
   padding: 0 12px !important;
-  background: #4A6741 !important;
+  background: var(--lucus-accent) !important;
   color: #fff !important;
   border: none !important;
   border-radius: 8px !important;
@@ -1884,7 +1830,7 @@ body.change-list-page .object-tools a.addlink:hover,
 body.change-list-page .object-tools a.addlink:focus,
 #content .object-tools a.addlink:hover,
 #content .object-tools a.addlink:focus {
-  background: #3d5636 !important;
+  background: var(--lucus-accent-hover) !important;
   color: #fff !important;
   text-decoration: none !important;
 }

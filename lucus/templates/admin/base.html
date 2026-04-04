@@ -12,7 +12,7 @@
     {% block dark-mode-vars %}{% endblock %}
 
     {% block extrastyle %}
-      {# Standard Django admin CSS (мы больше не наследуемся от admin/base.html). #}
+      {# Django admin stylesheets (Lucus base does not extend admin/base.html). #}
       <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
       <link rel="stylesheet" href="{% static 'admin/css/dark_mode.css' %}">
       <link rel="stylesheet" href="{% static 'admin/css/unusable_password_field.css' %}">
@@ -25,8 +25,14 @@
       <link rel="stylesheet" href="{% static 'admin/css/constance.css' %}">
       <link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
 
-      {# Lucus styles (single scaffold entrypoint). #}
+      {# Lucus: style.css, LUCUS_COLOR_SCHEME stylesheet, LUCUS_EXTRA_STATIC_CSS. #}
       <link rel="stylesheet" href="{% static 'lucus/css/style.css' %}">
+      <link rel="stylesheet" href="{% static lucus_scheme_stylesheet|default:'lucus/css/olivia.css' %}">
+      {% if lucus_extra_stylesheets %}
+      {% for lucus_extra_stylesheet in lucus_extra_stylesheets %}
+      <link rel="stylesheet" href="{% static lucus_extra_stylesheet %}">
+      {% endfor %}
+      {% endif %}
     {% endblock %}
 
     {% block responsive %}

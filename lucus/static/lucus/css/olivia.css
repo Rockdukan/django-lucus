@@ -1,0 +1,73 @@
+@charset "UTF-8";
+
+/* Color scheme: olivia. Loaded after style.css when LUCUS_COLOR_SCHEME is "olivia". */
+
+:root {
+  --color-bg-page: #f2f4f1;
+  --color-surface: #ffffff;
+  --color-surface-secondary: #dde3db;
+  --color-brand-primary: #4a6741;
+  --color-brand-hover: #3d5636;
+  --color-text-primary: #2a2c29;
+  --color-text-muted: #6b7068;
+  --color-border: #c8d1c5;
+}
+
+:root {
+  --bg-page: var(--color-bg-page);
+  --bg-module: var(--color-surface);
+  --bg-header: var(--color-surface-secondary);
+  --text-main: var(--color-text-primary);
+  --text-header: #ffffff;
+  --color-accent: var(--color-brand-primary);
+  --color-accent-hover: var(--color-brand-hover);
+  --color-link: var(--color-brand-primary);
+}
+
+:root {
+  --lucus-shadow: 0 2px 8px rgba(42, 44, 41, 0.05);
+  --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 45%, transparent);
+}
+
+html[data-theme="dark"] {
+  --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 55%, transparent);
+}
+
+:root {
+  --lucus-accent: var(--color-brand-primary);
+  --lucus-accent-hover: var(--color-brand-hover);
+}
+
+:root,
+html[data-theme="light"] {
+  --button-bg: var(--lucus-accent);
+  --button-hover-bg: var(--lucus-accent-hover);
+  --default-button-bg: var(--lucus-accent);
+  --default-button-hover-bg: var(--lucus-accent-hover);
+  --link-fg: var(--lucus-accent);
+  --link-hover-color: var(--lucus-accent-hover);
+  --link-selected-fg: var(--lucus-accent);
+}
+
+html,
+html[data-theme="dark"],
+html[data-theme="auto"] {
+  --body-bg: var(--color-bg-page) !important;
+  --body-fg: var(--color-text-primary) !important;
+  color-scheme: light !important;
+}
+
+:root,
+html[data-theme="light"],
+html[data-theme="dark"] {
+  --button-bg: var(--lucus-accent);
+  --button-hover-bg: var(--lucus-accent-hover);
+  --default-button-bg: var(--lucus-accent);
+  --default-button-hover-bg: var(--lucus-accent-hover);
+  --link-fg: var(--lucus-accent);
+  --link-hover-color: var(--lucus-accent-hover);
+  --link-selected-fg: var(--lucus-accent);
+  --hairline-color: var(--color-border);
+  --border-color: var(--color-border);
+  --darkened-bg: var(--color-bg-page);
+}

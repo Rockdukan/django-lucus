@@ -1,0 +1,75 @@
+@charset "UTF-8";
+
+/* Color scheme: grey. Loaded when LUCUS_COLOR_SCHEME is "grey". */
+
+:root {
+  --color-bg-page: #eeeeee;
+  --color-surface: #ffffff;
+  --color-surface-secondary: #e0e0e0;
+  --color-brand-primary: #309bbf;
+  --color-brand-hover: #2a87a8;
+  --color-link: #309bbf;
+  --color-link-hover: #444444;
+  --color-link-soft-hover: #59afcc;
+  --color-text-primary: #444444;
+  --color-text-muted: #888888;
+  --color-border: #cccccc;
+}
+
+:root {
+  --bg-page: var(--color-bg-page);
+  --bg-module: var(--color-surface);
+  --bg-header: var(--color-surface-secondary);
+  --text-main: var(--color-text-primary);
+  --text-header: #ffffff;
+  --color-accent: var(--color-brand-primary);
+  --color-accent-hover: var(--color-brand-hover);
+}
+
+:root {
+  --lucus-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 45%, transparent);
+}
+
+html[data-theme="dark"] {
+  --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 55%, transparent);
+}
+
+:root {
+  --lucus-accent: var(--color-brand-primary);
+  --lucus-accent-hover: var(--color-brand-hover);
+}
+
+:root,
+html[data-theme="light"] {
+  --button-bg: var(--lucus-accent);
+  --button-hover-bg: var(--lucus-accent-hover);
+  --default-button-bg: var(--lucus-accent);
+  --default-button-hover-bg: var(--lucus-accent-hover);
+  --link-fg: var(--color-link);
+  --link-hover-color: var(--color-link-hover);
+  --link-selected-fg: var(--color-link);
+}
+
+html,
+html[data-theme="dark"],
+html[data-theme="auto"] {
+  --body-bg: var(--color-bg-page) !important;
+  --body-fg: var(--color-text-primary) !important;
+  color-scheme: light !important;
+}
+
+:root,
+html[data-theme="light"],
+html[data-theme="dark"] {
+  --button-bg: var(--lucus-accent);
+  --button-hover-bg: var(--lucus-accent-hover);
+  --default-button-bg: var(--lucus-accent);
+  --default-button-hover-bg: var(--lucus-accent-hover);
+  --link-fg: var(--color-link);
+  --link-hover-color: var(--color-link-hover);
+  --link-selected-fg: var(--color-link);
+  --hairline-color: var(--color-border);
+  --border-color: var(--color-border);
+  --darkened-bg: var(--color-bg-page);
+}

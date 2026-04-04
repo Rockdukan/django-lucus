@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-lucus"
-version = "0.1.0"
+version = "0.2.0"
 description = "Lucus enhances Django Admin with custom templates, static theming, and a multi-column dashboard."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { file = "lucus/LICENSE" }
+license = { file = "LICENSE" }
 authors = [{ name = "Rockdukan" }]
 keywords = ["django", "admin", "dashboard", "templates", "static"]
 classifiers = [
