@@ -1,102 +1,89 @@
-# Lucus (Django Admin)
+# Lucus (Django admin theme)
 
-**Read this in another language:** [Русский](README.ru.md)
+[Русский](README.ru.md)
 
-**Lucus** restyles **django.contrib.admin**: a standalone admin base template, Lucus-owned static (including vendored admin structural CSS under `lucus/static/`), per-user color scheme + appearance, and a configurable multi-column dashboard on `/admin/`. The Django nav sidebar is disabled; change-form actions use a fixed bottom bar.
+Admin skin: Lucus `base.html`, bundled CSS (`lucus/css/style.css`, `lucus-admin.css`), per-user palette + light/dark/auto (`LucusAdminUiPreference`), `/admin/` dashboard config. Nav sidebar off; changelist actions + change-form save row pinned to viewport bottom.
 
-![Lucus dashboard](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_1.jpg)
-![Lucus dashboard](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_2.jpg)
-![Lucus dashboard](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_3.jpg)
+![Lucus](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_1.jpg)
+![Lucus](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_2.jpg)
+![Lucus](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_3.jpg)
 
 ## Requirements
 
 - Python 3.10+
-- Django 5.2+ (see package metadata: `django>=5.2,<7`)
+- Django `>=5.2,<7` (see `pyproject.toml`)
 
-## Installation
+## Install
 
 ```bash
 pip install django-lucus
 ```
 
-Package import name: `lucus`. PyPI project name: **django-lucus**.
+Import: `lucus`. PyPI: **django-lucus**.
 
-## Quick start
-
-Add **Lucus before** `django.contrib.admin` so its templates win:
+## Setup
 
 ```python
 INSTALLED_APPS = [
     # ...
     "lucus",
     "django.contrib.admin",
-    # ...
 ]
 ```
-
-Templates and static files ship with the package; run `collectstatic` in production as usual.
-
-After upgrading, run migrations so `LucusAdminUiPreference` exists:
 
 ```bash
 python manage.py migrate lucus_admin
 ```
 
-## Settings reference
+Production: `collectstatic` as usual.
 
-| Setting | Type | Default | Description |
-|--------|------|---------|-------------|
-| `SITE_NAME` | `str` | `"Site"` | Used in `LUCUS_ADMIN_SITE_HEADER_TEMPLATE` and optionally as `site_title` |
-| `LUCUS_ADMIN_SITE_HEADER_TEMPLATE` | `str` | `"Administration — {site}"` | Passed to `str.format(site=SITE_NAME)` for `admin.site.site_header`. Use only `{site}` unless you escape other braces. |
-| `LUCUS_ADMIN_SITE_TITLE_USE_SITE_NAME` | `bool` | `True` | If `True`, `admin.site.site_title` = `SITE_NAME` |
-| *(none)* | — | — | **Color scheme** is not a project setting: staff choose **palette + appearance** (light / dark / auto) from header dropdowns; choices are stored in **`LucusAdminUiPreference`** per user. Bundled palettes: `olivia`, `grey`, `slate`, `dune`, `midnight` (`lucus/static/lucus/css/<slug>.css`). |
-| `LUCUS_UI` | `dict` | see below | Flags: `help_as_icon`, `high_contrast_toggle` (default `True`). Change-form save bar and changelist actions bar are fixed to the **viewport** bottom. |
-| `LUCUS_EXTRA_STATIC_CSS` | `str` \| `list` \| `tuple` | `()` | Extra stylesheet paths (relative to static roots), loaded after the scheme. No `..` or leading `/`. |
-| `LUCUS_EMPTY_VALUE_DISPLAY_WRAP` | `bool` | `True` | Wrap empty changelist cells in `<span class="lucus-admin-empty">` |
-| `LUCUS_EMPTY_VALUE_PLACEHOLDER` | `str` | `"—"` | Text for `empty_value_display` |
-| `LUCUS_ACTIONS_ON_BOTTOM` | `bool` | `True` | Sets **`ModelAdmin.actions_on_bottom = True` on the class** (global for the process) |
-| `LUCUS_DASHBOARD` | `list` \| `None` | `None` | Dashboard config (see [Dashboard](#dashboard-lucus_dashboard)); if unset, grouped defaults apply |
-| `LUCUS_DASHBOARD_APPEND_UNCOVERED` | `bool` | `True` | In **grouped** mode: append apps not “covered” by groups into the **last** column |
+## Settings
 
-Theme context is built by `lucus.theme.lucus_admin_extra_context(request)` and merged in `admin.site.each_context`.
+| Setting | Type | Default | Effect |
+|---------|------|---------|--------|
+| `SITE_NAME` | `str` | `"Site"` | `LUCUS_ADMIN_SITE_HEADER_TEMPLATE` / `site_title` |
+| `LUCUS_ADMIN_SITE_HEADER_TEMPLATE` | `str` | `"Administration — {site}"` | `admin.site.site_header` = `.format(site=SITE_NAME)`; use only `{site}` or escape other `{}` |
+| `LUCUS_ADMIN_SITE_TITLE_USE_SITE_NAME` | `bool` | `True` | `admin.site.site_title` = `SITE_NAME` if true |
+| `LUCUS_ADMIN_BACKGROUND_IMAGE` | `str` / `Path` | `""` | Full-page background: `http(s)://`, `//`, site path `/…`, or static path (no `..`) |
+| `LUCUS_ADMIN_BACKGROUND_SCRIM_OPACITY` | `float` | `0.88` | Theme overlay on image, `0.0`…`1.0` |
+| `LUCUS_ADMIN_LANGUAGE_SELECTOR` | `bool` | *(auto)* | `False` → hide header language `<select>`. Shown only if `USE_I18N`, `len(LANGUAGES) > 1`, `LocaleMiddleware`, `set_language` URL exists |
+| `LUCUS_ADMIN_SITE_SELECTOR` | `bool` | *(auto)* | `False` → hide `django.contrib.sites` header switcher. Shown if sites app + ≥2 `Site` rows |
+| `LUCUS_UI` | `dict` | `{}` | See below |
+| `LUCUS_EXTRA_STATIC_CSS` | `str` / `list` / `tuple` | `()` | Extra CSS paths after palette; no `..`, no leading `/` |
+| `LUCUS_EMPTY_VALUE_DISPLAY_WRAP` | `bool` | `True` | Wrap empty changelist cells in `lucus-admin-empty` |
+| `LUCUS_EMPTY_VALUE_PLACEHOLDER` | `str` | `"—"` | `empty_value_display` text |
+| `LUCUS_ACTIONS_ON_BOTTOM` | `bool` | `True` | Set `ModelAdmin.actions_on_bottom` on the class |
+| `LUCUS_ACTIONS_ON_TOP` | `bool` | `True` | Set `ModelAdmin.actions_on_top` on the class |
+| `LUCUS_DASHBOARD` | `list` / `None` | `None` | Dashboard; `None` → built-in grouped layout |
+| `LUCUS_DASHBOARD_APPEND_UNCOVERED` | `bool` | `True` | Grouped mode: append uncovered apps to last column |
 
-## Dashboard: `LUCUS_DASHBOARD`
+**Palette / appearance:** not in `settings`. Stored per user in `LucusAdminUiPreference`. Slugs: `olivia`, `grey`, `slate`, `dune`, `midnight`, `nord`, `dracula`, `github`, `catppuccin`, `tokyo` → `lucus/static/lucus/css/<slug>.css`. Context: `lucus.theme.lucus_admin_extra_context` → `admin.site.each_context`.
 
-Lucus detects one of two shapes (`lucus.dashboard`: `looks_like_dashboard_layout`, `looks_like_groups_config`).
+### `LUCUS_UI`
 
-Template context: **`lucus_dashboard_columns`** — `tuple[DashboardColumn, ...]` from `get_dashboard_for_request(request)`.
+| Key | Default | Effect |
+|-----|---------|--------|
+| `help_as_icon` | `True` | Field `help_text` behind a `?` / `<details>` |
+| `high_contrast_toggle` | `False` | User menu “High contrast” (`localStorage` + `data-lucus-contrast` on `<html>`) |
 
-Links in a section can use:
+Example:
 
-- `url` — explicit URL  
-- `admin_urlname` — e.g. `admin:app_model_changelist` (resolved with `reverse()`)
+```python
+LUCUS_UI = {
+    "help_as_icon": True,
+    "high_contrast_toggle": False,
+}
+```
 
-A section is shown only if at least one link resolves.
+## `LUCUS_DASHBOARD`
 
-### Mode 1: layout columns
+Context: `lucus_dashboard_columns` from `get_dashboard_for_request`. Section link: `{"label", "url"}` or `{"label", "admin_urlname"}` (e.g. `admin:app_model_changelist`). Section omitted if no link resolves.
 
-List of dicts with `classes` and/or `sections`. Optional **`column`** in `1..4`: multiple dicts with the same `column` are **merged** (sections concatenated; `classes` from the first dict for that column wins). Column index is clamped to **1–4**.
+**Layout mode:** `[{ "column"?: 1–4, "classes"?: str, "sections": [{ "title", "links": [...] }] }, …]`. Same `column` → merge sections; `classes` from first dict.
 
-### Mode 2: column groups
+**Groups mode:** `[{ "column", "title", "links"?: [...], "app_labels"?: set|list|tuple|frozenset }, …]`. `links` first, then models from `app_labels`; duplicate URLs dropped. `list`/`tuple` `app_labels` → order kept; `set` → `get_app_list` order.
 
-List of dicts with:
-
-- **`column`** (1-based, clamped to ≥ 1; practical grid **1–4**)
-- **`title`** — card heading
-- **`links`** — optional list of `{"label", "admin_urlname"|"url"}`
-- **`app_labels`** — optional `set`, `frozenset`, `list`, or `tuple` of `app_label` strings
-
-Rules:
-
-- Within a group, explicit `links` are listed first (in order), then models from `app_labels`. **URLs are deduplicated.**
-- For **`list` / `tuple`** `app_labels`, app order follows that sequence; model order matches the admin.
-- For **`set` / `frozenset`**, app order follows `get_app_list`.
-
-**Uncovered apps:** if `LUCUS_DASHBOARD_APPEND_UNCOVERED` is `True`, apps not in the “covered” set are appended to the last column. Covered includes every `app_label` mentioned in groups and apps inferred from successful `admin_urlname` values in `links` (pattern `admin:<app>_<model>_changelist`, longest `app_label` match wins). Set to **`False`** if you want only the groups you defined, with no extra column of leftovers.
-
-### Examples
-
-**Layout with explicit columns:**
+`LUCUS_DASHBOARD_APPEND_UNCOVERED`: `True` → apps not referenced by groups / inferred from `admin_urlname` go to last column; `False` → only configured groups.
 
 ```python
 LUCUS_DASHBOARD = [
@@ -116,58 +103,39 @@ LUCUS_DASHBOARD = [
 ]
 ```
 
-**Groups with `app_labels`:**
-
 ```python
 LUCUS_DASHBOARD = [
     {"column": 1, "title": "Authorization", "app_labels": {"auth"}},
 ]
 ```
 
-**Mixed `links` + `app_labels`:**
-
 ```python
 LUCUS_DASHBOARD = [
     {
         "column": 2,
         "title": "Auth",
-        "links": [
-            {"label": "Users", "admin_urlname": "admin:auth_user_changelist"},
-        ],
+        "links": [{"label": "Users", "admin_urlname": "admin:auth_user_changelist"}],
         "app_labels": ("auth",),
     },
 ]
 ```
 
-## Templates and static files
+## Static
 
-`templates/admin/base.html` is Lucus-owned. CSS load order: `lucus/css/style.css` (layout/tokens), **`lucus/css/lucus-admin.css`** (single admin UI sheet shipped with the package — no `django.contrib.admin` `<link>`), then the palette (`lucus/css/<slug>.css`, overrides tokens), then optional `LUCUS_EXTRA_STATIC_CSS`.
+Load order: `lucus/css/style.css` → `lucus/css/lucus-admin.css` → `lucus/css/<slug>.css` → `LUCUS_EXTRA_STATIC_CSS`. Admin widget JS still from `django.contrib.admin`.
 
-Admin **JavaScript** still comes from `django.contrib.admin` (`admin/js/…`) for widgets, inlines, and actions.
+Custom palette: add `static/.../lucus/css/<slug>.css` and extend `lucus.theme.BUNDLED_COLOR_SCHEMES` in your project.
 
-**Bundled palettes** (extend by shipping `static/lucus/css/<slug>.css` and forking `lucus.theme.BUNDLED_COLOR_SCHEMES` in your project if needed):
+## Package
 
-| File | Role |
-|------|------|
-| `style.css` | Spacing scale, grid, UI; accents via `var(--lucus-accent)` etc. |
-| `olivia.css` | Default green-gray palette |
-| `grey.css` | Blue-gray palette |
-| `slate.css` | Neutral slate |
-| `dune.css` | Warm sand |
-| `midnight.css` | Dark / light pairing |
+- `lucus.apps.LucusConfig` — `ready()`: headers, `each_context`, dashboard, URLs `lucus_save_ui` / `lucus_save_site`, `enable_nav_sidebar = False`, empty value display, actions flags
+- `lucus.dashboard` — config → columns
+- `lucus.models` — `LucusAdminUiPreference`
+- `lucus.theme` — schemes, `lucus_admin_extra_context`
+- `lucus.views` — POST save UI / site
 
-## Package layout
+Version: `lucus.__version__`.
 
-| Module | Role |
-|--------|------|
-| `lucus.apps.LucusConfig` | `ready()`: site headers, `each_context`, dashboard, theme prefs URL, `enable_nav_sidebar = False`, `empty_value_display`, `actions_on_bottom` |
-| `lucus.dashboard` | Config normalization, columns, links |
-| `lucus.models` | `LucusAdminUiPreference` (per-user scheme + appearance) |
-| `lucus.theme` | Bundled schemes, `lucus_admin_extra_context(request)` |
-| `lucus.views` | POST handler for saving UI preferences |
+**Sites toolbar:** for `request.site` in admin to follow the header switcher, add `lucus.sites_panel.LucusAdminSiteMiddleware` after `SessionMiddleware` (`lucus.sites_panel`).
 
-Version: `lucus.__version__` (kept in sync with package metadata on release).
-
-## Compatibility
-
-Lucus targets **Django 5.2+** and is tested against the supported 5.x / 6.x line per `pyproject.toml`.
+**Compatibility:** Django 5.2+ (`pyproject.toml`).
