@@ -128,11 +128,6 @@
                     </select>
                   </form>
                   {% endif %}
-                  {% if lucus_user_avatar_url %}
-                  <span class="lucus-header__avatar" aria-hidden="true">
-                    <img src="{{ lucus_user_avatar_url }}" alt="" width="40" height="40" loading="lazy" decoding="async">
-                  </span>
-                  {% endif %}
                   <div class="lucus-header__user" id="lucus-user-dropdown">
                     <button type="button" class="lucus-header__user-trigger" aria-expanded="false" aria-controls="lucus-user-menu" aria-haspopup="true">
                       <span class="lucus-header__user-name">{% firstof user.get_short_name user.get_username %}</span>

@@ -29,67 +29,8 @@ import re
 from typing import Any
 
 from django.conf import settings
-from django.core.exceptions import FieldDoesNotExist
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
-
-
-def _user_model_declares_avatar(model: type) -> bool:
-    try:
-        model._meta.get_field("avatar")
-        return True
-    except FieldDoesNotExist:
-        pass
-    desc = model.__dict__.get("avatar")
-    if isinstance(desc, property):
-        return True
-    try:
-        from django.utils.functional import cached_property as django_cached_property
-    except ImportError:
-        django_cached_property = None
-    if django_cached_property is not None and isinstance(desc, django_cached_property):
-        return True
-    functools_cached = getattr(__import__("functools", fromlist=["cached_property"]), "cached_property", None)
-    if functools_cached is not None and isinstance(desc, functools_cached):
-        return True
-    return False
-
-
-def _avatar_raw_to_url(request: HttpRequest, raw: Any) -> str | None:
-    if raw is None or raw is False:
-        return None
-    if hasattr(raw, "url"):
-        try:
-            u = raw.url
-        except (ValueError, OSError):
-            return None
-        if not u:
-            return None
-    else:
-        u = str(raw).strip()
-        if not u:
-            return None
-    if u.startswith("/"):
-        return request.build_absolute_uri(u)
-    return u
-
-
-def lucus_user_avatar_url(request: HttpRequest) -> str | None:
-    """
-    URL for the admin header avatar image if the user model defines ``avatar``
-    (model field or ``@property`` / ``cached_property``) and the value is non-empty.
-    """
-    user = getattr(request, "user", None)
-    if user is None or not getattr(user, "is_authenticated", False):
-        return None
-    model = user.__class__
-    if not _user_model_declares_avatar(model):
-        return None
-    try:
-        raw = getattr(user, "avatar")
-    except Exception:
-        return None
-    return _avatar_raw_to_url(request, raw)
 
 _SCHEME_RE = re.compile(r"^[a-z0-9_-]{1,64}$", re.I)
 _EXTRA_RE = re.compile(r"^[a-zA-Z0-9_./-]+$")
@@ -196,5 +137,4 @@ def lucus_admin_extra_context(request: HttpRequest) -> dict[str, Any]:
         "lucus_selected_appearance": appearance,
         "lucus_ui_help_as_icon": _ui_flag(ui_raw, "help_as_icon", True),
         "lucus_ui_high_contrast_toggle": _ui_flag(ui_raw, "high_contrast_toggle", True),
-        "lucus_user_avatar_url": lucus_user_avatar_url(request),
     }
