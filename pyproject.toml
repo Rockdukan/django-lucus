@@ -2,9 +2,12 @@
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
+# Только метаданные пакета lucus для PyPI / python -m build.
+# Зависимости демо-сайта — в requirements.txt (не дублировать сюда).
+
 [project]
 name = "django-lucus"
-version = "0.1.5"
+version = "0.1.6"
 description = "Lucus enhances Django Admin with custom templates, static theming, and a multi-column dashboard."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -22,7 +25,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-
 dependencies = [
     "django>=5.2,<7",
 ]
@@ -38,6 +40,11 @@ include-package-data = true
 where = ["."]
 include = ["lucus"]
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+pythonpath = ["."]
+testpaths = ["tests"]
+
 [tool.setuptools.package-data]
 lucus = [
     "templates/**/*.html",
@@ -48,4 +55,3 @@ lucus = [
     "locale/**/*.mo",
     "migrations/*.py",
 ]
-
