@@ -1,12 +1,22 @@
-# Lucus (оформление Django admin)
+# Lucus
 
 [English](README.md)
 
-Свой `base.html`, статика Lucus (`lucus/css/style.css`, `lucus-admin.css`), палитра и светлая/тёмная/авто на пользователя (`LucusAdminUiPreference`), настраиваемый дашборд `/admin/`. Боковая навигация Django отключена; действия changelist и панель сохранения change-form закреплены у низа viewport.
+Lucus — пакет для Django, который переоформляет `django.contrib.admin`: свой `base.html`, CSS вёрстки и один общий лист админки (`lucus/css/lucus-admin.css`) вместо подключения стандартных `admin/css/`. Палитра и режим отображения (светлая, тёмная или как в системе) выбираются в шапке и сохраняются для каждого пользователя в модели `LucusAdminUiPreference`. Главная страница `/admin/` поддерживает настраиваемый многоколоночный дашборд.
 
-![Lucus](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_1.jpg)
-![Lucus](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_2.jpg)
-![Lucus](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_3.jpg)
+Боковая панель навигации Django в админке отключена. На страницах списка объектов и редактирования записи основные действия закреплены у нижней границы окна просмотра, чтобы оставаться доступными при прокрутке.
+
+![Главная админки — тема Dune, светлое оформление, фон на весь экран](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_1.jpg)
+
+*Индекс: многоколоночный дашборд с карточками приложений (примеры: Education, Logistics, Support и др.), в шапке — палитра, оформление, сайт, язык, пользователь.*
+
+![Список объектов — тема Slate (модель Instructors)](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_2.jpg)
+
+*Changelist: «хлебные крошки», поиск, массовые действия, таблица результатов, фильтры справа.*
+
+![Форма объекта — тема Dracula, тёмное оформление](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_3.jpg)
+
+*Форма изменения: поля, закреплённая нижняя панель (сохранение и удаление). На кадре — тёмный режим; палитра и режим задаются настройками пользователя.*
 
 ## Требования
 
@@ -19,7 +29,7 @@
 pip install django-lucus
 ```
 
-Импорт: `lucus`. PyPI: **django-lucus**.
+На PyPI пакет называется **django-lucus**, в коде приложение подключается как `lucus`.
 
 ## Подключение
 
@@ -35,7 +45,7 @@ INSTALLED_APPS = [
 python manage.py migrate lucus_admin
 ```
 
-Продакшен: `collectstatic`.
+В продакшене выполните `collectstatic`, чтобы статика админки отдавалась так же, как остальные файлы.
 
 ## Настройки
 
@@ -57,7 +67,7 @@ python manage.py migrate lucus_admin
 | `LUCUS_DASHBOARD` | `list` / `None` | `None` | Дашборд; `None` — встроенная групповая сетка |
 | `LUCUS_DASHBOARD_APPEND_UNCOVERED` | `bool` | `True` | Групповой режим: непокрытые приложения в последнюю колонку |
 
-**Палитра и тема:** не в `settings`. В БД: `LucusAdminUiPreference`. Слуги: `olivia`, `grey`, `slate`, `dune`, `midnight`, `nord`, `dracula`, `github`, `catppuccin`, `tokyo` → `lucus/static/lucus/css/<slug>.css`. Контекст: `lucus.theme.lucus_admin_extra_context` в `admin.site.each_context`.
+**Палитра и оформление** не задаются в `settings`: значения хранятся в `LucusAdminUiPreference`. Встроенные слаги: `olivia`, `grey`, `slate`, `dune`, `midnight`, `nord`, `dracula`, `github`, `catppuccin`, `tokyo` — файлы `lucus/static/lucus/css/<slug>.css`. Данные для шаблонов добавляет `lucus.theme.lucus_admin_extra_context` через `admin.site.each_context`.
 
 ### `LUCUS_UI`
 
@@ -118,22 +128,24 @@ LUCUS_DASHBOARD = [
 ]
 ```
 
-## Статика
+## Стили
 
-Порядок: `lucus/css/style.css` → `lucus/css/lucus-admin.css` → `lucus/css/<slug>.css` → `LUCUS_EXTRA_STATIC_CSS`. JS виджетов — из `django.contrib.admin`.
+Подключаются по порядку: `lucus/css/style.css`, `lucus/css/lucus-admin.css`, выбранная палитра `lucus/css/<slug>.css`, затем пути из `LUCUS_EXTRA_STATIC_CSS`. JavaScript виджетов, инлайнов и действий по-прежнему из `django.contrib.admin`.
 
-Своя палитра: файл `lucus/css/<slug>.css` в static + дополнение `lucus.theme.BUNDLED_COLOR_SCHEMES` в проекте.
+Свою палитру можно добавить, положив в static файл `lucus/css/<slug>.css` и дописав пару `(slug, подпись)` в `lucus.theme.BUNDLED_COLOR_SCHEMES` в проекте.
 
-## Пакет
+## Модули
 
-- `lucus.apps.LucusConfig` — `ready()`: заголовки, `each_context`, дашборд, URL `lucus_save_ui` / `lucus_save_site`, `enable_nav_sidebar = False`, пустые значения, флаги actions
-- `lucus.dashboard` — конфиг → колонки
-- `lucus.models` — `LucusAdminUiPreference`
-- `lucus.theme` — палитры, `lucus_admin_extra_context`
-- `lucus.views` — POST сохранения UI / сайта
+| Модуль | Назначение |
+|--------|------------|
+| `lucus.apps.LucusConfig` | `ready()`: `site_header` / `site_title`, подключение `each_context`, контекст дашборда, маршруты `lucus_save_ui` и `lucus_save_site`, `enable_nav_sidebar = False`, `empty_value_display`, размещение действий `ModelAdmin` |
+| `lucus.dashboard` | Разбор `LUCUS_DASHBOARD` в структуру колонок |
+| `lucus.models` | `LucusAdminUiPreference` (палитра и оформление на пользователя) |
+| `lucus.theme` | Встроенные схемы, `lucus_admin_extra_context(request)` |
+| `lucus.views` | Обработчики POST для сохранения UI и выбора сайта |
 
-Версия: `lucus.__version__`.
+Версия пакета: `lucus.__version__`.
 
-**Панель сайтов:** чтобы `request.site` в админке совпадал с выбором в шапке, подключите `lucus.sites_panel.LucusAdminSiteMiddleware` после `SessionMiddleware` (`lucus.sites_panel`).
+Если используется переключатель сайтов в шапке и нужно, чтобы внутри `/admin/` объект `request.site` совпадал с выбором, зарегистрируйте `lucus.sites_panel.LucusAdminSiteMiddleware` сразу после `SessionMiddleware` (см. `lucus.sites_panel`).
 
-**Совместимость:** Django 5.2+ (`pyproject.toml`).
+Поддерживаемые версии Django указаны в `pyproject.toml` (ориентир — 5.2 и совместимая линия 6.x).

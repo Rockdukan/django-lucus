@@ -1,12 +1,22 @@
-# Lucus (Django admin theme)
+# Lucus
 
 [Русский](README.ru.md)
 
-Admin skin: Lucus `base.html`, bundled CSS (`lucus/css/style.css`, `lucus-admin.css`), per-user palette + light/dark/auto (`LucusAdminUiPreference`), `/admin/` dashboard config. Nav sidebar off; changelist actions + change-form save row pinned to viewport bottom.
+Lucus is a Django package that restyles `django.contrib.admin` with its own `base.html`, layout CSS, and a single bundled admin stylesheet (`lucus/css/lucus-admin.css`) instead of linking the stock admin CSS. Staff can pick a color palette and appearance (light, dark, or system) from the header; choices are stored per user in `LucusAdminUiPreference`. The index page supports a configurable multi-column dashboard.
 
-![Lucus](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_1.jpg)
-![Lucus](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_2.jpg)
-![Lucus](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_3.jpg)
+The default admin navigation sidebar is disabled. On changelist and change-form views, the primary action controls are fixed to the bottom of the viewport so they stay visible while scrolling.
+
+![Admin index — Dune theme, light appearance, full-page background](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_1.jpg)
+
+*Index page: multi-column dashboard cards (sample apps: Education, Logistics, Support, …), header toolbars for palette, appearance, site, language, and user.*
+
+![Changelist — Slate theme (Instructors)](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_2.jpg)
+
+*Model changelist: breadcrumbs, search, bulk actions, result table, right-hand filters.*
+
+![Change form — Dracula theme, dark appearance](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_3.jpg)
+
+*Change form: fieldset, fixed bottom bar (save variants and delete). Capture uses dark mode; palette and appearance are per-user settings.*
 
 ## Requirements
 
@@ -19,7 +29,7 @@ Admin skin: Lucus `base.html`, bundled CSS (`lucus/css/style.css`, `lucus-admin.
 pip install django-lucus
 ```
 
-Import: `lucus`. PyPI: **django-lucus**.
+The Python package name on PyPI is **django-lucus**; import the app as `lucus`.
 
 ## Setup
 
@@ -35,7 +45,7 @@ INSTALLED_APPS = [
 python manage.py migrate lucus_admin
 ```
 
-Production: `collectstatic` as usual.
+Run `collectstatic` in production so admin assets are served like any other static files.
 
 ## Settings
 
@@ -65,8 +75,6 @@ Production: `collectstatic` as usual.
 |-----|---------|--------|
 | `help_as_icon` | `True` | Field `help_text` behind a `?` / `<details>` |
 | `high_contrast_toggle` | `False` | User menu “High contrast” (`localStorage` + `data-lucus-contrast` on `<html>`) |
-
-Example:
 
 ```python
 LUCUS_UI = {
@@ -120,22 +128,24 @@ LUCUS_DASHBOARD = [
 ]
 ```
 
-## Static
+## Stylesheets
 
-Load order: `lucus/css/style.css` → `lucus/css/lucus-admin.css` → `lucus/css/<slug>.css` → `LUCUS_EXTRA_STATIC_CSS`. Admin widget JS still from `django.contrib.admin`.
+Stylesheets load in this order: `lucus/css/style.css`, `lucus/css/lucus-admin.css`, the selected palette `lucus/css/<slug>.css`, then paths from `LUCUS_EXTRA_STATIC_CSS`. JavaScript for admin widgets, inlines, and actions still comes from `django.contrib.admin`.
 
-Custom palette: add `static/.../lucus/css/<slug>.css` and extend `lucus.theme.BUNDLED_COLOR_SCHEMES` in your project.
+To add a custom palette, ship `lucus/css/<slug>.css` on your static path and append the slug and label to `lucus.theme.BUNDLED_COLOR_SCHEMES` in your project.
 
-## Package
+## Modules
 
-- `lucus.apps.LucusConfig` — `ready()`: headers, `each_context`, dashboard, URLs `lucus_save_ui` / `lucus_save_site`, `enable_nav_sidebar = False`, empty value display, actions flags
-- `lucus.dashboard` — config → columns
-- `lucus.models` — `LucusAdminUiPreference`
-- `lucus.theme` — schemes, `lucus_admin_extra_context`
-- `lucus.views` — POST save UI / site
+| Module | Responsibility |
+|--------|----------------|
+| `lucus.apps.LucusConfig` | `ready()`: `site_header` / `site_title`, `each_context` hook, dashboard context, routes `lucus_save_ui` and `lucus_save_site`, `enable_nav_sidebar = False`, `empty_value_display`, `ModelAdmin` actions placement |
+| `lucus.dashboard` | Normalizes `LUCUS_DASHBOARD` into column structures |
+| `lucus.models` | `LucusAdminUiPreference` (palette + appearance per user) |
+| `lucus.theme` | Bundled schemes, `lucus_admin_extra_context(request)` |
+| `lucus.views` | POST handlers for saving UI and site selection |
 
-Version: `lucus.__version__`.
+Package version: `lucus.__version__`.
 
-**Sites toolbar:** for `request.site` in admin to follow the header switcher, add `lucus.sites_panel.LucusAdminSiteMiddleware` after `SessionMiddleware` (`lucus.sites_panel`).
+If you use the optional sites switcher in the header and need `request.site` inside `/admin/` to match the selection, register `lucus.sites_panel.LucusAdminSiteMiddleware` immediately after `SessionMiddleware` (see `lucus.sites_panel`).
 
-**Compatibility:** Django 5.2+ (`pyproject.toml`).
+Supported Django versions are declared in `pyproject.toml` (currently 5.2 and compatible 6.x).
