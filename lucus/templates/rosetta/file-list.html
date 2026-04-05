@@ -1,0 +1,129 @@
+{% extends "rosetta/base.html" %}
+{% load i18n static %}
+
+{% block pagetitle %}{{ block.super }} - {% trans "Language selection" %}{% endblock %}
+
+{% block breadcumbs %}
+  <div><a href="{% url 'rosetta-file-list' po_filter=po_filter %}">{% trans "Home" %}</a> &rsaquo; {% trans "Language selection" %}</div>
+  {% if do_session_warn %}<p class="errornote session-warn">{% trans "Couldn't load the specified language file. This usually happens when using the Encrypted Cookies Session Storage backend on Django 1.4 or higher.<br/>Setting ROSETTA_STORAGE_CLASS = 'rosetta.storage.CacheRosettaStorage' in your settings file should fix this." %}</p>{% endif %}
+{% endblock %}
+
+{% block main %}
+  <div class="lucus-changelist__pagehead">
+    <h1 class="lucus-changelist__title">{% trans "Language selection" %}</h1>
+  </div>
+
+  <div class="module lucus-changelist filtered" id="changelist">
+    <div class="lucus-changelist__layout">
+      <div class="lucus-changelist__main-column">
+        {% if has_pos %}
+          {% for lid,language,pos in languages %}
+            {% if pos %}
+              <section class="lucus-rosetta-lang-section module" aria-labelledby="rosetta-lang-{{ lid }}">
+                <h2 id="rosetta-lang-{{ lid }}" class="lucus-rosetta-lang-section__heading">{{ language }}</h2>
+                <div class="results">
+                  <div class="lucus-results-scroll">
+                    {# Same header shell as admin/change_list_results.html so Lucus #result_list padding + guides apply. #}
+                    <table class="lucus-rosetta-file-table" cellspacing="0">
+                      <thead>
+                        <tr>
+                          <th scope="col">
+                            <div class="lucus-th-heading-inner">
+                              <div class="text"><span>{% trans "Application" %}</span></div>
+                            </div>
+                          </th>
+                          <th scope="col" class="r">
+                            <div class="lucus-th-heading-inner">
+                              <div class="text"><span>{% trans "Progress" %}</span></div>
+                            </div>
+                          </th>
+                          <th scope="col" class="r">
+                            <div class="lucus-th-heading-inner">
+                              <div class="text"><span>{% trans "Messages" %}</span></div>
+                            </div>
+                          </th>
+                          <th scope="col" class="r">
+                            <div class="lucus-th-heading-inner">
+                              <div class="text"><span>{% trans "Translated" %}</span></div>
+                            </div>
+                          </th>
+                          {# info-tip on <th> + width:100% .lucus-th-heading-inner pushed ::after to next line — tip lives inside the flex row. #}
+                          <th scope="col" class="r" title="{% trans "Fuzzy entries call for revision by the translator." %}">
+                            <div class="lucus-th-heading-inner">
+                              <div class="text"><span>{% trans "Fuzzy" %}</span></div>
+                              <span class="info-tip" aria-hidden="true"></span>
+                            </div>
+                          </th>
+                          <th scope="col" class="r">
+                            <div class="lucus-th-heading-inner">
+                              <div class="text"><span>{% trans "Obsolete" %}</span></div>
+                            </div>
+                          </th>
+                          <th scope="col">
+                            <div class="lucus-th-heading-inner">
+                              <div class="text"><span>{% trans "File" %}</span></div>
+                            </div>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for app,path,po in pos %}
+                          <tr class="{% cycle 'row1' 'row2' %}">
+                            <td><a href="{% url 'rosetta-form' po_filter=po_filter lang_id=lid idx=forloop.counter0 %}">{{ app|title }}</a></td>
+                            <td class="ch-progress r">{{ po.percent_translated }}%</td>
+                            {% with po.untranslated_entries|length as len_untranslated_entries %}
+                              <td class="ch-messages r">{{ po.translated_entries|length|add:len_untranslated_entries }}</td>
+                            {% endwith %}
+                            <td class="ch-translated r">{{ po.translated_entries|length }}</td>
+                            <td class="ch-fuzzy r">{{ po.fuzzy_entries|length }}</td>
+                            <td class="ch-obsolete r">{{ po.obsolete_entries|length }}</td>
+                            <td class="hint">{{ path }}</td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </section>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <div class="lucus-empty-state">
+            <p class="lucus-empty-state__text">{% trans "Nothing to translate!" %}</p>
+            <p>{% trans "You haven't specified any languages in your settings file, or haven't yet generated a batch of translation catalogs." %}</p>
+            <p>{% blocktrans with "http://docs.djangoproject.com/en/dev/topics/i18n/#topics-i18n" as i18n_doc_link %}Please refer to <a href="{{ i18n_doc_link }}">Django's I18N documentation</a> for a guide on how to set up internationalization for your project.{% endblocktrans %}</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <aside class="lucus-changelist__aside" aria-label="{% trans 'Filter' %}">
+        <header class="lucus-changelist__aside-header">
+          <span class="lucus-changelist__aside-title">{% trans "Filters" %}</span>
+        </header>
+        <div class="lucus-changelist__aside-body">
+          <div class="lucus-changelist__filters">
+            <details class="lucus-filter" open>
+              <summary class="lucus-filter__summary">
+                <span class="lucus-filter__summary-label">{% trans "Catalog scope" %}</span>
+              </summary>
+              <ul class="lucus-filter__list">
+                <li{% if po_filter == 'project' %} class="selected"{% endif %}>
+                  <a href="{% url 'rosetta-file-list' po_filter='project' %}">{% trans "Project" %}</a>
+                </li>
+                <li{% if po_filter == 'third-party' %} class="selected"{% endif %}>
+                  <a href="{% url 'rosetta-file-list' po_filter='third-party' %}">{% trans "Third party" %}</a>
+                </li>
+                <li{% if po_filter == 'django' %} class="selected"{% endif %}>
+                  <a href="{% url 'rosetta-file-list' po_filter='django' %}">Django</a>
+                </li>
+                <li{% if po_filter == 'all' %} class="selected"{% endif %}>
+                  <a href="{% url 'rosetta-file-list' po_filter='all' %}">{% trans "All" %}</a>
+                </li>
+              </ul>
+            </details>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+{% endblock %}

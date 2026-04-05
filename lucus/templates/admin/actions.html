@@ -9,7 +9,10 @@
     {% endblock %}
     {% block actions-counter %}
     {% if actions_selection_counter %}
+        <div class="lucus-action-counter-row">
         <span class="action-counter" data-actions-icnt="{{ cl.result_list|length }}">{{ selection_note }}</span>
+        <button type="button" class="button lucus-action-deselect" hidden>{% translate "Clear selection" %}</button>
+        </div>
         {% if cl.result_count != cl.result_list|length %}
         <span class="all hidden">{{ selection_note_all }}</span>
         <span class="question hidden">

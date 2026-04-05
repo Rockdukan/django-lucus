@@ -1,4 +1,45 @@
+from __future__ import annotations
+
+from typing import Any
+
 from django.apps import AppConfig
+
+
+def _install_staff_integrations_context_processor() -> None:
+    """Theme + admin chrome on /logs/, /rosetta/, … (see lucus.context_processors)."""
+    from django.conf import settings
+
+    proc = "lucus.context_processors.staff_integrations_theme"
+    for tpl in settings.TEMPLATES:
+        if tpl.get("BACKEND") != "django.template.backends.django.DjangoTemplates":
+            continue
+        opts = tpl.setdefault("OPTIONS", {})
+        cps = list(opts.get("context_processors") or [])
+        if proc not in cps:
+            cps.append(proc)
+            opts["context_processors"] = cps
+
+
+def _lucus_admin_site_instances() -> tuple[Any, ...]:
+    """AdminSite instances Lucus patches. Default: only ``django.contrib.admin.site``."""
+    from django.conf import settings
+    from django.contrib import admin
+    from django.contrib.admin.sites import AdminSite
+
+    raw = getattr(settings, "LUCUS_ADMIN_SITES", None)
+    if raw is None:
+        return (admin.site,)
+    if isinstance(raw, (list, tuple)):
+        sites = tuple(raw)
+    else:
+        sites = (raw,)
+    for s in sites:
+        if not isinstance(s, AdminSite):
+            raise TypeError(
+                "LUCUS_ADMIN_SITES must be an AdminSite or a list/tuple of AdminSite instances, "
+                f"got {type(s)!r}"
+            )
+    return sites
 
 
 class LucusConfig(AppConfig):
@@ -8,7 +49,6 @@ class LucusConfig(AppConfig):
 
     def ready(self) -> None:
         from django.conf import settings
-        from django.contrib import admin
         from django.contrib.admin.options import ModelAdmin
         from django.urls import path
         from django.utils.html import format_html
@@ -20,59 +60,65 @@ class LucusConfig(AppConfig):
 
         apply_admin_list_boolean_patch()
 
-        site = getattr(settings, "SITE_NAME", "Site")
+        site_name = getattr(settings, "SITE_NAME", "Site")
         header_tpl = getattr(
             settings,
             "LUCUS_ADMIN_SITE_HEADER_TEMPLATE",
             "Administration — {site}",
         )
-        admin.site.site_header = header_tpl.format(site=site)
-        admin.site.site_title = (
-            site if getattr(settings, "LUCUS_ADMIN_SITE_TITLE_USE_SITE_NAME", True) else ""
+        site_title = (
+            site_name if getattr(settings, "LUCUS_ADMIN_SITE_TITLE_USE_SITE_NAME", True) else ""
         )
-        admin.site.index_title = ""
 
-        admin.site.enable_nav_sidebar = False
+        for admin_site in _lucus_admin_site_instances():
+            admin_site.site_header = header_tpl.format(site=site_name)
+            admin_site.site_title = site_title
+            admin_site.index_title = ""
+            admin_site.enable_nav_sidebar = False
 
-        if getattr(settings, "LUCUS_EMPTY_VALUE_DISPLAY_WRAP", True):
-            admin.site.empty_value_display = format_html(
-                '<span class="lucus-admin-empty">{}</span>',
-                getattr(settings, "LUCUS_EMPTY_VALUE_PLACEHOLDER", "—"),
-            )
+            if getattr(settings, "LUCUS_EMPTY_VALUE_DISPLAY_WRAP", True):
+                admin_site.empty_value_display = format_html(
+                    '<span class="lucus-admin-empty">{}</span>',
+                    getattr(settings, "LUCUS_EMPTY_VALUE_PLACEHOLDER", "—"),
+                )
+
+            if not getattr(admin_site, "_lucus_each_context_patched", False):
+                original_each_context = admin_site.each_context
+
+                def each_context_with_dashboard(
+                    request, *, _orig=original_each_context
+                ):
+                    ctx = _orig(request)
+                    ctx["lucus_dashboard_columns"] = get_dashboard_for_request(request)
+                    ctx.update(lucus_admin_extra_context(request))
+                    return ctx
+
+                admin_site.each_context = each_context_with_dashboard
+                admin_site._lucus_each_context_patched = True
+
+            if not getattr(admin_site, "_lucus_get_urls_patched", False):
+                original_get_urls = admin_site.get_urls
+
+                def get_urls_with_lucus(*, _site=admin_site, _orig=original_get_urls):
+                    return [
+                        path(
+                            "lucus/save-ui/",
+                            _site.admin_view(lucus_views.save_admin_ui),
+                            name="lucus_save_ui",
+                        ),
+                        path(
+                            "lucus/save-site/",
+                            _site.admin_view(lucus_views.save_admin_site),
+                            name="lucus_save_site",
+                        ),
+                    ] + _orig()
+
+                admin_site.get_urls = get_urls_with_lucus
+                admin_site._lucus_get_urls_patched = True
 
         if getattr(settings, "LUCUS_ACTIONS_ON_BOTTOM", True):
             ModelAdmin.actions_on_bottom = True
         if getattr(settings, "LUCUS_ACTIONS_ON_TOP", True):
             ModelAdmin.actions_on_top = True
 
-        if not getattr(admin.site, "_lucus_each_context_patched", False):
-            original_each_context = admin.site.each_context
-
-            def each_context_with_dashboard(request):
-                ctx = original_each_context(request)
-                ctx["lucus_dashboard_columns"] = get_dashboard_for_request(request)
-                ctx.update(lucus_admin_extra_context(request))
-                return ctx
-
-            admin.site.each_context = each_context_with_dashboard
-            admin.site._lucus_each_context_patched = True
-
-        if not getattr(admin.site, "_lucus_get_urls_patched", False):
-            original_get_urls = admin.site.get_urls
-
-            def get_urls_with_lucus():
-                return [
-                    path(
-                        "lucus/save-ui/",
-                        admin.site.admin_view(lucus_views.save_admin_ui),
-                        name="lucus_save_ui",
-                    ),
-                    path(
-                        "lucus/save-site/",
-                        admin.site.admin_view(lucus_views.save_admin_site),
-                        name="lucus_save_site",
-                    ),
-                ] + original_get_urls()
-
-            admin.site.get_urls = get_urls_with_lucus
-            admin.site._lucus_get_urls_patched = True
+        _install_staff_integrations_context_processor()

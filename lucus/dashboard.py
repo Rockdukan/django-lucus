@@ -294,7 +294,9 @@ def grouped_dashboard_from_app_list(
         if not links_tuple:
             continue
 
-        cols[int(g.get("column", 1)) - 1].append(DashboardSection(title=g.get("title", ""), links=links_tuple))
+        cols[int(g.get("column", 1)) - 1].append(
+            DashboardSection(title=g.get("title", ""), links=links_tuple)
+        )
 
     if getattr(settings, "LUCUS_DASHBOARD_APPEND_UNCOVERED", True):
         covered: set[str] = set()

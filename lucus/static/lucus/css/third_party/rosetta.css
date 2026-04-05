@@ -1,0 +1,215 @@
+/*
+ * django-rosetta: Lucus changelist chrome (same blocks as admin/change_list.html).
+ * Templates: lucus/templates/rosetta/*.html — body.rosetta-page.change-list-page.
+ */
+body.rosetta-page #content {
+  max-width: none;
+  padding: var(--m) var(--l) var(--l) !important;
+}
+
+body.rosetta-page .lucus-rosetta {
+  padding-bottom: var(--l);
+}
+
+/* Form: title row + catalog actions (replaces horizontal object-tools). */
+body.rosetta-page .lucus-rosetta-form__pagehead-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+body.rosetta-page .lucus-rosetta-form__head-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: var(--lucus-radius-md);
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none !important;
+  line-height: 1.25;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-brand-primary) !important;
+}
+
+body.rosetta-page .lucus-rosetta-form__head-link:hover {
+  border-color: var(--color-brand-primary);
+}
+
+body.rosetta-page .lucus-rosetta-form__head-link--primary {
+  background: var(--color-brand-primary) !important;
+  color: var(--color-surface) !important;
+  border-color: var(--color-brand-primary) !important;
+}
+
+body.rosetta-page .lucus-rosetta-form__head-link--primary:hover {
+  filter: brightness(1.06);
+}
+
+/* File list: stacked language blocks inside changelist main column. */
+body.rosetta-page .lucus-rosetta .lucus-changelist__main-column > .lucus-rosetta-lang-section {
+  margin-bottom: var(--l);
+}
+
+body.rosetta-page .lucus-rosetta .lucus-changelist__main-column > .lucus-rosetta-lang-section:last-child {
+  margin-bottom: 0;
+}
+
+body.rosetta-page .lucus-rosetta .lucus-rosetta-lang-section__heading {
+  margin: 0;
+}
+
+/*
+ * Stock Lucus uses border-radius on .lucus-results-scroll on all four corners; under a
+ * module <h2> or below the changelist toolbar that rounds the table header. Flat top only.
+ */
+body.rosetta-page #content #changelist .results .lucus-results-scroll {
+  border-radius: 0 0 var(--lucus-radius-lg) var(--lucus-radius-lg) !important;
+}
+
+/*
+ * File-list table is not #result_list — without these rules it only gets generic
+ * `.results thead th { padding: 1px 6px }` and no column guides / outer border.
+ * Mirror changelist #result_list (see style.css + change_list_results.html).
+ */
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table {
+  border: 1px solid var(--color-border) !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none !important;
+  background: transparent;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table thead th {
+  text-align: center !important;
+  display: table-cell !important;
+  vertical-align: middle !important;
+  padding-top: 5px !important;
+  padding-right: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  box-sizing: border-box;
+  background: var(--color-surface-secondary) !important;
+  color: var(--color-brand-primary) !important;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 700;
+  border: none !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  line-height: 1.1;
+  border-radius: 0 !important;
+}
+
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table thead th .lucus-th-heading-inner {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 6px;
+  row-gap: 2px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+html[dir="rtl"] body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table thead th .lucus-th-heading-inner {
+  flex-direction: row-reverse;
+}
+
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table thead th .lucus-th-heading-inner .text {
+  flex: 0 1 auto;
+  min-width: 0;
+  text-align: center !important;
+}
+
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table thead th .text span,
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table thead th .text a {
+  text-align: center !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  padding: 4px 6px !important;
+  margin: 0;
+  line-height: 1.25 !important;
+}
+
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table thead th.r .lucus-th-heading-inner {
+  justify-content: flex-end;
+}
+
+/* Rosetta .info-tip::after ("?") on <th> sat below .lucus-th-heading-inner { width:100% }; inline tip stays with label. */
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table thead th .lucus-th-heading-inner .info-tip {
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table thead th.r .text,
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table thead th.r .text span {
+  text-align: end !important;
+}
+
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table thead th:not(:last-child),
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table tbody td:not(:last-child) {
+  border-right: 1px solid color-mix(in srgb, var(--color-border) 48%, transparent) !important;
+}
+
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table tbody td {
+  border: none !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  padding: 4px 10px !important;
+  color: var(--color-text-primary);
+  line-height: 1.25;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table tbody td.r {
+  text-align: end !important;
+}
+
+body.rosetta-page #content #changelist .lucus-results-scroll table.lucus-rosetta-file-table tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+
+/* Rosetta fuzzy row tint — keep readable on Lucus surfaces. */
+body.rosetta-page .lucus-rosetta tr.row1 td.original code,
+body.rosetta-page .lucus-rosetta tr.row2 td.original code {
+  background-color: rgba(255, 178, 165, 0.35);
+}
+
+body.rosetta-page .rosetta-version-footer {
+  margin: var(--l) 0 0;
+  padding: 0 var(--l);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+body.rosetta-page .rosetta-version-footer a {
+  color: var(--color-brand-primary);
+}
+
+/* Legacy bar (if used elsewhere). */
+body.rosetta-page .lucus-rosetta__file-actions {
+  margin: 0 0 var(--m);
+  padding: var(--s) var(--m);
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+body.rosetta-page .lucus-rosetta__file-actions a {
+  color: var(--color-brand-primary) !important;
+  font-weight: 600;
+}
+
+body.rosetta-page .lucus-rosetta__file-actions a:hover {
+  text-decoration: underline;
+}

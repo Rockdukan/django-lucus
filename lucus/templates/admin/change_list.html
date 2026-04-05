@@ -24,6 +24,9 @@
 {% block extrahead %}
   {{ block.super }}
   {{ media.js }}
+  {% if action_form and cl.result_count %}
+  <script src="{% static 'lucus/js/lucus-changelist-actions.js' %}" defer></script>
+  {% endif %}
 {% endblock %}
 
 {# ---------- BREADCRUMBS ---------- #}

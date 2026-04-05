@@ -1421,7 +1421,9 @@ fieldset.monospace textarea {
 .submit-row {
     padding: 12px 14px 12px;
     margin: 0 0 20px;
-    background: var(--darkened-bg);
+    background: transparent none no-repeat;
+    background-color: transparent;
+    background-image: none;
     border: 1px solid var(--hairline-color);
     border-radius: 4px;
     overflow: hidden;
@@ -1591,9 +1593,9 @@ body.popup .submit-row {
     border: none;
 }
 
+/* Width only: horizontal scroll lives on .wrapper (forms.css). overflow-x on <table> breaks thead/tbody column alignment in some engines. */
 .inline-related.tabular fieldset.module table {
     width: 100%;
-    overflow-x: scroll;
 }
 
 .last-related fieldset {
@@ -1607,7 +1609,7 @@ body.popup .submit-row {
 .inline-group .tabular tr td.original {
     padding: 2px 0 0 0;
     width: 0;
-    _position: relative;
+    position: relative;
 }
 
 .inline-group .tabular th.original {
@@ -1625,6 +1627,30 @@ body.popup .submit-row {
     font-weight: bold;
     color: var(--body-quiet-color);
     _width: 700px;
+}
+
+/* Tabular inlines: keep real table layout (Lucus .module / flex elsewhere must not flatten rows). */
+.inline-group[data-inline-type="tabular"] table {
+    display: table !important;
+    table-layout: auto;
+    border-collapse: collapse;
+}
+
+.inline-group[data-inline-type="tabular"] thead {
+    display: table-header-group !important;
+}
+
+.inline-group[data-inline-type="tabular"] tbody {
+    display: table-row-group !important;
+}
+
+.inline-group[data-inline-type="tabular"] tr {
+    display: table-row !important;
+}
+
+.inline-group[data-inline-type="tabular"] th,
+.inline-group[data-inline-type="tabular"] td {
+    display: table-cell !important;
 }
 
 .inline-group div.add-row,
@@ -4315,4 +4341,95 @@ html[dir="rtl"] .selector .selector-chooser {
   align-items: stretch;
   justify-content: flex-start;
   gap: 0;
+}
+
+/*
+ * Changelist + wallpaper (stock Django admin).
+ * Django’s changelists.css loads later in extrastyle but uses no !important; these rules use
+ * !important and higher specificity (#content …), so they still win. Third-party admin CSS:
+ * lucus/css/third_party/*.css (linked after extrastyle in base.html).
+ */
+#content #changelist .results,
+#content #changelist-form .results {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  overflow: visible !important;
+  width: 100% !important;
+}
+
+#content #changelist .results .lucus-results-scroll {
+  border-radius: 10px !important;
+  box-shadow: var(--lucus-shadow) !important;
+  background: var(--color-surface) !important;
+  overflow-x: auto !important;
+  overflow-y: clip !important;
+  max-width: 100% !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+#content #changelist table#result_list {
+  border: 1px solid var(--color-border) !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  width: 100% !important;
+}
+
+#content #changelist table#result_list tbody {
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+}
+
+#content #changelist table#result_list thead,
+#content #changelist table#result_list thead th,
+#content #changelist table#result_list tbody td,
+#content #changelist table#result_list tbody th {
+  border-radius: 0 !important;
+}
+
+#content #changelist table#result_list thead th .lucus-th-heading-inner {
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center !important;
+  justify-content: center !important;
+  column-gap: 6px;
+  row-gap: 2px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+html[dir="rtl"] #content #changelist table#result_list thead th .lucus-th-heading-inner {
+  flex-direction: row-reverse;
+}
+
+#content #changelist table#result_list thead th.sorted .sortoptions {
+  float: none !important;
+  display: inline-flex !important;
+  text-align: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#content #changelist table#result_list thead th.sorted .text {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+#content #changelist .results table tbody,
+#content .results table tbody {
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+}
+
+body.lucus-admin-has-bg #container,
+body.lucus-admin-has-bg .main > .content,
+body.lucus-admin-has-bg #content {
+  background-color: transparent !important;
 }

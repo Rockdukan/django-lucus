@@ -1,0 +1,44 @@
+{% extends "admin/base.html" %}
+{% load static i18n %}
+{# django-rosetta: use Lucus admin chrome + palette (staff_integrations_theme on /rosetta/). #}
+
+{% block title %}
+  {% block pagetitle %}{% translate "Rosetta" %}{% endblock %}
+  |
+  {% if site_title %}{{ site_title }}{% else %}{% translate "Django administration" %}{% endif %}
+{% endblock %}
+
+{# change-list-page: Lucus changelist layout/CSS (#changelist.lucus-changelist, aside, toolbar). #}
+{% block bodyclass %}rosetta-page change-list-page{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'admin/css/changelists.css' %}">
+  <link rel="stylesheet" href="{% static 'admin/rosetta/css/rosetta.css' %}">
+  <link rel="stylesheet" href="{% static 'lucus/css/third_party/rosetta.css' %}">
+  {% block extra_styles %}{% endblock %}
+{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; script-src-elem 'self' https://translate.yandex.net">
+  {{ rosetta_settings_js|json_script:"rosetta-settings-js" }}
+  <script src="{% static 'admin/rosetta/js/rosetta.js' %}"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    {% block breadcumbs %}{% endblock %}
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div id="content-main" class="lucus-content lucus-rosetta">
+    {% block main %}{% endblock %}
+  </div>
+  <p class="rosetta-version-footer">
+    <a href="https://github.com/mbi/django-rosetta">Rosetta</a>
+    {% if version %}<span class="version">{{ version }}</span>{% endif %}
+  </p>
+{% endblock %}

@@ -1,0 +1,207 @@
+/*
+ * django-filer folder browser (body.filebrowser): table-cell + float layout fixes.
+ */
+
+body.filebrowser #content .navigator-top-nav {
+  background: var(--color-bg-page) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  /*
+   * Do not use overflow-x: auto here: with a non-visible horizontal overflow,
+   * CSS forces the vertical axis to compute to "auto" as well, which clips
+   * absolutely positioned .filer-dropdown-menu (breadcrumbs, actions, …).
+   */
+  overflow: visible !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  /* Stack above #content-main (float/sibling paint order) so menus are not hidden. */
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+body.filebrowser #content .navigator-top-nav .filer-dropdown-menu,
+body.filebrowser #content .navigator-top-nav .filer-dropdown-container + .filer-dropdown-menu {
+  z-index: 1100 !important;
+}
+
+/*
+ * Filer uses display:table on this row; table-cells clip when breadcrumbs + tools > 100%.
+ * Flex + min-width:0 on the left lets the search shrink; tools stay flex-shrink:0.
+ */
+body.filebrowser #content .navigator-top-nav .breadcrumbs-container-wrapper {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body.filebrowser #content .navigator-top-nav .breadcrumbs-container {
+  display: flex !important;
+  align-items: center !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  vertical-align: middle !important;
+}
+
+body.filebrowser #content .navigator-top-nav .breadcrumbs-container-inner {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.filebrowser #content .navigator-top-nav .tools-container {
+  display: flex !important;
+  align-items: center !important;
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  /* Same as .navigator-top-nav: avoid overflow:auto here or dropdowns inside tools clip too */
+  overflow: visible !important;
+  vertical-align: middle !important;
+}
+
+body.filebrowser #content .filter-files-container {
+  display: block !important;
+  width: auto !important;
+  flex: 0 1 245px !important;
+  max-width: min(100%, 280px) !important;
+  min-width: 120px !important;
+  position: relative !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/*
+ * Inner only: flex + gap fixes float/calc overlap; order keeps [field][search btn] like Filer.
+ * Do not set display:flex on form.filter-files-container (breaks table-cell row).
+ */
+body.filebrowser #content .filter-files-container .filter-filers-container-inner {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.filebrowser #content .filter-files-container .filter-search-wrapper {
+  float: none !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  margin: 0 !important;
+  max-width: none !important;
+  order: 1 !important;
+}
+
+body.filebrowser #content .filter-files-container .filter-files-button {
+  float: none !important;
+  flex: 0 0 36px !important;
+  order: 2 !important;
+  height: 36px !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: var(--color-brand-primary) !important;
+  color: #fff !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.filebrowser #content .filter-files-container .filter-files-field {
+  height: 36px !important;
+  line-height: normal !important;
+  padding: 0 34px 0 10px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
+  background: var(--color-surface) !important;
+  color: var(--color-text-primary) !important;
+  font-size: 13px !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+body.filebrowser #content .filter-files-container .filter-files-button .icon {
+  font-size: 15px !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
+/* Text buttons: Filer uses <a class="navigator-button"> — need flex, not inherited line-height */
+body.filebrowser #content .navigator-tools a.navigator-button,
+body.filebrowser #content .navigator-button-wrapper a.navigator-button,
+body.filebrowser #content a.navigator-button,
+body.filebrowser #content button.navigator-button,
+body.filebrowser #content .navigator-button-wrapper > a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 16px !important;
+  box-sizing: border-box !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--color-border) !important;
+  background: var(--color-surface) !important;
+  color: var(--color-text-primary) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  text-decoration: none !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+}
+
+body.filebrowser #content .navigator-button.navigator-button-upload,
+body.filebrowser #content a.navigator-button-upload {
+  background: var(--color-brand-primary) !important;
+  color: var(--color-surface) !important;
+  border: none !important;
+}
+
+body.filebrowser #content .navigator-tools {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+body.filebrowser #content .navigator-button-wrapper {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+  vertical-align: middle !important;
+}
+
+@media (max-width: 720px) {
+  body.filebrowser #content .filter-files-container {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}

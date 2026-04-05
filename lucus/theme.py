@@ -39,17 +39,33 @@ LUCUS_ADMIN_SITE_SELECTOR
     (after ``SessionMiddleware``) so ``request.site`` in ``/admin/`` matches the
     selection.
 
-    LUCUS_UI
-        Optional dict of UI feature flags:
+LUCUS_STAFF_THEME_PATH_PREFIXES
+    Optional iterable of URL path prefixes (strings). For authenticated staff,
+    :func:`lucus.context_processors.staff_integrations_theme` merges
+    ``AdminSite.each_context`` (Lucus theme, header tools) on matching paths.
+    Default: ``/logs/``, ``/rosetta/``, ``/explorer/`` (not ``/admin/`` — already wired).
+    Set to ``()`` to disable.
 
-        - ``help_as_icon`` — field ``help_text`` behind a “?” ``<details>`` control
-          (default ``True`` if omitted).
-        - ``high_contrast_toggle`` — show “High contrast” in the user menu (uses
-          ``localStorage`` + ``data-lucus-contrast="high"`` on ``<html>``;
-          default ``False`` if omitted).
+LUCUS_ADMIN_SITES
+    Optional ``django.contrib.admin.sites.AdminSite`` instance or iterable of
+    instances. Lucus applies the same patches (context, URLs, headers,
+    ``empty_value_display``, ``enable_nav_sidebar``) to each. If omitted, only
+    ``django.contrib.admin.site`` is used. Forms in ``base.html`` post to
+    ``{% url 'admin:lucus_save_ui' %}`` (default ``admin`` namespace); an extra
+    site mounted under another URL namespace may need a template override for
+    those endpoints.
 
-        Change-form save/delete bar and changelist actions bar are fixed to the
-        viewport bottom.
+LUCUS_UI
+    Optional dict of UI feature flags:
+
+    - ``help_as_icon`` — field ``help_text`` behind a “?” ``<details>`` control
+      (default ``True`` if omitted).
+    - ``high_contrast_toggle`` — show “High contrast” in the user menu (uses
+      ``localStorage`` + ``data-lucus-contrast="high"`` on ``<html>``;
+      default ``False`` if omitted).
+
+    Change-form save/delete bar and changelist actions bar are fixed to the
+    viewport bottom.
 
 Color scheme is chosen from bundled schemes (and optional extra entries) and
 stored per user in ``LucusAdminUiPreference``. There is no ``LUCUS_COLOR_SCHEME``
@@ -72,7 +88,7 @@ from django.utils.translation import gettext_lazy as _
 _SCHEME_RE = re.compile(r"^[a-z0-9_-]{1,64}$", re.I)
 _EXTRA_RE = re.compile(r"^[a-zA-Z0-9_./+%-]+$")
 
-# Bundled palette files under static/lucus/css/<slug>.css
+# Bundled palette files under static/lucus/css/schemes/<slug>.css
 BUNDLED_COLOR_SCHEMES: tuple[tuple[str, str], ...] = (
     ("olivia", _("Olivia")),
     ("grey", _("Grey")),
@@ -241,7 +257,7 @@ def lucus_admin_extra_context(request: HttpRequest) -> dict[str, Any]:
     except Exception:
         lang_url = None
     ctx = {
-        "lucus_scheme_stylesheet": f"lucus/css/{scheme}.css",
+        "lucus_scheme_stylesheet": f"lucus/css/schemes/{scheme}.css",
         "lucus_extra_stylesheets": _extra_stylesheets(),
         "lucus_color_scheme_choices": BUNDLED_COLOR_SCHEMES,
         "lucus_selected_color_scheme": scheme,

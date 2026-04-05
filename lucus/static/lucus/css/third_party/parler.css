@@ -1,0 +1,31 @@
+/*
+ * django-parler: TranslatableAdmin language tabs (.parler-language-tabs).
+ */
+
+#content .parler-language-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 2px 4px;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0.75rem;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-surface, #fff) 72%, transparent);
+  border: 1px solid var(--color-border, #ccc);
+}
+
+#content .parler-language-tabs span {
+  font-weight: 700 !important;
+}
+
+#content .parler-language-tabs span a {
+  font-weight: 700 !important;
+}
+
+#content .parler-language-tabs span.empty {
+  font-weight: 700 !important;
+  opacity: 0.85;
+}

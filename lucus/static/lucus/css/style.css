@@ -22,7 +22,7 @@
 /* ------------------------------------------------------------------ */
 /*                                BASE                                */
 /* ------------------------------------------------------------------ */
-/* Spacing scale. Palette: static/lucus/css/<scheme>.css (user-selected in admin). */
+/* Spacing scale. Palette: static/lucus/css/schemes/<scheme>.css (user-selected in admin). */
 :root {
   --phi: 1.618;
   --u: 16px;
@@ -814,6 +814,8 @@ body.lucus-admin-has-bg #container > .main {
   min-height: 84px !important;
   padding: 10px !important;
   line-height: var(--phi);
+  background: #fff !important;
+  color: #2a2c29 !important;
   border: 1px solid var(--color-border) !important;
   border-radius: 8px !important;
   box-shadow: none !important;
@@ -869,8 +871,12 @@ body.lucus-admin-has-bg #container > .main {
   cursor: not-allowed;
 }
 
-#content .form-row,
-#content .aligned .form-row {
+/*
+ * Aligned change-form rows only. Django tabular inlines use <tr class="form-row"> —
+ * flex on <tr> breaks the table column grid (misaligned thead vs tbody).
+ */
+#content .form-row:not(tr),
+#content .aligned .form-row:not(tr) {
   display: flex !important;
   align-items: center !important;
   min-height: 32px;
@@ -878,7 +884,7 @@ body.lucus-admin-has-bg #container > .main {
   gap: var(--m);
 }
 #content .aligned label,
-#content .form-row label {
+#content .form-row:not(tr) label {
   flex: 0 0 160px;
   width: 160px;
   min-width: 160px;
@@ -903,7 +909,7 @@ body.lucus-admin-has-bg #container > .main {
   line-height: 1.2 !important;
 }
 #content .aligned .form-row > div,
-#content .form-row > div:not(:first-child) {
+#content .form-row:not(tr) > div:not(:first-child) {
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -1082,7 +1088,9 @@ body.login {
   margin-bottom: 0;
   padding: 0;
   text-align: center;
-  background: var(--color-surface) !important;
+  background: transparent none no-repeat !important;
+  background-color: transparent !important;
+  background-image: none !important;
   border: none !important;
 }
 .login .submit-row input {
@@ -1125,6 +1133,9 @@ body.login {
   padding: var(--l) 0;
   margin-top: var(--l);
   border-top: none;
+  background: transparent none no-repeat !important;
+  background-color: transparent !important;
+  background-image: none !important;
 }
 
 .lucus-form-sections .module {
@@ -1493,8 +1504,8 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
 }
 
 /*
- * Changelist (#result_list): keep table-cell display (flex on <th> breaks the header row).
- * Center content; sort icons + label share one line via inline-block + vertical-align.
+ * Changelist (#result_list): <th> stays table-cell; inner .lucus-th-heading-inner is flex
+ * (see change_list_results.html — label before .sortoptions, no float layout).
  */
 #content #result_list thead th {
   text-align: center !important;
@@ -1508,6 +1519,28 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   box-sizing: border-box;
 }
 
+#content #result_list thead th .lucus-th-heading-inner {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 6px;
+  row-gap: 2px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+html[dir="rtl"] #content #result_list thead th .lucus-th-heading-inner {
+  flex-direction: row-reverse;
+}
+
+#content #result_list thead th .lucus-th-heading-inner .text {
+  flex: 0 1 auto;
+  min-width: 0;
+  text-align: center !important;
+}
+
 #content #result_list thead th .sortoptions {
   float: none !important;
   display: inline-flex !important;
@@ -1519,8 +1552,9 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   max-width: 100%;
   box-sizing: border-box;
   padding: 0 !important;
-  margin: 0 4px 0 0 !important;
+  margin: 0 !important;
   vertical-align: middle;
+  flex: 0 0 auto;
 }
 
 #content #result_list thead th .text {
@@ -1535,6 +1569,12 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
 #content #result_list thead th.sorted .text {
   padding-left: 0 !important;
   padding-right: 0 !important;
+}
+
+/* Undo Django admin padding reserved for float:right sort icons */
+#content #result_list thead th.sorted .lucus-th-heading-inner .text {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
 }
 
 #content #result_list thead th .text a,
@@ -1576,6 +1616,53 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
 }
 #content #changelist .results tbody tr:hover,
 #content .results tbody tr:hover {
+  background: rgba(74, 103, 65, 0.05);
+}
+
+/* Changelist: actions row — counter + clear selection */
+.lucus-action-counter-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s);
+  vertical-align: middle;
+}
+
+.lucus-action-deselect {
+  font-size: 12px !important;
+  padding: 4px 10px !important;
+  min-height: 28px !important;
+  line-height: 1.2 !important;
+}
+
+/* Changelist: sticky first column (checkbox / first cell) in horizontal scroll */
+#content #result_list thead th:first-child,
+#content #result_list tbody td:first-child,
+#content #result_list tbody th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--color-surface);
+  box-shadow: 1px 0 0 color-mix(in srgb, var(--color-border) 55%, transparent);
+}
+
+#content #result_list thead th:first-child {
+  z-index: 4;
+  background: var(--color-surface-secondary);
+}
+
+#content #result_list tbody tr:nth-child(odd) td:first-child,
+#content #result_list tbody tr:nth-child(odd) th:first-child {
+  background: rgba(221, 227, 219, 0.25);
+}
+
+#content #result_list tbody tr:nth-child(even) td:first-child,
+#content #result_list tbody tr:nth-child(even) th:first-child {
+  background: var(--color-surface);
+}
+
+#content #result_list tbody tr:hover td:first-child,
+#content #result_list tbody tr:hover th:first-child {
   background: rgba(74, 103, 65, 0.05);
 }
 
@@ -2466,7 +2553,9 @@ body.change-list-page .object-tools a.addlink:focus,
 body.login #content .submit-row,
 body.login #content-main .submit-row,
 body.login #login-form .submit-row {
-  background: var(--color-surface) !important;
+  background: transparent none no-repeat !important;
+  background-color: transparent !important;
+  background-image: none !important;
   border: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;
@@ -2784,7 +2873,9 @@ body.lucus-fixed-submit.change-form-page form .submit-row {
   z-index: 950;
   margin: 0 !important;
   padding: var(--m) var(--l) calc(var(--m) + env(safe-area-inset-bottom, 0)) !important;
-  background: var(--color-surface) !important;
+  background: transparent none no-repeat !important;
+  background-color: transparent !important;
+  background-image: none !important;
   border-top: 1px solid var(--color-border) !important;
   border-radius: 0 !important;
   overflow: visible !important;

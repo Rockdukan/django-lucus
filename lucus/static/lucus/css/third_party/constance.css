@@ -1,0 +1,172 @@
+/*
+ * django-constance: changelist uses div#results (not table#result_list).
+ * Load order: after Lucus extrastyle (style + lucus-admin + scheme); core changelist fixes live in lucus-admin.css.
+ */
+
+/* Constance / similar: #content-main + #changelist without .lucus-changelist */
+#content #content-main.lucus-content.constance,
+#content #content-main.constance {
+  float: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  clear: both !important;
+  box-sizing: border-box !important;
+}
+
+#content #changelist.module:not(.lucus-changelist),
+#content #changelist.module:not(.lucus-changelist) #changelist-form {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Constance: no border-radius on #results or inner <table> */
+#content #changelist.module:not(.lucus-changelist) #results {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+#content #changelist.module:not(.lucus-changelist) #results table {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border: 1px solid var(--color-border) !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+  background: var(--color-surface) !important;
+}
+
+#content #changelist.module:not(.lucus-changelist) #results table thead th,
+#content #changelist.module:not(.lucus-changelist) #results table tbody th,
+#content #changelist.module:not(.lucus-changelist) #results table tbody td,
+#content #changelist.module:not(.lucus-changelist) #results table tbody tr {
+  border-radius: 0 !important;
+}
+
+/* Match Lucus changelist (#result_list) header strip + centered labels */
+#content #changelist #results table thead th {
+  background: var(--color-surface-secondary) !important;
+  color: var(--color-brand-primary) !important;
+  text-transform: uppercase !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  white-space: normal !important;
+  vertical-align: middle !important;
+  padding: 5px 6px !important;
+  border: none !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  line-height: 1.25 !important;
+  display: table-cell !important;
+}
+
+#content #changelist #results table thead th .text {
+  display: inline-block !important;
+  vertical-align: middle !important;
+  margin: 0 !important;
+  padding: 4px 6px !important;
+  max-width: 100%;
+  text-align: center !important;
+}
+
+/* Inner column guides — same semi-transparent verticals as table#result_list */
+#content #changelist #results table thead th:not(:last-child),
+#content #changelist #results table tbody th:not(:last-child),
+#content #changelist #results table tbody td:not(:last-child) {
+  border-right: 1px solid color-mix(in srgb, var(--color-border) 48%, transparent) !important;
+}
+
+#content #changelist #results table tbody th,
+#content #changelist #results table tbody td {
+  padding: 8px 10px !important;
+  font-size: 0.8125rem !important;
+  vertical-align: top !important;
+}
+
+/*
+ * Constance row: <th> name | <td> default | <td> value | <td> modified (icons).
+ * Center booleans: value column = 2nd <td>; modified icons = last <td> (img may not be direct child).
+ */
+#content #changelist #results table tbody td:has(img[src*="icon-yes"]),
+#content #changelist #results table tbody td:has(img[src*="icon-no"]),
+#content #changelist #results table tbody td:has(img[src*="icon-unknown"]) {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+#content #changelist #results table tbody tr > td:nth-of-type(2):has(input[type="checkbox"]) {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+#content #changelist #results table tbody tr > td:nth-of-type(2):has(input[type="checkbox"]) label,
+#content #changelist #results table tbody tr > td:nth-of-type(2):has(input[type="checkbox"]) .vCheckboxLabel {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  margin: 0 auto !important;
+  float: none !important;
+  width: auto !important;
+  max-width: 100% !important;
+}
+
+#content #changelist #results table tbody tr > td:nth-of-type(2):has(input[type="checkbox"]) input[type="checkbox"] {
+  margin: 0 !important;
+  vertical-align: middle !important;
+}
+
+#content #changelist #results table tbody td:has(img[src*="icon-"]) img {
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+/* Constance: <p class="paginator sticky-footer"><input class="default" type="submit" …> */
+#content #changelist-form p.paginator.sticky-footer {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#content #changelist-form p.paginator.sticky-footer input[type="submit"],
+#content #changelist-form p.paginator.sticky-footer input.default,
+#content #changelist-form p.paginator.sticky-footer input[type="submit"].default {
+  width: auto !important;
+  min-width: 12rem !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  line-height: 36px !important;
+  padding: 0 16px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+  background: var(--color-brand-primary) !important;
+  color: var(--color-surface) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+}
+
+#content #changelist #results table tbody {
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+}
