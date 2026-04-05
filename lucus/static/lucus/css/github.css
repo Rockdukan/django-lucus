@@ -1,0 +1,72 @@
+@charset "UTF-8";
+
+/* Color scheme: github — Primer-like neutrals + blue accent. */
+
+:root,
+html[data-theme="light"],
+html[data-theme="auto"] {
+  --color-bg-page: #f6f8fa;
+  --color-surface: #ffffff;
+  --color-surface-secondary: #eaeef2;
+  --color-brand-primary: #0969da;
+  --color-brand-hover: #0550ae;
+  --color-text-primary: #1f2328;
+  --color-text-muted: #656d76;
+  --color-border: #d0d7de;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --color-bg-page: #0d1117;
+  --color-surface: #161b22;
+  --color-surface-secondary: #21262d;
+  --color-brand-primary: #58a6ff;
+  --color-brand-hover: #79b8ff;
+  --color-text-primary: #e6edf3;
+  --color-text-muted: #8b949e;
+  --color-border: #30363d;
+  color-scheme: dark;
+}
+
+:root {
+  --bg-page: var(--color-bg-page);
+  --bg-module: var(--color-surface);
+  --bg-header: var(--color-surface-secondary);
+  --text-main: var(--color-text-primary);
+  --text-header: #ffffff;
+  --color-accent: var(--color-brand-primary);
+  --color-accent-hover: var(--color-brand-hover);
+  --color-link: var(--color-brand-primary);
+}
+
+:root {
+  --lucus-shadow: 0 1px 3px rgba(31, 35, 40, 0.12);
+  --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 45%, transparent);
+}
+
+html[data-theme="dark"] {
+  --lucus-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+  --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 55%, transparent);
+}
+
+:root {
+  --lucus-accent: var(--color-brand-primary);
+  --lucus-accent-hover: var(--color-brand-hover);
+}
+
+html[data-theme="light"],
+html[data-theme="auto"],
+html[data-theme="dark"] {
+  --button-bg: var(--lucus-accent);
+  --button-hover-bg: var(--lucus-accent-hover);
+  --default-button-bg: var(--lucus-accent);
+  --default-button-hover-bg: var(--lucus-accent-hover);
+  --link-fg: var(--lucus-accent);
+  --link-hover-color: var(--lucus-accent-hover);
+  --link-selected-fg: var(--lucus-accent);
+  --body-bg: var(--color-bg-page) !important;
+  --body-fg: var(--color-text-primary) !important;
+  --hairline-color: var(--color-border);
+  --border-color: var(--color-border);
+  --darkened-bg: var(--color-bg-page);
+}

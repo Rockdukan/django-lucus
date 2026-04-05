@@ -3,6 +3,7 @@
 
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:'en' }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}"
+      class="{% if lucus_admin_background_image_url and not is_popup %}lucus-admin-has-bg{% endif %}"
       data-lucus-appearance="{{ lucus_selected_appearance|default:'auto' }}"
       data-theme="{% if lucus_selected_appearance == 'auto' %}auto{% else %}{{ lucus_selected_appearance }}{% endif %}">
   <head>
@@ -38,6 +39,8 @@
       {% endfor %}
       {% endif %}
     {% endblock %}
+    {# After child extrastyle (changelists.css, constance.css, …) so overrides win. #}
+    <link rel="stylesheet" href="{% static 'lucus/css/lucus-after-extrastyle.css' %}">
 
     {% block responsive %}
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -95,10 +98,18 @@
     {% endblock %}
   </head>
 
-  <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+  <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}{% if lucus_admin_background_image_url and not is_popup %} lucus-admin-has-bg{% endif %}">
     <a href="#content-start" class="skip-to-content-link">{% translate 'Skip to main content' %}</a>
 
     <div id="container">
+      {% if lucus_admin_background_image_url and not is_popup %}
+      {# Inside #container so it stacks under header/main; sibling-before-container stayed under z-index:1 and never showed through. #}
+      <div class="lucus-admin-bg" aria-hidden="true">
+        {# <img> avoids broken url() from HTML escaping in style="" (was a common cause of “no image”). #}
+        <img class="lucus-admin-bg__photo" src="{{ lucus_admin_background_image_url }}" alt="" decoding="async" width="1920" height="1080" draggable="false">
+        <div class="lucus-admin-bg__scrim" style="opacity: {{ lucus_admin_background_scrim_opacity }};"></div>
+      </div>
+      {% endif %}
       {% if not is_popup %}
         {% block header %}
           <header id="header" class="lucus-header">
@@ -110,23 +121,52 @@
               </div>
               {% if has_permission %}
                 <div class="lucus-header__right">
-                  {% if lucus_color_scheme_choices %}
-                  <form method="post" action="{% url 'admin:lucus_save_ui' %}" class="lucus-header__theme-form">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                    <label class="visually-hidden" for="lucus-theme-scheme">{% translate "Color scheme" %}</label>
-                    <select name="color_scheme" id="lucus-theme-scheme" class="lucus-header__theme-select" aria-label="{% translate 'Color scheme' %}" onchange="this.form.submit()">
-                      {% for slug, label in lucus_color_scheme_choices %}
-                        <option value="{{ slug }}" {% if slug == lucus_selected_color_scheme %}selected{% endif %}>{{ label }}</option>
-                      {% endfor %}
-                    </select>
-                    <label class="visually-hidden" for="lucus-theme-appearance">{% translate "Appearance" %}</label>
-                    <select name="appearance" id="lucus-theme-appearance" class="lucus-header__theme-select" aria-label="{% translate 'Appearance' %}" onchange="this.form.submit()">
-                      {% for slug, label in lucus_appearance_choices %}
-                        <option value="{{ slug }}" {% if slug == lucus_selected_appearance %}selected{% endif %}>{{ label }}</option>
-                      {% endfor %}
-                    </select>
-                  </form>
+                  {% if lucus_color_scheme_choices or lucus_admin_set_language_url or lucus_admin_site_choices %}
+                  <div class="lucus-header__toolbar">
+                    {% if lucus_color_scheme_choices %}
+                    <form method="post" action="{% url 'admin:lucus_save_ui' %}" class="lucus-header__theme-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                      <label class="visually-hidden" for="lucus-theme-scheme">{% translate "Color scheme" %}</label>
+                      <select name="color_scheme" id="lucus-theme-scheme" class="lucus-header__theme-select" aria-label="{% translate 'Color scheme' %}" onchange="this.form.submit()">
+                        {% for slug, label in lucus_color_scheme_choices %}
+                          <option value="{{ slug }}" {% if slug == lucus_selected_color_scheme %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                      <label class="visually-hidden" for="lucus-theme-appearance">{% translate "Appearance" %}</label>
+                      <select name="appearance" id="lucus-theme-appearance" class="lucus-header__theme-select" aria-label="{% translate 'Appearance' %}" onchange="this.form.submit()">
+                        {% for slug, label in lucus_appearance_choices %}
+                          <option value="{{ slug }}" {% if slug == lucus_selected_appearance %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                    </form>
+                    {% endif %}
+                    {% if lucus_admin_site_choices %}
+                    <form method="post" action="{% url 'admin:lucus_save_site' %}" class="lucus-header__site-form lucus-header__lang-form--toolbar">
+                      {% csrf_token %}
+                      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                      <label class="visually-hidden" for="lucus-admin-site">{% translate "Site" %}</label>
+                      <select id="lucus-admin-site" name="site_id" class="lucus-header__theme-select" aria-label="{% translate 'Site' %}" onchange="this.form.submit()">
+                        {% for sid, label in lucus_admin_site_choices %}
+                          <option value="{{ sid }}" {% if sid == lucus_selected_site_id %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                    </form>
+                    {% endif %}
+                    {% if lucus_admin_set_language_url %}
+                    <form action="{{ lucus_admin_set_language_url }}" method="post" class="lucus-header__lang-form lucus-header__lang-form--toolbar">
+                      {% csrf_token %}
+                      <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                      {% get_available_languages as lucus_header_languages %}
+                      <label class="visually-hidden" for="lucus-lang-toolbar">{% translate "Language" %}</label>
+                      <select id="lucus-lang-toolbar" name="language" class="lucus-header__theme-select" aria-label="{% translate 'Language' %}" onchange="this.form.submit()">
+                        {% for code, name in lucus_header_languages %}
+                          <option value="{{ code }}" {% if LANGUAGE_CODE == code %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                      </select>
+                    </form>
+                    {% endif %}
+                  </div>
                   {% endif %}
                   <div class="lucus-header__user" id="lucus-user-dropdown">
                     <button type="button" class="lucus-header__user-trigger" aria-expanded="false" aria-controls="lucus-user-menu" aria-haspopup="true">
@@ -134,20 +174,6 @@
                       <span class="lucus-header__user-chevron" aria-hidden="true"></span>
                     </button>
                     <div class="lucus-header__user-menu" id="lucus-user-menu" role="menu" hidden>
-                      {% url "set_language" as set_language_url %}
-                      {% if set_language_url %}
-                        <form action="{{ set_language_url }}" method="post" class="lucus-header__lang-form lucus-header__user-item">
-                          {% csrf_token %}
-                          <input name="next" type="hidden" value="{{ request.get_full_path }}">
-                          {% get_available_languages as admin_languages %}
-                          <label for="lucus-lang" class="visually-hidden">{% translate "Язык админки" %}</label>
-                          <select id="lucus-lang" name="language" onchange="this.form.submit()" aria-label="{% translate "Язык админки" %}">
-                            {% for code, name in admin_languages %}
-                              <option value="{{ code }}" {% if LANGUAGE_CODE == code %}selected{% endif %}>{{ name }}</option>
-                            {% endfor %}
-                          </select>
-                        </form>
-                      {% endif %}
                       {% if site_url %}<a href="{{ site_url }}" class="lucus-header__user-item" role="menuitem">{% translate 'View site' %}</a>{% endif %}
                       {% if user.has_usable_password %}<a href="{% url 'admin:password_change' %}" class="lucus-header__user-item" role="menuitem">{% translate 'Change password' %}</a>{% endif %}
                       {% if lucus_ui_high_contrast_toggle %}

@@ -101,7 +101,8 @@ body {
     font-size: 0.875rem;
     font-family: var(--font-family-primary);
     color: var(--body-fg);
-    background: var(--body-bg);
+    /* background-color only — shorthand `background` resets background-image (e.g. LUCUS_ADMIN_BACKGROUND_IMAGE). */
+    background-color: var(--body-bg);
 }
 
 /* LINKS */
@@ -3998,7 +3999,8 @@ input[type="submit"], button {
         background-position: 0 0;
     }
 
-    [dir="rtl"] :enabled.selector-remove:focus, :enabled.selector-remove:hover {
+    [dir="rtl"] :enabled.selector-remove:focus,
+    [dir="rtl"] :enabled.selector-remove:hover {
         background-position: 0 -24px;
     }
 
@@ -4006,106 +4008,107 @@ input[type="submit"], button {
         background-position: 0 -48px;
     }
 
-    [dir="rtl"] :enabled.selector-add:focus, :enabled.selector-add:hover {
+    [dir="rtl"] :enabled.selector-add:focus,
+    [dir="rtl"] :enabled.selector-add:hover {
         background-position: 0 -72px;
     }
 }
-/* GLOBAL */
+/* GLOBAL — RTL only (vendored Django rtl.css; was unscoped and broke LTR layouts) */
 
-th {
+html[dir="rtl"] th {
     text-align: right;
 }
 
-.module h2, .module caption {
+html[dir="rtl"] .module h2, html[dir="rtl"] .module caption {
     text-align: right;
 }
 
-.module ul, .module ol {
+html[dir="rtl"] .module ul, html[dir="rtl"] .module ol {
     margin-left: 0;
     margin-right: 1.5em;
 }
 
-.viewlink, .addlink, .changelink, .hidelink {
+html[dir="rtl"] .viewlink, html[dir="rtl"] .addlink, html[dir="rtl"] .changelink, html[dir="rtl"] .hidelink {
     padding-left: 0;
     padding-right: 16px;
     background-position: 100% 1px;
 }
 
-.deletelink {
+html[dir="rtl"] .deletelink {
     padding-left: 0;
     padding-right: 16px;
     background-position: 100% 1px;
 }
 
-.object-tools {
+html[dir="rtl"] .object-tools {
     float: left;
 }
 
-thead th:first-child,
-tfoot td:first-child {
+html[dir="rtl"] thead th:first-child,
+html[dir="rtl"] tfoot td:first-child {
     border-left: none;
 }
 
 /* LAYOUT */
 
-#user-tools {
+html[dir="rtl"] #user-tools {
     right: auto;
     left: 0;
     text-align: left;
 }
 
-div.breadcrumbs {
+html[dir="rtl"] div.breadcrumbs {
     text-align: right;
 }
 
-#content-main {
+html[dir="rtl"] #content-main {
     float: right;
 }
 
-#content-related {
+html[dir="rtl"] #content-related {
     float: left;
     margin-left: -300px;
     margin-right: auto;
 }
 
-.colMS {
+html[dir="rtl"] .colMS {
     margin-left: 300px;
     margin-right: 0;
 }
 
 /* SORTABLE TABLES */
 
-table thead th.sorted .sortoptions {
+html[dir="rtl"] table thead th.sorted .sortoptions {
    float: left;
 }
 
-thead th.sorted .text {
+html[dir="rtl"] thead th.sorted .text {
     padding-right: 0;
     padding-left: 42px;
 }
 
 /* dashboard styles */
 
-.dashboard .module table td a {
+html[dir="rtl"] .dashboard .module table td a {
     padding-left: .6em;
     padding-right: 16px;
 }
 
 /* changelists styles */
 
-.change-list .filtered .results table {
+html[dir="rtl"] .change-list .filtered .results table {
     border-left: none;
     border-right: 0px none;
 }
 
-#changelist-filter {
+html[dir="rtl"] #changelist-filter {
     border-left: none;
     border-right: none;
     margin-left: 0;
     margin-right: 30px;
 }
 
-#changelist-filter li.selected {
+html[dir="rtl"] #changelist-filter li.selected {
     border-left: none;
     padding-left: 10px;
     margin-left: 0;
@@ -4114,176 +4117,176 @@ thead th.sorted .text {
     margin-right: -15px;
 }
 
-#changelist .results table tbody td:first-child, #changelist .results table tbody th:first-child {
+html[dir="rtl"] #changelist .results table tbody td:first-child, html[dir="rtl"] #changelist .results table tbody th:first-child {
     border-right: none;
     border-left: none;
 }
 
-.paginator .end {
+html[dir="rtl"] .paginator .end {
     margin-left: 6px;
     margin-right: 0;
 }
 
-.paginator input {
+html[dir="rtl"] .paginator input {
     margin-left: 0;
     margin-right: auto;
 }
 
 /* FORMS */
 
-.aligned label {
+html[dir="rtl"] .aligned label {
     padding: 0 0 3px 1em;
 }
 
-.submit-row a.deletelink {
+html[dir="rtl"] .submit-row a.deletelink {
     margin-left: 0;
     margin-right: auto;
 }
 
-.vDateField, .vTimeField {
+html[dir="rtl"] .vDateField, html[dir="rtl"] .vTimeField {
     margin-left: 2px;
 }
 
-.aligned .form-row input {
+html[dir="rtl"] .aligned .form-row input {
     margin-left: 5px;
 }
 
-form .aligned ul {
+html[dir="rtl"] form .aligned ul {
     margin-right: 163px;
     padding-right: 10px;
     margin-left: 0;
     padding-left: 0;
 }
 
-form ul.inline li {
+html[dir="rtl"] form ul.inline li {
     float: right;
     padding-right: 0;
     padding-left: 7px;
 }
 
-form .aligned p.help,
-form .aligned div.help {
+html[dir="rtl"] form .aligned p.help,
+html[dir="rtl"] form .aligned div.help {
     margin-left: 0;
     margin-right: 160px;
     padding-right: 10px;
 }
 
-form div.help ul,
-form .aligned .checkbox-row + .help,
-form .aligned p.date div.help.timezonewarning,
-form .aligned p.datetime div.help.timezonewarning,
-form .aligned p.time div.help.timezonewarning {
+html[dir="rtl"] form div.help ul,
+html[dir="rtl"] form .aligned .checkbox-row + .help,
+html[dir="rtl"] form .aligned p.date div.help.timezonewarning,
+html[dir="rtl"] form .aligned p.datetime div.help.timezonewarning,
+html[dir="rtl"] form .aligned p.time div.help.timezonewarning {
     margin-right: 0;
     padding-right: 0;
 }
 
-form .wide p.help,
-form .wide ul.errorlist,
-form .wide div.help {
+html[dir="rtl"] form .wide p.help,
+html[dir="rtl"] form .wide ul.errorlist,
+html[dir="rtl"] form .wide div.help {
     padding-left: 0;
     padding-right: 50px;
 }
 
-.submit-row {
+html[dir="rtl"] .submit-row {
     text-align: right;
 }
 
-fieldset .fieldBox {
+html[dir="rtl"] fieldset .fieldBox {
     margin-left: 20px;
     margin-right: 0;
 }
 
-.errorlist li {
+html[dir="rtl"] .errorlist li {
     background-position: 100% 12px;
     padding: 0;
 }
 
-.errornote {
+html[dir="rtl"] .errornote {
     background-position: 100% 12px;
     padding: 10px 12px;
 }
 
 /* WIDGETS */
 
-.calendarnav-previous {
+html[dir="rtl"] .calendarnav-previous {
     top: 0;
     left: auto;
     right: 10px;
     background: url(../img/calendar-icons.svg) 0 -15px no-repeat;
 }
 
-.calendarnav-next {
+html[dir="rtl"] .calendarnav-next {
     top: 0;
     right: auto;
     left: 10px;
     background: url(../img/calendar-icons.svg) 0 0 no-repeat;
 }
 
-.calendar caption, .calendarbox h2 {
+html[dir="rtl"] .calendar caption, html[dir="rtl"] .calendarbox h2 {
     text-align: center;
 }
 
-.selector {
+html[dir="rtl"] .selector {
     float: right;
 }
 
-.selector .selector-filter {
+html[dir="rtl"] .selector .selector-filter {
     text-align: right;
 }
 
-.selector-add {
+html[dir="rtl"] .selector-add {
     background: url(../img/selector-icons.svg) 0 -96px no-repeat;
     background-size: 24px auto;
 }
 
-:enabled.selector-add:focus, :enabled.selector-add:hover {
+html[dir="rtl"] :enabled.selector-add:focus, html[dir="rtl"] :enabled.selector-add:hover {
     background-position: 0 -120px;
 }
 
-.selector-remove {
+html[dir="rtl"] .selector-remove {
     background: url(../img/selector-icons.svg) 0 -144px no-repeat;
     background-size: 24px auto;
 }
 
-:enabled.selector-remove:focus, :enabled.selector-remove:hover {
+html[dir="rtl"] :enabled.selector-remove:focus, html[dir="rtl"] :enabled.selector-remove:hover {
     background-position: 0 -168px;
 }
 
-.selector-chooseall {
+html[dir="rtl"] .selector-chooseall {
     background: url(../img/selector-icons.svg) right -128px no-repeat;
 }
 
-:enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
+html[dir="rtl"] :enabled.selector-chooseall:focus, html[dir="rtl"] :enabled.selector-chooseall:hover {
     background-position: 100% -144px;
 }
 
-.selector-clearall {
+html[dir="rtl"] .selector-clearall {
     background: url(../img/selector-icons.svg) 0 -160px no-repeat;
 }
 
-:enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
+html[dir="rtl"] :enabled.selector-clearall:focus, html[dir="rtl"] :enabled.selector-clearall:hover {
     background-position: 0 -176px;
 }
 
-.inline-deletelink {
+html[dir="rtl"] .inline-deletelink {
     float: left;
 }
 
-form .form-row p.datetime {
+html[dir="rtl"] form .form-row p.datetime {
     overflow: hidden;
 }
 
-.related-widget-wrapper {
+html[dir="rtl"] .related-widget-wrapper {
     float: right;
 }
 
 /* MISC */
 
-.inline-related h2, .inline-group h2 {
-    text-align: right
+html[dir="rtl"] .inline-related h2, html[dir="rtl"] .inline-group h2 {
+    text-align: right;
 }
 
-.inline-related h3 span.delete {
+html[dir="rtl"] .inline-related h3 span.delete {
     padding-right: 20px;
     padding-left: inherit;
     left: 10px;
@@ -4291,16 +4294,16 @@ form .form-row p.datetime {
     float:left;
 }
 
-.inline-related h3 span.delete label {
+html[dir="rtl"] .inline-related h3 span.delete label {
     margin-left: inherit;
     margin-right: 2px;
 }
 
-.inline-group .tabular td.original p {
+html[dir="rtl"] .inline-group .tabular td.original p {
     right: 0;
 }
 
-.selector .selector-chooser {
+html[dir="rtl"] .selector .selector-chooser {
     margin: 0;
 }
 

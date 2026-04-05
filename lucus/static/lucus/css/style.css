@@ -360,7 +360,7 @@ small {
   border: 1px solid var(--color-border);
   border-radius: var(--s);
   box-shadow: var(--lucus-shadow);
-  padding: 6px 0;
+  padding: 6px var(--s);
   z-index: 1000;
 }
 .lucus-header__user-menu[hidden] {
@@ -400,19 +400,10 @@ small {
   color: var(--color-brand-primary) !important;
 }
 
-.lucus-header__user-item .lucus-header__lang-form { padding: 0; margin: 0; }
-.lucus-header__user-item select {
-  width: 100%;
-  padding: 6px 10px;
-  font-size: 13px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-primary) !important;
-  border-radius: 10px;
-  background-clip: padding-box;
+.lucus-header__logout-form {
+  display: block;
+  margin: 0;
 }
-
-.lucus-header__logout-form { display: block; margin: 0; }
 .lucus-header__logout-form button {
   background: none;
   border: none;
@@ -423,6 +414,7 @@ small {
   text-align: left;
   display: block;
   padding: 6px 12px !important;
+  box-sizing: border-box;
 }
 
 /* Lucus: no nav sidebar — content uses full width of .main */
@@ -431,6 +423,7 @@ small {
   margin-left: 0 !important;
   width: 100% !important;
   max-width: none !important;
+  background: transparent;
 }
 
 /* Bundled base.css floats #content-main; without a related sidebar this can skew layout */
@@ -443,7 +436,7 @@ small {
 #content {
   max-width: none;
   padding: var(--l);
-  background: var(--color-bg-page);
+  background: transparent;
 }
 
 #content h1 {
@@ -623,6 +616,53 @@ body {
   color: var(--color-text-primary);
 }
 
+/* Full-page background: markup .lucus-admin-bg (settings.LUCUS_ADMIN_BACKGROUND_IMAGE) */
+html.lucus-admin-has-bg {
+  min-height: 100%;
+}
+
+body.lucus-admin-has-bg {
+  min-height: 100vh;
+}
+
+.lucus-admin-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.lucus-admin-bg__photo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+  object-position: center center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.lucus-admin-bg__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--color-bg-page);
+}
+
+body.lucus-admin-has-bg #container {
+  position: relative;
+  isolation: isolate;
+  background: transparent !important;
+}
+
+body.lucus-admin-has-bg #container > .main {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+}
+
 #content .module h2,
 #content .module caption,
 #content .inline-group h2,
@@ -635,7 +675,7 @@ body {
   border: none;
   border-radius: 10px 10px 0 0;
   padding: var(--s) var(--m);
-  font-size: var(--s);
+  font-size: calc(var(--m) * 0.8) !important;
   font-weight: 700;
   text-transform: uppercase;
   line-height: var(--phi);
@@ -651,7 +691,7 @@ body {
   border: none;
   border-radius: 10px 10px 0 0;
   padding: var(--s) var(--m);
-  font-size: var(--s);
+  font-size: calc(var(--m) * 0.8) !important;
   font-weight: 700;
   text-transform: uppercase;
   line-height: var(--phi);
@@ -1360,51 +1400,76 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   --border-color: var(--color-border);
 }
 
-#content .lucus-changelist.module {
-  padding: 10px 12px;
+/* Changelist outer shell: no full-width surface — .results / aside keep their own cards */
+#content #changelist.module {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  overflow: visible;
 }
-
-#content #result_list {
-  border-radius: 10px;
-}
-
 
 #content .results {
-  border-radius: 10px;
-  box-shadow: var(--lucus-shadow);
+  border-radius: 0;
+  box-shadow: none;
   overflow: visible;
-  background: var(--color-surface);
+  background: transparent;
   max-width: 100%;
 }
 
-/* Horizontal scroll for wide tables */
+/* Horizontal scroll + single rounded frame (table itself often ignores overflow/border-radius). */
 #content .results .lucus-results-scroll {
   overflow-x: auto;
   overflow-y: clip;
   max-width: 100%;
   -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+  box-shadow: var(--lucus-shadow);
+  background: var(--color-surface);
 }
-
 
 #content table#result_list {
   border: 1px solid var(--color-border) !important;
   border-collapse: separate !important;
   border-spacing: 0 !important;
-  border-radius: 10px;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+  background: transparent;
 }
 
 /* Scope to .results only — tabular inlines (e.g. gallery_images) live inside #changelist too */
 #content #changelist .results table,
 #content .results table {
-  border-collapse: collapse;
   width: 100%;
+}
+#content #changelist .results table:not(#result_list),
+#content .results table:not(#result_list) {
+  border-collapse: collapse;
   box-shadow: none !important;
 }
 #content #changelist .results table thead,
+#content .results table thead {
+  border: none !important;
+  border-radius: 0 !important;
+}
+
 #content #changelist .results table tbody,
-#content .results table thead,
 #content .results table tbody {
   border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-radius: 0 !important;
+}
+
+/* Rounding lives on <table> only — not on thead/tbody/cells */
+#content #changelist .results table thead th,
+#content #changelist .results table tbody td,
+#content #changelist .results table tbody th,
+#content .results table thead th,
+#content .results table tbody td,
+#content .results table tbody th {
+  border-radius: 0 !important;
 }
 #content #changelist .results table thead th,
 #content .results table thead th {
@@ -1684,7 +1749,7 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
 #content .paginator a,
 #content .paginator .this-page,
 #content .paginator .end,
-#content .paginator input {
+#content .paginator input:not([type="submit"]):not(.default) {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -1698,6 +1763,32 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   border: 1px solid var(--color-border);
   background: var(--color-surface) !important;
   color: var(--color-brand-primary);
+  box-sizing: border-box;
+}
+
+/* e.g. Constance: submit lives in <p class="paginator sticky-footer"> — do not use page-chip sizing */
+#content .paginator input[type="submit"],
+#content .paginator input.default {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 2.25rem !important;
+  padding: 10px 18px !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  border-radius: 6px;
+  margin: 0 !important;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-brand-primary) !important;
+  color: var(--color-surface) !important;
   box-sizing: border-box;
 }
 
@@ -1724,7 +1815,7 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   text-decoration: underline;
 }
 
-#content .paginator input {
+#content .paginator input:not([type="submit"]):not(.default) {
   width: 26px;
   box-sizing: border-box;
 }
@@ -2202,6 +2293,29 @@ body.change-list-page button[type="submit"]:hover,
   color: #fff !important;
 }
 
+/* Header user menu: logout is type=submit — must not inherit changelist primary-button styles */
+body.change-list-page #header .lucus-header__user-menu button[type="submit"] {
+  height: auto !important;
+  min-height: 0 !important;
+  line-height: 1.25 !important;
+  padding: 6px 12px !important;
+  background: none !important;
+  color: var(--color-text-primary) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  font-size: 13px !important;
+  font-weight: 400;
+  box-shadow: none !important;
+  width: 100%;
+  text-align: left;
+  display: block;
+}
+body.change-list-page #header .lucus-header__user-menu button[type="submit"]:hover,
+body.change-list-page #header .lucus-header__user-menu button[type="submit"]:focus-visible {
+  background: var(--color-surface-secondary) !important;
+  color: var(--color-brand-primary) !important;
+}
+
 body.change-list-page .lucus-changelist a,
 body.change-list-page .lucus-changelist .results a,
 body.change-list-page .lucus-changelist__filters a,
@@ -2460,6 +2574,14 @@ body.delete-confirmation form > div:has(input[type="submit"]) .cancel-link {
 /* LUCUS UI: theme selects, field help (?), sticky thead, fixed submit */
 /* ------------------------------------------------------------------ */
 
+.lucus-header__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s);
+  margin-right: var(--m);
+}
+
 .lucus-header__theme-form {
   display: flex;
   flex-wrap: wrap;
@@ -2467,7 +2589,13 @@ body.delete-confirmation form > div:has(input[type="submit"]) .cancel-link {
   gap: var(--s);
   margin: 0;
   padding: 0;
-  margin-right: var(--s);
+}
+
+.lucus-header__lang-form--toolbar {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 .lucus-header__theme-select {
@@ -2714,4 +2842,10 @@ html[data-theme="dark"] #content .messagelist li.success {
 html[data-theme="dark"] .lucus-field-help__body {
   background: var(--color-surface);
   color: var(--color-text-primary);
+}
+
+
+.filebrowser .navigator-table tbody {
+  /*padding-bottom: 5px;*/
+  margin-top: 5px;
 }

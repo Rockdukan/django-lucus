@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
 
 from lucus.models import LucusAdminUiPreference
+from lucus.sites_panel import SESSION_KEY, sites_app_enabled, sites_selector_enabled
 from lucus.theme import bundled_scheme_slugs, is_valid_scheme_slug, normalize_appearance
 
 
@@ -40,3 +41,25 @@ def save_admin_ui(request):
     resp.set_cookie("lucus_color_scheme", scheme, max_age=age, samesite="Lax", path="/")
     resp.set_cookie("lucus_appearance", appearance, max_age=age, samesite="Lax", path="/")
     return resp
+
+
+@require_POST
+def save_admin_site(request):
+    """Store selected django.contrib.sites Site pk in session (staff-only via admin_view)."""
+    next_url = _safe_redirect_url(
+        request.POST.get("next", ""),
+        request.META.get("HTTP_REFERER") or "/admin/",
+    )
+    if not sites_app_enabled() or not sites_selector_enabled():
+        return HttpResponseRedirect(next_url)
+    from django.contrib.sites.models import Site
+
+    raw = (request.POST.get("site_id") or "").strip()
+    try:
+        pk = int(raw)
+    except ValueError:
+        return HttpResponseRedirect(next_url)
+    if Site.objects.filter(pk=pk).exists():
+        request.session[SESSION_KEY] = pk
+        request.session.modified = True
+    return HttpResponseRedirect(next_url)

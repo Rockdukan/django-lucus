@@ -1,0 +1,72 @@
+@charset "UTF-8";
+
+/* Color scheme: dracula — inspired by Dracula (purple / pink on dark). */
+
+:root,
+html[data-theme="light"],
+html[data-theme="auto"] {
+  --color-bg-page: #f0f1f5;
+  --color-surface: #ffffff;
+  --color-surface-secondary: #e2e4ec;
+  --color-brand-primary: #7c3aed;
+  --color-brand-hover: #6d28d9;
+  --color-text-primary: #282a36;
+  --color-text-muted: #6272a4;
+  --color-border: #ccd0dc;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --color-bg-page: #282a36;
+  --color-surface: #363447;
+  --color-surface-secondary: #44475a;
+  --color-brand-primary: #bd93f9;
+  --color-brand-hover: #d4b5ff;
+  --color-text-primary: #f8f8f2;
+  --color-text-muted: #bd93f9;
+  --color-border: #6272a4;
+  color-scheme: dark;
+}
+
+:root {
+  --bg-page: var(--color-bg-page);
+  --bg-module: var(--color-surface);
+  --bg-header: var(--color-surface-secondary);
+  --text-main: var(--color-text-primary);
+  --text-header: #ffffff;
+  --color-accent: var(--color-brand-primary);
+  --color-accent-hover: var(--color-brand-hover);
+  --color-link: var(--color-brand-primary);
+}
+
+:root {
+  --lucus-shadow: 0 2px 12px rgba(40, 42, 54, 0.1);
+  --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 45%, transparent);
+}
+
+html[data-theme="dark"] {
+  --lucus-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+  --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 55%, transparent);
+}
+
+:root {
+  --lucus-accent: var(--color-brand-primary);
+  --lucus-accent-hover: var(--color-brand-hover);
+}
+
+html[data-theme="light"],
+html[data-theme="auto"],
+html[data-theme="dark"] {
+  --button-bg: var(--lucus-accent);
+  --button-hover-bg: var(--lucus-accent-hover);
+  --default-button-bg: var(--lucus-accent);
+  --default-button-hover-bg: var(--lucus-accent-hover);
+  --link-fg: var(--lucus-accent);
+  --link-hover-color: var(--lucus-accent-hover);
+  --link-selected-fg: var(--lucus-accent);
+  --body-bg: var(--color-bg-page) !important;
+  --body-fg: var(--color-text-primary) !important;
+  --hairline-color: var(--color-border);
+  --border-color: var(--color-border);
+  --darkened-bg: var(--color-bg-page);
+}

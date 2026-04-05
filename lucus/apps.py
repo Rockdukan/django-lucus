@@ -67,6 +67,11 @@ class LucusConfig(AppConfig):
                         admin.site.admin_view(lucus_views.save_admin_ui),
                         name="lucus_save_ui",
                     ),
+                    path(
+                        "lucus/save-site/",
+                        admin.site.admin_view(lucus_views.save_admin_site),
+                        name="lucus_save_site",
+                    ),
                 ] + original_get_urls()
 
             admin.site.get_urls = get_urls_with_lucus
