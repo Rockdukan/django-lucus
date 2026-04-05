@@ -1393,24 +1393,25 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   border-radius: 10px;
 }
 
-#content #changelist table,
+/* Scope to .results only — tabular inlines (e.g. gallery_images) live inside #changelist too */
+#content #changelist .results table,
 #content .results table {
   border-collapse: collapse;
   width: 100%;
   box-shadow: none !important;
 }
-#content #changelist table thead,
-#content #changelist table tbody,
+#content #changelist .results table thead,
+#content #changelist .results table tbody,
 #content .results table thead,
 #content .results table tbody {
   border: none !important;
 }
-#content #changelist table thead th,
+#content #changelist .results table thead th,
 #content .results table thead th {
   border-color: var(--color-border) !important;
 }
 
-#content #changelist thead th,
+#content #changelist .results thead th,
 #content .results thead th,
 #content #changelist-filter h2 {
   background: var(--color-surface-secondary) !important;
@@ -1492,28 +1493,28 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   border-right: 1px solid color-mix(in srgb, var(--color-border) 48%, transparent) !important;
 }
 
-#content #changelist thead th .text a:hover,
-#content #changelist thead th .text a:focus,
+#content #changelist .results thead th .text a:hover,
+#content #changelist .results thead th .text a:focus,
 #content .results thead th .text a:hover,
 #content .results thead th .text a:focus {
   background: rgba(74, 103, 65, 0.12) !important;
   color: var(--color-brand-primary) !important;
 }
 
-#content #changelist tbody tr,
+#content #changelist .results tbody tr,
 #content .results tbody tr {
   background: var(--color-surface);
 }
-#content #changelist tbody tr:nth-child(odd),
+#content #changelist .results tbody tr:nth-child(odd),
 #content .results tbody tr:nth-child(odd) {
   background: rgba(221, 227, 219, 0.25);
 }
-#content #changelist tbody tr:hover,
+#content #changelist .results tbody tr:hover,
 #content .results tbody tr:hover {
   background: rgba(74, 103, 65, 0.05);
 }
 
-#content #changelist tbody td,
+#content #changelist .results tbody td,
 #content .results tbody td {
   border: none !important;
   border-bottom: 1px solid var(--color-border) !important;
@@ -1523,13 +1524,13 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   font-size: 13px;
   vertical-align: middle;
 }
-#content #changelist tbody tr:last-child td,
+#content #changelist .results tbody tr:last-child td,
 #content .results tbody tr:last-child td {
   border-bottom: 0 !important;
 }
 
 
-#content #changelist tbody th,
+#content #changelist .results tbody th,
 #content .results tbody th {
   border: none !important;
   border-bottom: 1px solid var(--color-border) !important;
@@ -1540,7 +1541,7 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   font-weight: 400;
   vertical-align: middle;
 }
-#content #changelist tbody tr:last-child th,
+#content #changelist .results tbody tr:last-child th,
 #content .results tbody tr:last-child th {
   border-bottom: 0 !important;
 }
@@ -1783,6 +1784,32 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
 #content #changelist .lucus-changelist__main-column {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+/* No filter aside: stretch main column + POST form to full content width */
+#content #changelist.lucus-changelist:not(.filtered) .lucus-changelist__layout {
+  width: 100%;
+  max-width: 100%;
+}
+#content #changelist.lucus-changelist:not(.filtered) .lucus-changelist__main-column {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+#content #changelist.lucus-changelist:not(.filtered) #changelist-form {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Tabular inlines on editable changelist: use width; avoid clipping positioned cells */
+#content #changelist .inline-group {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
+}
+#content #changelist .inline-group fieldset.module {
+  overflow: visible;
 }
 
 #content #changelist .lucus-changelist__aside {

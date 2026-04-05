@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-lucus"
-version = "0.1.2"
+version = "0.1.333333333333333333333333333333333"
 description = "Lucus enhances Django Admin with custom templates, static theming, and a multi-column dashboard."
 readme = "README.md"
 requires-python = ">=3.10"

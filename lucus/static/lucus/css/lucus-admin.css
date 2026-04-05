@@ -2299,13 +2299,13 @@ ul.timelist, .timelist li {
     min-width: 0;
 }
 
-#changelist table {
+#changelist .results table {
     width: 100%;
 }
 
 .change-list .hiddenfields { display:none; }
 
-.change-list .filtered table {
+.change-list .filtered .results table {
     border-right: none;
 }
 
@@ -2318,7 +2318,7 @@ ul.timelist, .timelist li {
     width: auto;
 }
 
-.change-list .filtered table tbody th {
+.change-list .filtered .results table tbody th {
     padding-right: 1em;
 }
 
@@ -2338,24 +2338,24 @@ ul.timelist, .timelist li {
     overflow: hidden;
 }
 
-/* CHANGELIST TABLES */
+/* CHANGELIST TABLES (only #result_list inside .results — not tabular inlines) */
 
-#changelist table thead th {
+#changelist .results table thead th {
     padding: 0;
     white-space: nowrap;
     vertical-align: middle;
 }
 
-#changelist table thead th.action-checkbox-column {
+#changelist .results table thead th.action-checkbox-column {
     width: 1.5em;
     text-align: center;
 }
 
-#changelist table tbody td.action-checkbox {
+#changelist .results table tbody td.action-checkbox {
     text-align: center;
 }
 
-#changelist table tfoot {
+#changelist .results table tfoot {
     color: var(--body-quiet-color);
 }
 
@@ -2544,26 +2544,26 @@ ul.timelist, .timelist li {
     border-right: none;
 }
 
-#changelist table input {
+#changelist .results table input {
     margin: 0;
     vertical-align: baseline;
 }
 
 /* Once the :has() pseudo-class is supported by all browsers, the tr.selected
    selector and the JS adding the class can be removed. */
-#changelist tbody tr.selected {
+#changelist .results tbody tr.selected {
     background-color: var(--selected-row);
 }
 
-#changelist tbody tr:has(.action-select:checked) {
+#changelist .results tbody tr:has(.action-select:checked) {
     background-color: var(--selected-row);
 }
 
 @media (forced-colors: active) {
-    #changelist tbody tr.selected {
+    #changelist .results tbody tr.selected {
         background-color: SelectedItem;
     }
-    #changelist tbody tr:has(.action-select:checked) {
+    #changelist .results tbody tr:has(.action-select:checked) {
         background-color: SelectedItem;
     }
 }
@@ -4093,7 +4093,7 @@ thead th.sorted .text {
 
 /* changelists styles */
 
-.change-list .filtered table {
+.change-list .filtered .results table {
     border-left: none;
     border-right: 0px none;
 }
@@ -4114,7 +4114,7 @@ thead th.sorted .text {
     margin-right: -15px;
 }
 
-#changelist table tbody td:first-child, #changelist table tbody th:first-child {
+#changelist .results table tbody td:first-child, #changelist .results table tbody th:first-child {
     border-right: none;
     border-left: none;
 }
