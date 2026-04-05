@@ -221,7 +221,7 @@ def normalize_group_columns(groups: Iterable[dict[str, Any]]) -> tuple[dict[str,
 
 
 def _raw_admin_app_list(request):
-    """Return ``get_app_list`` (same grouping as sidebar if patched)."""
+    """Return ``get_app_list`` for the dashboard."""
     return admin.site.get_app_list(request)
 
 

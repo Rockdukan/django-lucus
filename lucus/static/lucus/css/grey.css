@@ -1,8 +1,10 @@
 @charset "UTF-8";
 
-/* Color scheme: grey. Loaded when LUCUS_COLOR_SCHEME is "grey". */
+/* Color scheme: grey. */
 
-:root {
+:root,
+html[data-theme="light"],
+html[data-theme="auto"] {
   --color-bg-page: #eeeeee;
   --color-surface: #ffffff;
   --color-surface-secondary: #e0e0e0;
@@ -14,6 +16,22 @@
   --color-text-primary: #444444;
   --color-text-muted: #888888;
   --color-border: #cccccc;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --color-bg-page: #121416;
+  --color-surface: #1a1e22;
+  --color-surface-secondary: #252b32;
+  --color-brand-primary: #5eb8db;
+  --color-brand-hover: #7bc8e8;
+  --color-link: #7bc8e8;
+  --color-link-hover: #b8e4f5;
+  --color-link-soft-hover: #9dd4ed;
+  --color-text-primary: #e4e8ec;
+  --color-text-muted: #9aa5b0;
+  --color-border: #3d4754;
+  color-scheme: dark;
 }
 
 :root {
@@ -32,6 +50,7 @@
 }
 
 html[data-theme="dark"] {
+  --lucus-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
   --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 55%, transparent);
 }
 
@@ -40,27 +59,8 @@ html[data-theme="dark"] {
   --lucus-accent-hover: var(--color-brand-hover);
 }
 
-:root,
-html[data-theme="light"] {
-  --button-bg: var(--lucus-accent);
-  --button-hover-bg: var(--lucus-accent-hover);
-  --default-button-bg: var(--lucus-accent);
-  --default-button-hover-bg: var(--lucus-accent-hover);
-  --link-fg: var(--color-link);
-  --link-hover-color: var(--color-link-hover);
-  --link-selected-fg: var(--color-link);
-}
-
-html,
-html[data-theme="dark"],
-html[data-theme="auto"] {
-  --body-bg: var(--color-bg-page) !important;
-  --body-fg: var(--color-text-primary) !important;
-  color-scheme: light !important;
-}
-
-:root,
 html[data-theme="light"],
+html[data-theme="auto"],
 html[data-theme="dark"] {
   --button-bg: var(--lucus-accent);
   --button-hover-bg: var(--lucus-accent-hover);
@@ -69,6 +69,8 @@ html[data-theme="dark"] {
   --link-fg: var(--color-link);
   --link-hover-color: var(--color-link-hover);
   --link-selected-fg: var(--color-link);
+  --body-bg: var(--color-bg-page) !important;
+  --body-fg: var(--color-text-primary) !important;
   --hairline-color: var(--color-border);
   --border-color: var(--color-border);
   --darkened-bg: var(--color-bg-page);

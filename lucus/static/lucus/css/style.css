@@ -22,7 +22,7 @@
 /* ------------------------------------------------------------------ */
 /*                                BASE                                */
 /* ------------------------------------------------------------------ */
-/* Spacing scale. Palette: static/lucus/css/<LUCUS_COLOR_SCHEME>.css */
+/* Spacing scale. Palette: static/lucus/css/<scheme>.css (user-selected in admin). */
 :root {
   --phi: 1.618;
   --u: 16px;
@@ -30,6 +30,18 @@
   --m: var(--u);
   --l: calc(var(--u) * var(--phi));
   --xl: calc(var(--l) * var(--phi));
+  /* Design tokens (radius / motion; shadows extended per color scheme) */
+  --lucus-radius-sm: 6px;
+  --lucus-radius-md: 8px;
+  --lucus-radius-lg: 10px;
+  --lucus-radius-xl: 12px;
+  --lucus-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --lucus-transition-fast: 0.15s var(--lucus-ease-out);
+  --lucus-transition-med: 0.22s var(--lucus-ease-out);
+  --lucus-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --lucus-shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
+  /* Below sticky admin header (matches #header height: var(--xl)) */
+  --lucus-sticky-thead-offset: var(--xl);
 }
 
 *,
@@ -206,11 +218,6 @@ small {
 /*                        ADMIN THEME / HEADER                        */
 /* ------------------------------------------------------------------ */
 
-#toggle-nav-sidebar,
-.toggle-nav-sidebar {
-  display: none !important;
-}
-
 #header.lucus-header,
 #header {
   background: var(--color-bg-page) !important;
@@ -221,6 +228,9 @@ small {
   min-height: var(--xl);
   padding: 0;
   margin-bottom: 0;
+  position: sticky;
+  top: 0;
+  z-index: 60;
 }
 
 .lucus-header__inner {
@@ -313,15 +323,19 @@ small {
   width: calc(var(--l) + var(--s));
   height: calc(var(--l) + var(--s));
   border-radius: 50%;
-  background: var(--color-brand-primary);
-  color: var(--text-header);
-  font-size: 14px;
-  font-weight: 700;
+  overflow: hidden;
+  background: var(--color-surface-secondary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
 
+.lucus-header__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .lucus-header__user-trigger {
@@ -430,16 +444,20 @@ small {
   padding: 6px 12px !important;
 }
 
-#nav-sidebar,
-body .main .nav-sidebar {
-  display: none !important;
-}
-.main { display: block !important; }
+/* Lucus: no nav sidebar — content uses full width of .main */
 .main #content-start,
 .main .content {
   margin-left: 0 !important;
   width: 100% !important;
   max-width: none !important;
+}
+
+/* Bundled base.css floats #content-main; without a related sidebar this can skew layout */
+#content #content-main.lucus-content {
+  float: none;
+  width: 100%;
+  max-width: 100%;
+  clear: both;
 }
 #content {
   max-width: none;
@@ -454,6 +472,57 @@ body .main .nav-sidebar {
   line-height: var(--phi);
   margin: 0 0 var(--l);
   color: var(--color-brand-primary);
+}
+
+/* Changelist: model title + Add on one row */
+body.change-list-page #content .lucus-changelist__pagehead {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--m);
+  flex-wrap: wrap;
+  width: 100%;
+  margin: 0 0 var(--l);
+  box-sizing: border-box;
+}
+
+body.change-list-page #content .lucus-changelist__title {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: start;
+  font-size: var(--l);
+  font-weight: 600;
+  line-height: var(--phi);
+  color: var(--color-brand-primary);
+}
+
+body.change-list-page #content .lucus-changelist__pagehead-actions {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+}
+
+body.change-list-page #content .lucus-changelist__addlink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 16px !important;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none !important;
+  background: var(--lucus-accent, var(--color-brand-primary)) !important;
+  color: #fff !important;
+  border: none;
+  box-shadow: none;
+}
+
+body.change-list-page #content .lucus-changelist__addlink:hover,
+body.change-list-page #content .lucus-changelist__addlink:focus {
+  filter: brightness(1.06);
+  color: #fff !important;
 }
 
 body.change-form-page #content h1:not(.lucus-change-form-title) {
@@ -473,6 +542,8 @@ body.change-form-page #content h1:not(.lucus-change-form-title) {
 .lucus-dashboard {
   margin: var(--l) auto var(--xl);
   max-width: 1400px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .lucus-dashboard__grid {
   margin-top: var(--m);
@@ -494,6 +565,11 @@ body.change-form-page #content h1:not(.lucus-change-form-title) {
   box-shadow: var(--lucus-shadow);
   padding: 0;
   overflow: hidden;
+  transition: box-shadow var(--lucus-transition-med);
+}
+
+.lucus-card:hover {
+  box-shadow: var(--lucus-shadow-md);
 }
 
 .lucus-card__title {
@@ -549,7 +625,7 @@ body.change-form-page #content h1:not(.lucus-change-form-title) {
   margin-right: var(--s);
 }
 .lucus-card__link:hover {
-  background: rgba(74, 103, 65, 0.05);
+  background: color-mix(in srgb, var(--color-brand-primary) 8%, transparent);
   color: var(--color-brand-primary) !important;
 }
 .lucus-card__link-desc {
@@ -1315,8 +1391,17 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
 #content .results {
   border-radius: 10px;
   box-shadow: var(--lucus-shadow);
-  overflow: hidden;
+  overflow: visible;
   background: var(--color-surface);
+  max-width: 100%;
+}
+
+/* Horizontal scroll for wide tables */
+#content .results .lucus-results-scroll {
+  overflow-x: auto;
+  overflow-y: clip;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 
@@ -1359,11 +1444,71 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   line-height: 1.1;
   vertical-align: middle !important;
 }
-#content #changelist thead th:first-child,
-#content .results thead th:first-child,
-#content #changelist thead th.action-checkbox-column,
-#content .results thead th.action-checkbox-column {
-  text-align: center;
+
+/*
+ * Changelist (#result_list): keep table-cell display (flex on <th> breaks the header row).
+ * Center content; sort icons + label share one line via inline-block + vertical-align.
+ */
+#content #result_list thead th {
+  text-align: center !important;
+  position: relative;
+  display: table-cell !important;
+  vertical-align: middle !important;
+  padding-top: 5px !important;
+  padding-right: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  box-sizing: border-box;
+}
+
+#content #result_list thead th .sortoptions {
+  float: none !important;
+  display: inline-flex !important;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: auto !important;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 !important;
+  margin: 0 4px 0 0 !important;
+  vertical-align: middle;
+}
+
+#content #result_list thead th .text {
+  display: inline-block !important;
+  vertical-align: middle !important;
+  margin: 0;
+  padding: 0 !important;
+  max-width: 100%;
+  text-align: center !important;
+}
+
+#content #result_list thead th.sorted .text {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+#content #result_list thead th .text a,
+#content #result_list thead th .text span {
+  text-align: center !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  padding: 4px 6px !important;
+  margin: 0;
+  line-height: 1.25 !important;
+}
+
+#content #result_list thead th .clear {
+  display: none !important;
+}
+
+/* Inner column guides (semi-transparent verticals) */
+#content table#result_list thead th:not(:last-child),
+#content table#result_list tbody td:not(:last-child),
+#content table#result_list tbody th:not(:last-child) {
+  border-right: 1px solid color-mix(in srgb, var(--color-border) 48%, transparent) !important;
 }
 
 #content #changelist thead th .text a:hover,
@@ -1418,11 +1563,13 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
 #content .results tbody tr:last-child th {
   border-bottom: 0 !important;
 }
-#content #changelist tbody td:first-child,
-#content .results tbody td:first-child,
-#content #changelist tbody td.action-checkbox,
+/* Center only the action checkbox column — not every first <td> (object links stay start-aligned). */
+#content #result_list tbody td.action-checkbox,
 #content .results tbody td.action-checkbox {
-  text-align: center;
+  text-align: center !important;
+}
+#content #result_list tbody th {
+  text-align: start !important;
 }
 #content .results tbody td.lucus-cell-muted,
 #content .results tbody td.lucus-cell-empty {
@@ -1433,39 +1580,168 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   color: var(--color-border) !important;
 }
 
-#content .paginator,
-#content #changelist .paginator {
-  font-size: 12px;
-  margin: 6px 0 !important;
+/*
+ * Boolean / empty cells: class lucus-admin-boolean from lucus.admin_list_patch.
+ * Flex on direct <a> so SVG sits in the middle of the cell (not only text-align).
+ */
+#content #result_list tbody td.lucus-admin-boolean,
+#content #result_list tbody th.lucus-admin-boolean,
+#content .results table tbody td.lucus-admin-boolean,
+#content .results table tbody th.lucus-admin-boolean {
+  text-align: center !important;
+  vertical-align: middle !important;
 }
+
+#content #result_list tbody td.lucus-admin-boolean > a,
+#content #result_list tbody th.lucus-admin-boolean > a,
+#content .results table tbody td.lucus-admin-boolean > a,
+#content .results table tbody th.lucus-admin-boolean > a {
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+#content #result_list tbody td.lucus-admin-boolean img,
+#content #result_list tbody th.lucus-admin-boolean img,
+#content .results table tbody td.lucus-admin-boolean img,
+#content .results table tbody th.lucus-admin-boolean img {
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+#content #result_list td:has(img[src*="icon-yes.svg"]),
+#content #result_list td:has(img[src*="icon-no.svg"]),
+#content #result_list td:has(img[src*="icon-unknown.svg"]),
+#content #result_list th:has(img[src*="icon-yes.svg"]),
+#content #result_list th:has(img[src*="icon-no.svg"]),
+#content #result_list th:has(img[src*="icon-unknown.svg"]),
+#content .results table td:has(img[src*="icon-yes.svg"]),
+#content .results table td:has(img[src*="icon-no.svg"]),
+#content .results table td:has(img[src*="icon-unknown.svg"]),
+#content .results table th:has(img[src*="icon-yes.svg"]),
+#content .results table th:has(img[src*="icon-no.svg"]),
+#content .results table th:has(img[src*="icon-unknown.svg"]),
+#content #result_list td:has(.lucus-admin-empty),
+#content #result_list th:has(.lucus-admin-empty),
+#content .results table td:has(.lucus-admin-empty),
+#content .results table th:has(.lucus-admin-empty) {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+#content #result_list td:has(img[src*="icon-yes.svg"]) > a,
+#content #result_list td:has(img[src*="icon-no.svg"]) > a,
+#content #result_list td:has(img[src*="icon-unknown.svg"]) > a,
+#content #result_list th:has(img[src*="icon-yes.svg"]) > a,
+#content #result_list th:has(img[src*="icon-no.svg"]) > a,
+#content #result_list th:has(img[src*="icon-unknown.svg"]) > a,
+#content .results table td:has(img[src*="icon-yes.svg"]) > a,
+#content .results table td:has(img[src*="icon-no.svg"]) > a,
+#content .results table td:has(img[src*="icon-unknown.svg"]) > a,
+#content .results table th:has(img[src*="icon-yes.svg"]) > a,
+#content .results table th:has(img[src*="icon-no.svg"]) > a,
+#content .results table th:has(img[src*="icon-unknown.svg"]) > a {
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Paginator: Django uses <ul><li> per page — keep one horizontal row */
+#content .paginator,
+#content #changelist .paginator,
+#content nav.paginator {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 10px;
+  font-size: 12px;
+  margin: 0 !important;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border-top: 0 !important;
+  border-bottom: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+#content .paginator .paginator__pages {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  gap: 4px;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#content .paginator .paginator__page {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#content .paginator .paginator__meta {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
 #content .paginator a,
 #content .paginator .this-page,
 #content .paginator .end,
 #content .paginator input {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
   min-width: 26px;
   height: 26px;
   padding: 0 var(--s);
-  border-radius: 0;
-  margin: 0 2px;
+  border-radius: 6px;
+  margin: 0 !important;
   font-weight: 400;
   text-decoration: none;
   border: 1px solid var(--color-border);
   background: var(--color-surface) !important;
   color: var(--color-brand-primary);
+  box-sizing: border-box;
 }
-#content .paginator .this-page {
+
+#content .paginator .this-page,
+#content .paginator a[aria-current="page"] {
   background: var(--color-brand-primary) !important;
   color: var(--color-surface) !important;
   border-color: var(--color-brand-primary);
+  cursor: default;
 }
+
 #content .paginator a:hover,
 #content .paginator a:focus {
   background: var(--color-surface-secondary) !important;
   color: var(--color-brand-primary);
 }
+
+#content .paginator a.showall {
+  min-width: 0;
+  height: auto;
+  padding: 2px 6px;
+  border: none;
+  background: transparent !important;
+  text-decoration: underline;
+}
+
 #content .paginator input {
   width: 26px;
   box-sizing: border-box;
@@ -1506,10 +1782,175 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   box-sizing: border-box;
 }
 
+/* Changelist: main + filter aside (classic admin sidebar, Lucus markup). */
+#content #changelist.lucus-changelist {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+}
 
-#content .paginator,
-#content #changelist .paginator {
-  border-top: 0 !important;
+#content #changelist .lucus-changelist__layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+#content #changelist .lucus-changelist__main-column {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#content #changelist .lucus-changelist__aside {
+  flex: 0 0 260px;
+  width: 260px;
+  max-width: 100%;
+  box-sizing: border-box;
+  align-self: flex-start;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: var(--lucus-shadow);
+  padding: 0;
+}
+
+#content #changelist .lucus-changelist__aside-header {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--color-brand-primary);
+  color: var(--color-surface);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+#content #changelist .lucus-changelist__aside-title {
+  display: block;
+}
+
+#content #changelist .lucus-changelist__aside-body {
+  padding: 10px;
+  background: var(--color-surface-secondary);
+}
+
+/* Toolbar: pagination left, search right */
+#content #changelist .lucus-changelist__toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: nowrap;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 10px;
+  padding: 4px 12px;
+  box-sizing: border-box;
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+#content #changelist .lucus-changelist__toolbar-pagination {
+  flex: 1 1 auto;
+  min-width: 0;
+  order: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+#content #changelist .lucus-changelist__toolbar-search {
+  flex: 0 0 auto;
+  max-width: min(100%, 520px);
+  order: 2;
+  margin-inline-start: auto;
+}
+
+#content #changelist .lucus-changelist__toolbar-search .lucus-changelist-search-toolbar {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+#content #changelist .lucus-changelist__toolbar-search .lucus-changelist-search-toolbar #changelist-search > div {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+}
+
+#content #changelist .lucus-changelist__toolbar-search #searchbar {
+  width: min(240px, 42vw);
+  min-width: 120px;
+  flex: 1 1 auto;
+  margin-left: 0 !important;
+}
+
+@media (max-width: 700px) {
+  #content #changelist .lucus-changelist__toolbar {
+    flex-wrap: wrap;
+  }
+  #content #changelist .lucus-changelist__toolbar-search {
+    max-width: 100%;
+    margin-inline-start: 0;
+    width: 100%;
+  }
+}
+
+/* Actions above table (Django default layout), same chrome as bottom bar */
+#changelist-form .lucus-changelist__topbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  width: 100%;
+  background: var(--color-surface-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 10px !important;
+}
+
+#changelist-form .lucus-changelist__topbar .lucus-changelist__actions .actions {
+  width: auto !important;
+  max-width: 100%;
+  display: inline-flex !important;
+  flex-wrap: wrap !important;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+#changelist-form .lucus-changelist__topbar .lucus-changelist__actions .actions label {
+  display: inline-flex !important;
+  flex-wrap: wrap !important;
+  align-items: center;
+  gap: 6px;
+  margin: 0 !important;
+}
+
+/* Strip default Django/Lucus panel fill from the inner actions box (parent bars provide chrome). */
+#content #changelist .actions,
+#content #changelist-form .actions {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 #content #changelist .lucus-changelist__filters-bar {
@@ -1518,59 +1959,121 @@ body.rosetta-page .lucus-rosetta .module a:not(.object-tools a):hover {
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
+  width: 100%;
 }
 #content #changelist .lucus-changelist__filters {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
 }
 
-.lucus-changelist__filters details {
-  margin: 6px 0 8px 0;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  overflow: hidden;
+@media (max-width: 900px) {
+  #content #changelist .lucus-changelist__layout {
+    flex-direction: column;
+  }
+  #content #changelist .lucus-changelist__aside {
+    flex: 1 1 auto;
+    width: 100%;
+  }
 }
-.lucus-changelist__filters details > summary {
+
+/* Grappelli-style filter blocks: theme strip + collapsible rows */
+#content #changelist .lucus-changelist__filters .lucus-filter {
+  margin: 0 0 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+#content #changelist .lucus-changelist__filters .lucus-filter:last-child {
+  margin-bottom: 0;
+}
+
+#content #changelist .lucus-changelist__filters .lucus-filter__summary {
   list-style: none;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--color-text-primary);
-  padding: 4px 8px;
-  background: var(--color-surface-secondary);
-  border-radius: 0;
   user-select: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 10px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-surface);
+  background: var(--color-brand-primary);
+  line-height: 1.25;
 }
-.lucus-changelist__filters details > summary::-webkit-details-marker {
+
+#content #changelist .lucus-changelist__filters .lucus-filter__summary::-webkit-details-marker {
   display: none;
 }
-.lucus-changelist__filters details > summary::before {
-  content: '\2192';
-  margin-right: var(--s);
-  color: var(--color-brand-primary);
+
+#content #changelist .lucus-changelist__filters .lucus-filter__summary::after {
+  content: '';
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid currentColor;
+  opacity: 0.85;
+  transition: transform 0.15s ease;
 }
-.lucus-changelist__filters details[open] > summary::before {
-  content: '\2193';
+
+#content #changelist .lucus-changelist__filters .lucus-filter[open] > .lucus-filter__summary::after {
+  transform: rotate(180deg);
 }
-.lucus-changelist__filters details ul {
+
+#content #changelist .lucus-changelist__filters .lucus-filter__summary-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: start;
+}
+
+#content #changelist .lucus-changelist__filters .lucus-filter__list {
   margin: 0;
-  padding: 2px 0 0;
+  padding: 6px 0;
   list-style: none;
-  border: none;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
-.lucus-changelist__filters details li {
+
+#content #changelist .lucus-changelist__filters .lucus-filter__list li {
   margin: 0;
   padding: 0;
 }
-.lucus-changelist__filters details a {
+
+#content #changelist .lucus-changelist__filters .lucus-filter__list a {
   display: block;
-  padding: 2px 8px;
+  padding: 6px 12px;
   font-size: 13px;
-  border-radius: 4px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  border-radius: 0;
 }
-.lucus-changelist__filters details li.selected a {
+
+#content #changelist .lucus-changelist__filters .lucus-filter__list a:hover,
+#content #changelist .lucus-changelist__filters .lucus-filter__list a:focus {
+  background: var(--color-surface-secondary);
+  color: var(--color-brand-primary);
+}
+
+#content #changelist .lucus-changelist__filters .lucus-filter__list li.selected a {
   font-weight: 600;
+  background: var(--selected-bg, rgba(74, 103, 65, 0.12));
+  color: var(--color-brand-primary);
 }
 
 body.change-list-page input[type="submit"],
@@ -1579,6 +2082,7 @@ body.change-list-page .button,
 body.change-list-page #changelist-form input[type="submit"],
 body.change-list-page #changelist-form button[type="submit"],
 body.change-list-page .lucus-changelist__search input[type="submit"],
+body.change-list-page .lucus-changelist__toolbar-search input[type="submit"],
 body.change-list-page .lucus-changelist__actions input[type="submit"],
 body.change-list-page .lucus-changelist__actions button,
 body.change-list-page .lucus-changelist__actions .button,
@@ -1586,6 +2090,7 @@ body.change-list-page .lucus-changelist__actions .button,
 #content #changelist-form button[type="submit"],
 #content #changelist-form .button,
 #content .lucus-changelist__search input[type="submit"],
+#content .lucus-changelist__toolbar-search input[type="submit"],
 #content .lucus-changelist__actions input[type="submit"],
 #content .lucus-changelist__actions button,
 #content .lucus-changelist__actions .button,
@@ -1661,6 +2166,7 @@ body.change-list-page .lucus-changelist__actions .button,
 #content-main #changelist-form button[type="submit"],
 #content-main #changelist-form .button,
 #content-main .lucus-changelist__search input[type="submit"],
+#content-main .lucus-changelist__toolbar-search input[type="submit"],
 #content-main .lucus-changelist__actions input[type="submit"],
 #content-main .lucus-changelist__actions button,
 #content-main .lucus-changelist__actions .button {
@@ -1907,7 +2413,9 @@ body.change-list-page select {
 body.change-list-page #toolbar #searchbar,
 body.change-list-page #changelist-search input[name="q"],
 body.change-list-page .lucus-changelist__search input[type="text"],
-body.change-list-page .lucus-changelist__search input[type="search"] {
+body.change-list-page .lucus-changelist__search input[type="search"],
+body.change-list-page .lucus-changelist__toolbar-search input[type="text"],
+body.change-list-page .lucus-changelist__toolbar-search input[type="search"] {
   padding-right: 15px !important;
 }
 
@@ -1938,4 +2446,264 @@ body.delete-confirmation form > div:has(input[type="submit"]) {
 
 body.delete-confirmation form > div:has(input[type="submit"]) .cancel-link {
   margin: 0 !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* LUCUS UI: theme selects, field help (?), sticky thead, fixed submit */
+/* ------------------------------------------------------------------ */
+
+.lucus-header__theme-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s);
+  margin: 0;
+  padding: 0;
+  margin-right: var(--s);
+}
+
+.lucus-header__theme-select {
+  min-width: 7.5rem;
+  max-width: 11rem;
+  padding: 6px 10px;
+  font-size: 13px;
+  line-height: 1.25;
+  color: var(--color-text-primary) !important;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--lucus-radius-md);
+  background-clip: padding-box;
+}
+
+.lucus-header__theme-select:focus {
+  outline: 2px solid var(--lucus-accent, var(--color-brand-primary));
+  outline-offset: 1px;
+}
+
+/* Field help: compact “?” + details panel */
+.lucus-field-help {
+  display: inline-block;
+  margin-top: 6px;
+  max-width: 100%;
+}
+
+.lucus-field-help__summary {
+  list-style: none;
+  cursor: help;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-secondary);
+  color: var(--color-brand-primary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+  transition: background var(--lucus-transition-fast), transform var(--lucus-transition-fast);
+}
+
+.lucus-field-help__summary::-webkit-details-marker {
+  display: none;
+}
+
+.lucus-field-help__glyph {
+  display: block;
+}
+
+.lucus-field-help__summary:hover,
+.lucus-field-help__summary:focus-visible {
+  background: var(--color-surface);
+  transform: scale(1.05);
+}
+
+.lucus-field-help__body {
+  margin-top: var(--s);
+  padding: var(--s) var(--m);
+  max-width: min(420px, 100%);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--lucus-radius-md);
+  box-shadow: var(--lucus-shadow-md);
+}
+
+/* Modules: subtle motion on hover */
+#content .module {
+  transition: box-shadow var(--lucus-transition-med);
+}
+
+#content .module:hover {
+  box-shadow: var(--lucus-shadow-md);
+}
+
+/* Changelist: thead scrolls with rows (sticky thead overlapped body cells) */
+body.change-list-page .lucus-changelist .results thead th {
+  position: static !important;
+  top: auto !important;
+  z-index: auto !important;
+}
+
+/*
+ * Changelist bottom: Grappelli-style bar in document flow (actions + paginator, not fixed).
+ */
+#changelist-form .lucus-changelist__bottombar {
+  position: static !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  z-index: auto;
+  margin: 10px 0 0 !important;
+  padding: 0 !important;
+  background: var(--color-surface-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 10px !important;
+  box-shadow: none;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+#changelist-form .lucus-changelist__bottombar .lucus-changelist__actions .actions {
+  width: auto !important;
+  max-width: 100%;
+  display: inline-flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+#changelist-form .lucus-changelist__bottombar .lucus-changelist__actions .actions label {
+  display: inline-flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  gap: 6px;
+  margin: 0 !important;
+}
+
+#changelist-form .lucus-changelist__bottombar .lucus-changelist__actions .actions select {
+  max-width: min(56vw, 22rem);
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+#changelist-form .lucus-changelist__bottombar .paginator {
+  flex: 0 1 auto;
+  margin: 0 0 0 auto !important;
+  width: auto !important;
+  max-width: 100% !important;
+  min-width: 0;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  position: relative;
+  z-index: 1;
+}
+
+#changelist-form .lucus-changelist__bottombar .paginator input {
+  margin-left: 4px !important;
+  margin-right: 0 !important;
+  flex-shrink: 0;
+}
+
+#changelist-form .lucus-changelist__bottombar .lucus-changelist__actions {
+  flex: 0 1 auto;
+  min-width: 0;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 1;
+}
+
+#changelist-form .lucus-changelist__bottombar > input.default[type="submit"] {
+  flex: 0 0 auto;
+}
+
+body.change-list-page:not(.popup) #content-main.lucus-content {
+  padding-bottom: var(--l) !important;
+}
+
+/* Fixed submit row on change form (viewport bottom, Grappelli-style bar) */
+body.lucus-fixed-submit.change-form-page #content .submit-row,
+body.lucus-fixed-submit.change-form-page #content-main .submit-row,
+body.lucus-fixed-submit.change-form-page form .submit-row {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  z-index: 950;
+  margin: 0 !important;
+  padding: var(--m) var(--l) calc(var(--m) + env(safe-area-inset-bottom, 0)) !important;
+  background: var(--color-surface) !important;
+  border-top: 1px solid var(--color-border) !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s) var(--m);
+}
+
+body.lucus-fixed-submit.change-form-page #content-main {
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0));
+}
+
+/* High contrast mode */
+html[data-lucus-contrast="high"] {
+  --lucus-shadow-sm: none;
+  --lucus-shadow-md: none;
+}
+
+html[data-lucus-contrast="high"] body,
+html[data-lucus-contrast="high"] #content {
+  -webkit-font-smoothing: antialiased;
+}
+
+html[data-lucus-contrast="high"] #content .module,
+html[data-lucus-contrast="high"] .lucus-header,
+html[data-lucus-contrast="high"] #content input:not([type="hidden"]),
+html[data-lucus-contrast="high"] #content select,
+html[data-lucus-contrast="high"] #content textarea {
+  border-width: 2px !important;
+}
+
+html[data-lucus-contrast="high"] #content .module h2,
+html[data-lucus-contrast="high"] #content .submit-row a.deletelink {
+  text-decoration: underline;
+}
+
+/* Date/time popups above fixed submit bar (Grappelli-style layering) */
+.calendarbox,
+.clockbox,
+div.calendar {
+  z-index: 1200 !important;
+}
+
+/* Dark theme: baseline fixes for Lucus chrome (per-scheme palettes in *.css) */
+html[data-theme="dark"] .lucus-header {
+  border-bottom-color: var(--color-border);
+}
+
+html[data-theme="dark"] #content .messagelist li.success {
+  color: var(--color-text-primary) !important;
+}
+
+html[data-theme="dark"] .lucus-field-help__body {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
 }

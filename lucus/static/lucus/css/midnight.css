@@ -1,30 +1,30 @@
 @charset "UTF-8";
 
-/* Color scheme: olivia. Loaded after style.css when this scheme is selected. */
+/* Color scheme: midnight — глубокий сине-фиолетовый, бирюзовый акцент. */
 
 :root,
 html[data-theme="light"],
 html[data-theme="auto"] {
-  --color-bg-page: #f2f4f1;
+  --color-bg-page: #e8ecf4;
   --color-surface: #ffffff;
-  --color-surface-secondary: #dde3db;
-  --color-brand-primary: #4a6741;
-  --color-brand-hover: #3d5636;
-  --color-text-primary: #2a2c29;
-  --color-text-muted: #6b7068;
-  --color-border: #c8d1c5;
+  --color-surface-secondary: #dce3f0;
+  --color-brand-primary: #0d9488;
+  --color-brand-hover: #0f766e;
+  --color-text-primary: #1e1b4b;
+  --color-text-muted: #6366f1;
+  --color-border: #c7d2fe;
   color-scheme: light;
 }
 
 html[data-theme="dark"] {
-  --color-bg-page: #141814;
-  --color-surface: #1e221e;
-  --color-surface-secondary: #2a302a;
-  --color-brand-primary: #7cb569;
-  --color-brand-hover: #91c77e;
-  --color-text-primary: #e8ebe6;
-  --color-text-muted: #9aaa94;
-  --color-border: #3d4a3a;
+  --color-bg-page: #0c0a1a;
+  --color-surface: #13102a;
+  --color-surface-secondary: #1e1b3a;
+  --color-brand-primary: #2dd4bf;
+  --color-brand-hover: #5eead4;
+  --color-text-primary: #e0e7ff;
+  --color-text-muted: #a5b4fc;
+  --color-border: #312e81;
   color-scheme: dark;
 }
 
@@ -40,12 +40,12 @@ html[data-theme="dark"] {
 }
 
 :root {
-  --lucus-shadow: 0 2px 8px rgba(42, 44, 41, 0.05);
+  --lucus-shadow: 0 2px 12px rgba(30, 27, 75, 0.08);
   --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 45%, transparent);
 }
 
 html[data-theme="dark"] {
-  --lucus-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  --lucus-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
   --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 55%, transparent);
 }
 

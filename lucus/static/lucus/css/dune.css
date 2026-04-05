@@ -1,30 +1,30 @@
 @charset "UTF-8";
 
-/* Color scheme: olivia. Loaded after style.css when this scheme is selected. */
+/* Color scheme: dune — тёплый песочный фон, терракотовый акцент. */
 
 :root,
 html[data-theme="light"],
 html[data-theme="auto"] {
-  --color-bg-page: #f2f4f1;
-  --color-surface: #ffffff;
-  --color-surface-secondary: #dde3db;
-  --color-brand-primary: #4a6741;
-  --color-brand-hover: #3d5636;
-  --color-text-primary: #2a2c29;
-  --color-text-muted: #6b7068;
-  --color-border: #c8d1c5;
+  --color-bg-page: #f5f0e8;
+  --color-surface: #fffdf9;
+  --color-surface-secondary: #ebe3d7;
+  --color-brand-primary: #b45309;
+  --color-brand-hover: #92400e;
+  --color-text-primary: #292524;
+  --color-text-muted: #78716c;
+  --color-border: #d6d3d1;
   color-scheme: light;
 }
 
 html[data-theme="dark"] {
-  --color-bg-page: #141814;
-  --color-surface: #1e221e;
-  --color-surface-secondary: #2a302a;
-  --color-brand-primary: #7cb569;
-  --color-brand-hover: #91c77e;
-  --color-text-primary: #e8ebe6;
-  --color-text-muted: #9aaa94;
-  --color-border: #3d4a3a;
+  --color-bg-page: #1c1917;
+  --color-surface: #292524;
+  --color-surface-secondary: #44403c;
+  --color-brand-primary: #fbbf24;
+  --color-brand-hover: #fcd34d;
+  --color-text-primary: #fafaf9;
+  --color-text-muted: #a8a29e;
+  --color-border: #57534e;
   color-scheme: dark;
 }
 
@@ -40,12 +40,12 @@ html[data-theme="dark"] {
 }
 
 :root {
-  --lucus-shadow: 0 2px 8px rgba(42, 44, 41, 0.05);
+  --lucus-shadow: 0 2px 10px rgba(41, 37, 36, 0.07);
   --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 45%, transparent);
 }
 
 html[data-theme="dark"] {
-  --lucus-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  --lucus-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
   --lucus-admin-table-col-divider: color-mix(in srgb, var(--color-border) 55%, transparent);
 }
 

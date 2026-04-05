@@ -1,9 +1,9 @@
 {% load i18n %}
-<details data-filter-title="{{ title }}">
-  <summary>
-    {% blocktranslate with filter_title=title %} By {{ filter_title }} {% endblocktranslate %}
+<details class="lucus-filter" data-filter-title="{{ title }}">
+  <summary class="lucus-filter__summary">
+    <span class="lucus-filter__summary-label">{{ title }}</span>
   </summary>
-  <ul>
+  <ul class="lucus-filter__list">
   {% for choice in choices %}
     <li{% if choice.selected %} class="selected"{% endif %}>
     <a href="{{ choice.query_string|iriencode }}">{{ choice.display }}</a></li>

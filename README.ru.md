@@ -2,7 +2,7 @@
 
 **Другие языки:** [English](README.md)
 
-**Lucus** переоформляет **django.contrib.admin**: отдельный базовый шаблон админки, многослойные стили (вёрстка + цветовые схемы), опциональная перегруппировка бокового меню и настраиваемый много колоночный дашборд на `/admin/`.
+**Lucus** переоформляет **django.contrib.admin**: свой базовый шаблон, статика только из `lucus/static` (в т.ч. один файл **`lucus/css/lucus-admin.css`** вместо подключения `django.contrib.admin` CSS), выбор палитры и оформления **по пользователю** (и cookie для экрана входа), дашборд на `/admin/`. Боковая панель Django отключена; кнопки сохранения на change-form и блок действий changelist — **у низа видимой области окна**.
 
 ![Lucus dashboard](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_1.jpg)
 ![Lucus dashboard](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_2.jpg)
@@ -36,6 +36,12 @@ INSTALLED_APPS = [
 
 Шаблоны и статика идут в составе пакета; в продакшене используйте `collectstatic`.
 
+После обновления выполните миграции (модель предпочтений темы):
+
+```bash
+python manage.py migrate lucus_admin
+```
+
 ## Справочник настроек
 
 | Настройка | Тип | По умолчанию | Описание |
@@ -43,16 +49,16 @@ INSTALLED_APPS = [
 | `SITE_NAME` | `str` | `"Site"` | Подстановка в `LUCUS_ADMIN_SITE_HEADER_TEMPLATE` и при `LUCUS_ADMIN_SITE_TITLE_USE_SITE_NAME` |
 | `LUCUS_ADMIN_SITE_HEADER_TEMPLATE` | `str` | `"Administration — {site}"` | `str.format(site=SITE_NAME)` для `admin.site.site_header`. В шаблоне безопасно использовать только `{site}` (остальные фигурные скобки нужно экранировать). |
 | `LUCUS_ADMIN_SITE_TITLE_USE_SITE_NAME` | `bool` | `True` | Если `True`, `admin.site.site_title` = `SITE_NAME` |
-| `LUCUS_COLOR_SCHEME` | `str` | `"olivia"` | Имя файла `static/lucus/css/<имя>.css`; допустимы `a-z`, `0-9`, `_`, `-`, длина 1–64. При невалидном значении — `olivia`. |
+| *(нет)* | — | — | **Палитра** не задаётся в `settings`: в шапке сотрудник выбирает схему и оформление (светлая / тёмная / авто); сохраняется в **`LucusAdminUiPreference`**. Встроенные: `olivia`, `grey`, `slate`, `dune`, `midnight`. |
+| `LUCUS_UI` | `dict` | см. ниже | `help_as_icon`, `high_contrast_toggle` (по умолчанию `True`). Панель сохранения на change-form и блок действий changelist — у **низа окна** (viewport). |
 | `LUCUS_EXTRA_STATIC_CSS` | `str` \| `list` \| `tuple` | `()` | Доп. CSS относительно корней staticfiles, после схемы. Запрещены `..` и путь с начальным `/`. |
 | `LUCUS_EMPTY_VALUE_DISPLAY_WRAP` | `bool` | `True` | Оборачивать пустые ячейки changelist в `<span class="lucus-admin-empty">` |
 | `LUCUS_EMPTY_VALUE_PLACEHOLDER` | `str` | `"—"` | Текст для `empty_value_display` |
 | `LUCUS_ACTIONS_ON_BOTTOM` | `bool` | `True` | Глобально для процесса: **`ModelAdmin.actions_on_bottom = True` на классе** |
-| `LUCUS_SIDEBAR_REORGANIZE` | `bool` | `True` | Обёртка `admin.site.get_app_list` с `reorganize_admin_app_list` |
 | `LUCUS_DASHBOARD` | `list` \| `None` | `None` | Конфиг дашборда (см. [Дашборд](#dashboard-ru)); если не задан — группы по умолчанию |
 | `LUCUS_DASHBOARD_APPEND_UNCOVERED` | `bool` | `True` | В **групповом** режиме: выносить непокрытые приложения в **последнюю** колонку |
 
-Контекст темы: `lucus.theme.lucus_admin_extra_context()`, подмешивается в `admin.site.each_context`.
+Контекст темы: `lucus.theme.lucus_admin_extra_context(request)`, подмешивается в `admin.site.each_context`.
 
 <a id="dashboard-ru"></a>
 
@@ -135,38 +141,32 @@ LUCUS_DASHBOARD = [
 ]
 ```
 
-## Боковое меню
-
-При `LUCUS_SIDEBAR_REORGANIZE = True` вызывается `lucus.sidebar.patch_admin_get_app_list()`. Для полного списка (`app_label is None`) результат проходит через `reorganize_admin_app_list`: модели из ряда сторонних приложений сливаются в целевые (например redirects/constance/solo → sites), часть заголовков секций переводится. Патч идемпотентен.
-
 ## Шаблоны и статика
 
-`templates/admin/base.html` **не** наследует стандартный `admin/base.html`; подключаются те же базовые CSS/JS админки Django плюс ресурсы Lucus.
+Базовый шаблон — свой. Порядок: `style.css` → **`lucus-admin.css`** (единый слой админки в пакете, без `<link>` на `admin/css/`) → палитра (`<slug>.css`) → `LUCUS_EXTRA_STATIC_CSS`.
 
-Порядок в `extrastyle`:
+JavaScript виджетов админки по-прежнему из `django.contrib.admin` (`admin/js/…`).
 
-1. `lucus/css/style.css` — сетка и компоненты (CSS-переменные).
-2. Файл схемы: `lucus_scheme_stylesheet` → `lucus/css/<LUCUS_COLOR_SCHEME>.css` (в шаблоне запасной вариант — `lucus/css/olivia.css`).
-3. Пути из `lucus_extra_stylesheets` (`LUCUS_EXTRA_STATIC_CSS`).
-
-Встроенные схемы:
+**Встроенные палитры:**
 
 | Файл | Назначение |
 |------|------------|
-| `style.css` | Масштаб, сетка, UI; акценты через `var(--lucus-accent)` и т.д. |
-| `olivia.css` | Светлая зелёно-серая палитра по умолчанию |
-| `grey.css` | Альтернатива: сине-серая палитра |
-
-Своя схема: добавьте `static/lucus/css/<slug>.css` в проект и укажите `LUCUS_COLOR_SCHEME = "<slug>"`.
+| `style.css` | Масштаб, сетка, UI |
+| `olivia.css` | Зелёно-серая палитра по умолчанию |
+| `grey.css` | Сине-серая |
+| `slate.css` | «Шифер» |
+| `dune.css` | Песочные акценты |
+| `midnight.css` | Тёмная пара к светлой |
 
 ## Структура пакета
 
 | Модуль | Назначение |
 |--------|------------|
-| `lucus.apps.LucusConfig` | `ready()`: заголовки, `each_context`, дашборд, тема, сайдбар, `empty_value_display`, `actions_on_bottom` |
+| `lucus.apps.LucusConfig` | `ready()`: заголовки, `each_context`, дашборд, URL сохранения темы, `enable_nav_sidebar = False`, `empty_value_display`, `actions_on_bottom` |
 | `lucus.dashboard` | Нормализация конфигурации, колонки, ссылки |
-| `lucus.sidebar` | `reorganize_admin_app_list`, `patch_admin_get_app_list` |
-| `lucus.theme` | `lucus_admin_extra_context` для шаблонов |
+| `lucus.models` | `LucusAdminUiPreference` |
+| `lucus.theme` | Список палитр, `lucus_admin_extra_context(request)` |
+| `lucus.views` | Сохранение предпочтений темы (POST) |
 
 Версия: `lucus.__version__` (при релизе синхронизируйте с метаданными пакета).
 

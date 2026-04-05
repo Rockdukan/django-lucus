@@ -12,3 +12,6 @@ msgstr ""
 msgctxt "lucus_admin_action_run"
 msgid "Run"
 msgstr "Выполнить"
+
+msgid "High contrast"
+msgstr "Высокий контраст"

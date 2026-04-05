@@ -10,9 +10,6 @@
 {# ---------- MEDIA (align with Django admin change_list) ---------- #}
 {% block extrastyle %}
   {{ block.super }}
-  {% if cl.formset %}
-    <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
-  {% endif %}
   {% if cl.formset or action_form %}
     <script src="{% url 'admin:jsi18n' %}"></script>
   {% endif %}
@@ -39,24 +36,22 @@
   {% endif %}
 {% endblock %}
 
-{# ---------- CONTENT TITLE ---------- #}
+{# ---------- TITLE + ADD (one row: title left, add right) ---------- #}
 {% block content_title %}
-  <h1>{{ cl.opts.verbose_name_plural|capfirst }}</h1>
-{% endblock %}
-
-{# ---------- OBJECT TOOLS ---------- #}
-{% block object-tools %}
-  {% if has_add_permission %}
-    <ul class="object-tools">
-      <li>
+  <div class="lucus-changelist__pagehead">
+    <h1 class="lucus-changelist__title">{{ cl.opts.verbose_name_plural|capfirst }}</h1>
+    {% if has_add_permission %}
+      <div class="lucus-changelist__pagehead-actions">
         {% url cl.opts|admin_urlname:'add' as add_url %}
-        <a href="{% add_preserved_filters add_url is_popup to_field %}" class="addlink">
+        <a href="{% add_preserved_filters add_url is_popup to_field %}" class="lucus-changelist__addlink addlink">
           {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
         </a>
-      </li>
-    </ul>
-  {% endif %}
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}
+
+{% block object-tools %}{% endblock %}
 
 {# ---------- CONTENT ---------- #}
 {% block content %}
@@ -69,26 +64,30 @@
     {% endif %}
 
     <div class="module lucus-changelist{% if cl.has_filters %} filtered{% endif %}" id="changelist">
-      {# GET search + filters + date hierarchy must stay OUTSIDE the POST changelist-form (invalid nested <form>). #}
-      {% if cl.search_fields or cl.has_filters or cl.date_hierarchy %}
-        <div class="lucus-changelist__filters-bar">
-          {% if cl.search_fields %}
-            <div class="lucus-changelist__search">
-              {% block search %}{% search_form cl %}{% endblock %}
-            </div>
-          {% endif %}
-          {% if cl.has_filters %}
-            <div class="lucus-changelist__filters">
-              {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+      <div class="lucus-changelist__layout">
+        <div class="lucus-changelist__main-column">
+          {# Pagination (left) + search (right), above the table; GET search stays outside POST form. #}
+          {% if cl.search_fields or cl.result_count or show_all_url %}
+            <div class="lucus-changelist__toolbar">
+              <div class="lucus-changelist__toolbar-pagination">
+                {% if cl.result_count or show_all_url %}
+                  {% pagination cl %}
+                {% endif %}
+              </div>
+              <div class="lucus-changelist__toolbar-search">
+                {% if cl.search_fields %}
+                  {% block search %}{% search_form cl %}{% endblock %}
+                {% endif %}
+              </div>
             </div>
           {% endif %}
           {% if cl.date_hierarchy %}
-            <div class="lucus-changelist__date-hierarchy">
-              {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+            <div class="lucus-changelist__filters-bar">
+              <div class="lucus-changelist__date-hierarchy">
+                {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+              </div>
             </div>
           {% endif %}
-        </div>
-      {% endif %}
 
       <form id="changelist-form"
             method="post"
@@ -107,25 +106,20 @@
           <div>{{ cl.formset.management_form }}</div>
         {% endif %}
 
-        {% if action_form and actions_on_top and cl.show_admin_actions or cl.result_count or show_all_url %}
+        {% if action_form and actions_on_top and cl.show_admin_actions %}
           <div class="lucus-changelist__topbar">
-            {% if action_form and actions_on_top and cl.show_admin_actions %}
-              <div class="lucus-changelist__actions">
-                {% admin_actions %}
-              </div>
-            {% endif %}
-            {% if cl.result_count or show_all_url %}
-              <div class="lucus-changelist__pagination-top">
-                {% pagination cl %}
-              </div>
-            {% endif %}
+            <div class="lucus-changelist__actions">
+              {% admin_actions %}
+            </div>
           </div>
         {% endif %}
 
         <div class="results">
-          {% block result_list %}
-            {% result_list cl %}
-          {% endblock %}
+          <div class="lucus-results-scroll">
+            {% block result_list %}
+              {% result_list cl %}
+            {% endblock %}
+          </div>
         </div>
 
         {% if cl.result_count or show_all_url or action_form and actions_on_bottom and cl.show_admin_actions or cl.formset and cl.result_count %}
@@ -144,6 +138,21 @@
           </div>
         {% endif %}
       </form>
+        </div>
+
+        {% if cl.has_filters %}
+          <aside class="lucus-changelist__aside" aria-label="{% translate 'Filter' %}">
+            <header class="lucus-changelist__aside-header">
+              <span class="lucus-changelist__aside-title">{% translate "Filters" %}</span>
+            </header>
+            <div class="lucus-changelist__aside-body">
+              <div class="lucus-changelist__filters">
+                {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+              </div>
+            </div>
+          </aside>
+        {% endif %}
+      </div>
     </div>
   </div>
 {% endblock %}

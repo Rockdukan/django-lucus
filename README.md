@@ -2,7 +2,7 @@
 
 **Read this in another language:** [Русский](README.ru.md)
 
-**Lucus** restyles **django.contrib.admin**: a standalone admin base template, layered CSS (layout + color schemes), optional sidebar regrouping, and a configurable multi-column dashboard on `/admin/`.
+**Lucus** restyles **django.contrib.admin**: a standalone admin base template, Lucus-owned static (including vendored admin structural CSS under `lucus/static/`), per-user color scheme + appearance, and a configurable multi-column dashboard on `/admin/`. The Django nav sidebar is disabled; change-form actions use a fixed bottom bar.
 
 ![Lucus dashboard](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_1.jpg)
 ![Lucus dashboard](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_2.jpg)
@@ -36,6 +36,12 @@ INSTALLED_APPS = [
 
 Templates and static files ship with the package; run `collectstatic` in production as usual.
 
+After upgrading, run migrations so `LucusAdminUiPreference` exists:
+
+```bash
+python manage.py migrate lucus_admin
+```
+
 ## Settings reference
 
 | Setting | Type | Default | Description |
@@ -43,16 +49,16 @@ Templates and static files ship with the package; run `collectstatic` in product
 | `SITE_NAME` | `str` | `"Site"` | Used in `LUCUS_ADMIN_SITE_HEADER_TEMPLATE` and optionally as `site_title` |
 | `LUCUS_ADMIN_SITE_HEADER_TEMPLATE` | `str` | `"Administration — {site}"` | Passed to `str.format(site=SITE_NAME)` for `admin.site.site_header`. Use only `{site}` unless you escape other braces. |
 | `LUCUS_ADMIN_SITE_TITLE_USE_SITE_NAME` | `bool` | `True` | If `True`, `admin.site.site_title` = `SITE_NAME` |
-| `LUCUS_COLOR_SCHEME` | `str` | `"olivia"` | Basename for `static/lucus/css/<name>.css`. Allowed: `a-z`, `0-9`, `_`, `-`, length 1–64. Invalid values fall back to `olivia`. |
+| *(none)* | — | — | **Color scheme** is not a project setting: staff choose **palette + appearance** (light / dark / auto) from header dropdowns; choices are stored in **`LucusAdminUiPreference`** per user. Bundled palettes: `olivia`, `grey`, `slate`, `dune`, `midnight` (`lucus/static/lucus/css/<slug>.css`). |
+| `LUCUS_UI` | `dict` | see below | Flags: `help_as_icon`, `high_contrast_toggle` (default `True`). Change-form save bar and changelist actions bar are fixed to the **viewport** bottom. |
 | `LUCUS_EXTRA_STATIC_CSS` | `str` \| `list` \| `tuple` | `()` | Extra stylesheet paths (relative to static roots), loaded after the scheme. No `..` or leading `/`. |
 | `LUCUS_EMPTY_VALUE_DISPLAY_WRAP` | `bool` | `True` | Wrap empty changelist cells in `<span class="lucus-admin-empty">` |
 | `LUCUS_EMPTY_VALUE_PLACEHOLDER` | `str` | `"—"` | Text for `empty_value_display` |
 | `LUCUS_ACTIONS_ON_BOTTOM` | `bool` | `True` | Sets **`ModelAdmin.actions_on_bottom = True` on the class** (global for the process) |
-| `LUCUS_SIDEBAR_REORGANIZE` | `bool` | `True` | Wraps `admin.site.get_app_list` with `reorganize_admin_app_list` (see below) |
 | `LUCUS_DASHBOARD` | `list` \| `None` | `None` | Dashboard config (see [Dashboard](#dashboard-lucus_dashboard)); if unset, grouped defaults apply |
 | `LUCUS_DASHBOARD_APPEND_UNCOVERED` | `bool` | `True` | In **grouped** mode: append apps not “covered” by groups into the **last** column |
 
-Theme context is built by `lucus.theme.lucus_admin_extra_context()` and merged in `admin.site.each_context`.
+Theme context is built by `lucus.theme.lucus_admin_extra_context(request)` and merged in `admin.site.each_context`.
 
 ## Dashboard: `LUCUS_DASHBOARD`
 
@@ -133,38 +139,32 @@ LUCUS_DASHBOARD = [
 ]
 ```
 
-## Sidebar
-
-When `LUCUS_SIDEBAR_REORGANIZE` is `True`, `lucus.sidebar.patch_admin_get_app_list()` wraps `admin.site.get_app_list`. For the full app list (`app_label is None`), entries are passed through `reorganize_admin_app_list`: models from several third-party apps are merged into target apps (e.g. redirects/constance/solo → sites), and some section titles are localized. Patching is idempotent.
-
 ## Templates and static files
 
-`templates/admin/base.html` does **not** extend Django’s `admin/base.html`; it loads the same core admin CSS/JS plus Lucus assets.
+`templates/admin/base.html` is Lucus-owned. CSS load order: `lucus/css/style.css` (layout/tokens), **`lucus/css/lucus-admin.css`** (single admin UI sheet shipped with the package — no `django.contrib.admin` `<link>`), then the palette (`lucus/css/<slug>.css`, overrides tokens), then optional `LUCUS_EXTRA_STATIC_CSS`.
 
-Load order in `extrastyle`:
+Admin **JavaScript** still comes from `django.contrib.admin` (`admin/js/…`) for widgets, inlines, and actions.
 
-1. `lucus/css/style.css` — layout, grid, components (uses CSS variables).
-2. Scheme file from context: `lucus_scheme_stylesheet` → `lucus/css/<LUCUS_COLOR_SCHEME>.css` (template default fallback: `lucus/css/olivia.css`).
-3. Each path in `lucus_extra_stylesheets` from `LUCUS_EXTRA_STATIC_CSS`.
-
-Bundled schemes:
+**Bundled palettes** (extend by shipping `static/lucus/css/<slug>.css` and forking `lucus.theme.BUNDLED_COLOR_SCHEMES` in your project if needed):
 
 | File | Role |
 |------|------|
 | `style.css` | Spacing scale, grid, UI; accents via `var(--lucus-accent)` etc. |
-| `olivia.css` | Default green-gray light palette |
-| `grey.css` | Alternative blue-gray palette |
-
-Custom scheme: add `static/lucus/css/<slug>.css` in your project and set `LUCUS_COLOR_SCHEME = "<slug>"`.
+| `olivia.css` | Default green-gray palette |
+| `grey.css` | Blue-gray palette |
+| `slate.css` | Neutral slate |
+| `dune.css` | Warm sand |
+| `midnight.css` | Dark / light pairing |
 
 ## Package layout
 
 | Module | Role |
 |--------|------|
-| `lucus.apps.LucusConfig` | `ready()`: site headers, `each_context`, dashboard, theme context, sidebar patch, `empty_value_display`, `actions_on_bottom` |
+| `lucus.apps.LucusConfig` | `ready()`: site headers, `each_context`, dashboard, theme prefs URL, `enable_nav_sidebar = False`, `empty_value_display`, `actions_on_bottom` |
 | `lucus.dashboard` | Config normalization, columns, links |
-| `lucus.sidebar` | `reorganize_admin_app_list`, `patch_admin_get_app_list` |
-| `lucus.theme` | `lucus_admin_extra_context` for templates |
+| `lucus.models` | `LucusAdminUiPreference` (per-user scheme + appearance) |
+| `lucus.theme` | Bundled schemes, `lucus_admin_extra_context(request)` |
+| `lucus.views` | POST handler for saving UI preferences |
 
 Version: `lucus.__version__` (kept in sync with package metadata on release).
 

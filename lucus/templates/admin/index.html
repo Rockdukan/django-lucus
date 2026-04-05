@@ -1,6 +1,9 @@
 {% extends "admin/base.html" %}
 {% load i18n %}
 
+{# colMS reserves 300px for #content-related; Lucus dashboard has no right rail — use full-width colM #}
+{% block coltype %}colM{% endblock %}
+
 {% block breadcrumbs %}
   <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
