@@ -3,10 +3,11 @@
 
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:'en' }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}"
-      class="{% if lucus_admin_background_image_url and not is_popup %}lucus-admin-has-bg{% endif %}"
+      class="lucus-admin{% if lucus_admin_background_image_url and not is_popup %} lucus-admin--has-bg{% endif %}"
       data-lucus-appearance="{{ lucus_selected_appearance|default:'auto' }}"
       data-theme="{% if lucus_selected_appearance == 'auto' %}auto{% else %}{{ lucus_selected_appearance }}{% endif %}">
   <head>
+<!---------------------- Meta / theme bootstrap ----------------------->
     <meta charset="utf-8">
     {% if lucus_selected_appearance == 'auto' %}
     <script>
@@ -22,12 +23,14 @@
       })();
     </script>
     {% endif %}
+<!------------------------------- Title ------------------------------->
     <title>
       {% block title %}{% if title %}{{ title }} | {% endif %}{{ site_title|default:'' }}{% endblock %}
     </title>
 
     {% block dark-mode-vars %}{# Appearance: data-theme on <html> (script above + lucus-appearance.js for auto). #}{% endblock %}
 
+<!---------------------------- Stylesheets ---------------------------->
     {% block extrastyle %}
       {# Lucus only: layout/tokens, then admin UI layer, then palette (overrides CSS variables). #}
       <link rel="stylesheet" href="{% static 'lucus/css/style.css' %}">
@@ -39,7 +42,7 @@
       {% endfor %}
       {% endif %}
     {% endblock %}
-    {# Third-party admin integrations — one file per package (see lucus/static/lucus/css/third_party/). #}
+<!----------------------- Third-party admin CSS ----------------------->
     <link rel="stylesheet" href="{% static 'lucus/css/third_party/constance.css' %}">
     <link rel="stylesheet" href="{% static 'lucus/css/third_party/filer.css' %}">
     <link rel="stylesheet" href="{% static 'lucus/css/third_party/parler.css' %}">
@@ -48,7 +51,21 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% endblock %}
 
+<!----------------- Extra head (inline scripts, etc.) ----------------->
     {% block extrahead %}
+      {% if lucus_side_dashboard_nav %}
+      <script>
+        (function () {
+          try {
+            var c = localStorage.getItem("lucus-side-dashboard-collapsed");
+            document.documentElement.setAttribute(
+              "data-lucus-side-dashboard",
+              c === "1" ? "collapsed" : "expanded"
+            );
+          } catch (e) {}
+        })();
+      </script>
+      {% endif %}
       <script>
         (function() {
           document.addEventListener('DOMContentLoaded', function() {
@@ -81,14 +98,14 @@
           document.addEventListener('DOMContentLoaded', function() {
             var nav = document.querySelector('.lucus-header__breadcrumbs .breadcrumbs');
             if (!nav || !nav.innerHTML.trim()) return;
-            var html = nav.innerHTML.replace(/\s*(?:&rsaquo;|&#8250;|›)\s*/g, '<span class="lucus-breadcrumb-sep" aria-hidden="true">/</span>');
+            var html = nav.innerHTML.replace(/\s*(?:&rsaquo;|&#8250;|›)\s*/g, '<span class="lucus-header-breadcrumbs__sep" aria-hidden="true">/</span>');
             nav.innerHTML = html;
             var nodes = nav.childNodes;
             for (var i = nodes.length - 1; i >= 0; i--) {
               var n = nodes[i];
               if (n.nodeType === 3 && n.textContent && n.textContent.trim()) {
                 var span = document.createElement('span');
-                span.className = 'lucus-breadcrumb-current';
+                span.className = 'lucus-header-breadcrumbs__current';
                 span.appendChild(n.cloneNode(true));
                 n.parentNode.replaceChild(span, n);
                 break;
@@ -98,12 +115,16 @@
         })();
       </script>
     {% endblock %}
+<!----------------------------- END HEAD ------------------------------>
   </head>
 
-  <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}{% if lucus_admin_background_image_url and not is_popup %} lucus-admin-has-bg{% endif %}">
+  <body class="{% if is_popup %}popup {% endif %}lucus-admin {% block bodyclass %}{% endblock %}{% if lucus_admin_background_image_url and not is_popup %} lucus-admin--has-bg{% endif %}{% if lucus_side_dashboard_nav %} lucus-admin--with-side-dashboard{% endif %}">
+<!----------------------------- Skip link ----------------------------->
     <a href="#content-start" class="skip-to-content-link">{% translate 'Skip to main content' %}</a>
 
+<!---------------------- Page shell (#container) ---------------------->
     <div id="container">
+<!------------------------ Optional wallpaper ------------------------->
       {% if lucus_admin_background_image_url and not is_popup %}
       {# Inside #container so it stacks under header/main; sibling-before-container stayed under z-index:1 and never showed through. #}
       <div class="lucus-admin-bg" aria-hidden="true">
@@ -113,6 +134,7 @@
       </div>
       {% endif %}
       {% if not is_popup %}
+<!------------------------ Site header (Lucus) ------------------------>
         {% block header %}
           <header id="header" class="lucus-header">
             <div class="lucus-header__inner">
@@ -192,8 +214,17 @@
             </div>
           </header>
         {% endblock %}
+<!-------------------------- END SITE HEADER -------------------------->
       {% endif %}
 
+<!---------------- Main layout (Django admin regions) ----------------->
+      {% if lucus_side_dashboard_nav %}
+      <div class="lucus-below-header">
+        {% block lucus_side_dashboard_nav %}
+        {% include "admin/includes/lucus_side_dashboard_nav.html" %}
+        {% endblock %}
+        <div class="lucus-shell__main">
+      {% endif %}
       <div class="main" id="main">
         <main id="content-start" class="content" tabindex="-1">
           {% block nav-breadcrumbs %}{% endblock %}
@@ -220,8 +251,15 @@
           </div>
         </main>
       </div>
+<!-------------------------- END MAIN LAYOUT -------------------------->
+      {% if lucus_side_dashboard_nav %}
+        </div>
+      </div>
+      {% endif %}
     </div>
+<!-------------------------- END PAGE SHELL --------------------------->
 
+<!------------------------ Scripts (body end) ------------------------->
     {% block extrabody %}
       <script src="{% static 'lucus/js/lucus-appearance.js' %}" defer></script>
       <script src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
@@ -232,9 +270,7 @@
       <script src="{% static 'admin/js/core.js' %}"></script>
 
       <script src="{% static 'admin/js/actions.js' %}"></script>
-      <script src="{% static 'admin/js/calendar.js' %}"></script>
-      <script src="{% static 'admin/js/SelectFilter2.js' %}"></script>
-      <script src="{% static 'admin/js/SelectBox.js' %}"></script>
+      {# calendar.js + DateTimeShortcuts.js: load only from Admin* widget {{ media }} on change_form. Including them here duplicates scripts and runs DateTimeShortcuts.init() twice (double “Today” / “Now” links). #}
       <script src="{% static 'admin/js/urlify.js' %}"></script>
 
       <script src="{% static 'admin/js/autocomplete.js' %}"></script>
@@ -247,10 +283,16 @@
       <script src="{% static 'admin/js/change_form.js' %}"></script>
       <script src="{% static 'admin/js/popup_response.js' %}"></script>
       <script src="{% static 'admin/js/unusable_password_field.js' %}"></script>
-      <script src="{% static 'admin/js/admin/DateTimeShortcuts.js' %}"></script>
       <script src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
 
+      {% if lucus_ui_clean_input_types %}
+      <script src="{% static 'lucus/js/lucus-clean-input-types.js' %}" defer></script>
+      {% endif %}
+      {% if lucus_side_dashboard_nav %}
+      <script src="{% static 'lucus/js/lucus-side-dashboard-nav.js' %}" defer></script>
+      {% endif %}
       <script src="{% static 'lucus/js/lucus-ui.js' %}" defer></script>
     {% endblock extrabody %}
+<!---------------------------- END SCRIPTS ---------------------------->
   </body>
 </html>

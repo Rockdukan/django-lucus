@@ -41,6 +41,7 @@
 
 {# ---------- TITLE + ADD (one row: title left, add right) ---------- #}
 {% block content_title %}
+<!---------------- Changelist: page head (title + add) ---------------->
   <div class="lucus-changelist__pagehead">
     <h1 class="lucus-changelist__title">{{ cl.opts.verbose_name_plural|capfirst }}</h1>
     {% if has_add_permission %}
@@ -58,7 +59,8 @@
 
 {# ---------- CONTENT ---------- #}
 {% block content %}
-  <div id="content-main" class="lucus-content">
+<!-------------------- Changelist: primary surface -------------------->
+  <div id="content-main" class="lucus-page__main">
     {% if cl.formset and cl.formset.errors %}
       <p class="errornote">
         {% blocktranslate count counter=cl.formset.total_error_count %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
@@ -69,6 +71,7 @@
     <div class="module lucus-changelist{% if cl.has_filters %} filtered{% endif %}" id="changelist">
       <div class="lucus-changelist__layout">
         <div class="lucus-changelist__main-column">
+<!--------------------- Toolbar + date hierarchy ---------------------->
           {# Pagination (left) + search (right), above the table; GET search stays outside POST form. #}
           {% if cl.search_fields or cl.result_count or show_all_url %}
             <div class="lucus-changelist__toolbar">
@@ -92,6 +95,7 @@
             </div>
           {% endif %}
 
+<!----------- Changelist form (actions, table, bottom bar) ------------>
       <form id="changelist-form"
             method="post"
             novalidate
@@ -144,6 +148,7 @@
         </div>
 
         {% if cl.has_filters %}
+<!-------------------------- Filter sidebar --------------------------->
           <aside class="lucus-changelist__aside" aria-label="{% translate 'Filter' %}">
             <header class="lucus-changelist__aside-header">
               <span class="lucus-changelist__aside-title">{% translate "Filters" %}</span>
@@ -158,4 +163,5 @@
       </div>
     </div>
   </div>
+<!-------------------------- END CHANGE LIST -------------------------->
 {% endblock %}

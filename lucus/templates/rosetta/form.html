@@ -8,7 +8,8 @@
 
 {% block breadcumbs %}
   <div>
-    <a href="{% url 'rosetta-file-list' po_filter=po_filter %}">{% trans "Home" %}</a> &rsaquo;
+    <a href="{% url 'admin:index' %}">{% trans "Home" %}</a> &rsaquo;
+    <a href="{% url 'rosetta-file-list' po_filter=po_filter %}">{% trans "Rosetta" %}</a> &rsaquo;
     {{ rosetta_i18n_lang_name }} &rsaquo;
     {{ rosetta_i18n_app|title }} &rsaquo;
     {% blocktrans with rosetta_i18n_pofile.percent_translated as percent_translated %}Progress: {{ percent_translated }}%{% endblocktrans %}
@@ -24,6 +25,7 @@
 {% endblock %}
 
 {% block main %}
+<!------ Rosetta: translate form (page head + changelist shell) ------->
   <div class="lucus-changelist__pagehead">
     <h1 class="lucus-changelist__title">{% blocktrans %}Translate into {{ rosetta_i18n_lang_name }}{% endblocktrans %}</h1>
     <div class="lucus-changelist__pagehead-actions lucus-rosetta-form__pagehead-actions">
@@ -199,4 +201,5 @@
       </aside>
     </div>
   </div>
+<!------------------------- END ROSETTA FORM -------------------------->
 {% endblock %}

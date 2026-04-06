@@ -22,7 +22,8 @@
 
 {% block extrahead %}
   {{ block.super }}
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; script-src-elem 'self' https://translate.yandex.net">
+  {# Rosetta ships a tight CSP; without style-src 'unsafe-inline' the scrim’s inline opacity is blocked → full-opaque scrim hides LUCUS_ADMIN_BACKGROUND_IMAGE. Allow http(s) images for off-site wallpaper URLs. #}
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https: http:; style-src 'self' 'unsafe-inline'; script-src-elem 'self' https://translate.yandex.net">
   {{ rosetta_settings_js|json_script:"rosetta-settings-js" }}
   <script src="{% static 'admin/rosetta/js/rosetta.js' %}"></script>
 {% endblock %}
@@ -34,11 +35,14 @@
 {% endblock %}
 
 {% block content %}
-  <div id="content-main" class="lucus-content lucus-rosetta">
+<!----------------------- Rosetta: main column ------------------------>
+  <div id="content-main" class="lucus-page__main lucus-rosetta">
     {% block main %}{% endblock %}
   </div>
+<!---------------------- Rosetta: vendor footer ----------------------->
   <p class="rosetta-version-footer">
     <a href="https://github.com/mbi/django-rosetta">Rosetta</a>
     {% if version %}<span class="version">{{ version }}</span>{% endif %}
   </p>
+<!------------------------- END ROSETTA BASE -------------------------->
 {% endblock %}

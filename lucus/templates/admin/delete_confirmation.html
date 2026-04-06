@@ -20,7 +20,8 @@
 {% endblock %}
 
 {% block content %}
-<div id="content-main" class="lucus-content">
+<!------------------------ Delete confirmation ------------------------>
+<div id="content-main" class="lucus-page__main">
   {% if perms_lacking %}
     <p class="errornote">
       {% block delete_forbidden %}
@@ -56,4 +57,5 @@
     </form>
   {% endif %}
 </div>
+<!---------------------- END DELETE CONFIRMATION ---------------------->
 {% endblock %}

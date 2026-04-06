@@ -11,8 +11,9 @@
 {% endblock %}
 
 {% block content %}
-  <div class="lucus-dashboard lucus-container">
-    <div class="lucus-row lucus-dashboard__grid">
+<!------------------ Admin index: dashboard columns ------------------->
+  <div class="lucus-dashboard lucus-layout__container">
+    <div class="lucus-grid__row lucus-dashboard__grid">
       {% for col in lucus_dashboard_columns %}
         <div class="{{ col.classes }}">
           {% for sec in col.sections %}
@@ -29,4 +30,5 @@
       {% endfor %}
     </div>
   </div>
+<!-------------------------- END ADMIN INDEX -------------------------->
 {% endblock %}

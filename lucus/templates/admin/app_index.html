@@ -4,6 +4,7 @@
 {% block bodyclass %}{{ block.super }} app-{{ app_label }}{% endblock %}
 
 {% if not is_popup %}
+<!---------------------- App index: breadcrumbs ----------------------->
 {% block nav-breadcrumbs %}
   <nav aria-label="{% translate 'Breadcrumbs' %}" class="lucus-breadcrumbs">
     <div class="breadcrumbs">
@@ -17,10 +18,11 @@
 {% endif %}
 
 {% block content %}
-<div class="lucus-dashboard lucus-container">
-  <div class="lucus-row lucus-dashboard__grid">
+<!----------------------- App index: model grid ----------------------->
+<div class="lucus-dashboard lucus-layout__container">
+  <div class="lucus-grid__row lucus-dashboard__grid">
     {% for app in app_list %}
-      <div class="lucus-dashboard__col lucus-col lucus-col-3 lucus-col-md-6 lucus-col-sm-12">
+      <div class="lucus-dashboard__col lucus-grid__col lucus-grid__col--3 lucus-grid__col--md-6 lucus-grid__col--sm-12">
         <section class="lucus-card">
           <h2 class="lucus-card__title">{{ app.name }}</h2>
           <ul class="lucus-card__list">
@@ -35,4 +37,5 @@
     {% endfor %}
   </div>
 </div>
+<!--------------------------- END APP INDEX --------------------------->
 {% endblock %}

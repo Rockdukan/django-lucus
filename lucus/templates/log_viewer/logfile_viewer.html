@@ -31,7 +31,8 @@
 {% endblock %}
 
 {% block content %}
-  <div id="content-main" class="lucus-content django__log__viewer">
+<!------------------- Log viewer (changelist shell) ------------------->
+  <div id="content-main" class="lucus-page__main lucus-log-viewer">
     <div class="module lucus-changelist filtered" id="changelist">
       <div class="lucus-changelist__layout">
         <div class="lucus-changelist__main-column">
@@ -75,6 +76,7 @@
       </div>
     </div>
   </div>
+<!----------------------- END LOG VIEWER MARKUP ----------------------->
 
   <script>
     var entityMap = {

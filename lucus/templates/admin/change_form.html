@@ -33,9 +33,18 @@
 {# ---------- Убираем дублирующий текст перед h1 (оставляем только наш заголовок) ---------- #}
 {% block content_title %}{% endblock %}
 
-{# ---------- EXTRA HEAD: стандартные js admin + наши стили уже в base_site ---------- #}
+{# Stock Django change_form: forms.css + jsi18n + form media (FilteredSelectMultiple → SelectFilter2 needs gettext). #}
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+{% endblock %}
+
 {% block extrahead %}
   {{ block.super }}
+  <script src="{% url 'admin:jsi18n' %}"></script>
+  {{ media }}
+  <script src="{% static 'lucus/js/lucus-inline-placeholders.js' %}" defer></script>
+  <script src="{% static 'lucus/js/lucus-sortable-inlines.js' %}" defer></script>
   {% if adminform and add %}
     <script type="text/javascript">
       (function() {
@@ -54,8 +63,9 @@
 
 {# ---------- CONTENT ---------- #}
 {% block content %}
-  <h1 class="lucus-change-form-title">{{ opts.verbose_name|capfirst }}</h1>
-  <div id="content-main" class="lucus-content">
+<!--------------- Change form: heading + primary column --------------->
+  <h1 class="lucus-change-form__title">{{ opts.verbose_name|capfirst }}</h1>
+  <div id="content-main" class="lucus-page__main">
     {% if errors %}
       <p class="errornote">
         {% if errors|length == 1 %}
@@ -83,7 +93,8 @@
 
       {% block form_top %}{% endblock %}
 
-      <div class="lucus-form-sections">
+<!------------------------ Fieldsets + inlines ------------------------>
+      <div class="lucus-change-form__sections">
         {# ---------- FIELDSETS ---------- #}
         {% block field_sets %}
           {% for fieldset in adminform %}
@@ -112,5 +123,6 @@
       {% prepopulated_fields_js %}
     </form>
   </div>
+<!-------------------------- END CHANGE FORM -------------------------->
 {% endblock %}
 

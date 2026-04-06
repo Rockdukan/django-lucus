@@ -1,5 +1,6 @@
 {% load i18n static %}
 {% if cl.search_fields %}
+<!------------------------- Changelist search ------------------------->
 <div id="toolbar" class="lucus-changelist-search-toolbar">
   <h2 id="changelist-search-form" class="visually-hidden">{% blocktranslate with name=cl.opts.verbose_name_plural %}Search {{ name }}{% endblocktranslate %}</h2>
   <form id="changelist-search" method="get" role="search" aria-labelledby="changelist-search-form">

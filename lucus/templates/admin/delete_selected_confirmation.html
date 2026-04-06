@@ -19,7 +19,8 @@
 {% endblock %}
 
 {% block content %}
-<div id="content-main" class="lucus-content">
+<!------------------- Delete selected confirmation -------------------->
+<div id="content-main" class="lucus-page__main">
   {% if perms_lacking %}
     <p class="errornote">
       {% blocktranslate %}Deleting the selected {{ objects_name }} would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktranslate %}
@@ -56,4 +57,5 @@
     </form>
   {% endif %}
 </div>
+<!------------------------ END DELETE SELECTED ------------------------>
 {% endblock %}

@@ -13,7 +13,8 @@
 {% endblock %}
 
 {% block content %}
-<div id="content-main" class="lucus-content">
+<!----------------------- Object change history ----------------------->
+<div id="content-main" class="lucus-page__main">
   <div class="module">
     {% if action_list %}
       <table id="change-history" class="table table-striped">
@@ -53,4 +54,5 @@
     {% endif %}
   </div>
 </div>
+<!------------------------ END OBJECT HISTORY ------------------------->
 {% endblock %}

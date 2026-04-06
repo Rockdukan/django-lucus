@@ -1,5 +1,6 @@
 {% load admin_list %}
 {% load i18n %}
+<!----------------------- Changelist pagination ----------------------->
 <nav class="paginator" aria-labelledby="pagination">
   <h2 id="pagination" class="visually-hidden">{% blocktranslate with name=cl.opts.verbose_name_plural %}Pagination {{ name }}{% endblocktranslate %}</h2>
   {% if pagination_required %}

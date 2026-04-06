@@ -1,0 +1,47 @@
+{% load i18n lucus_nav %}
+<!--------------------- Lucus: side dashboard nav --------------------->
+<button type="button"
+        id="lucus-side-dashboard-reveal"
+        class="lucus-side-dashboard__reveal"
+        aria-controls="lucus-side-dashboard"
+        aria-expanded="false"
+        title="{% translate 'Show navigation' %}">
+  <span aria-hidden="true">›</span>
+</button>
+<aside id="lucus-side-dashboard"
+       class="lucus-side-dashboard"
+       aria-label="{% translate 'Dashboard navigation' %}">
+  <div class="lucus-side-dashboard__inner">
+    <div class="lucus-side-dashboard__toolbar">
+      <a class="lucus-side-dashboard__dashboard" href="{% url 'admin:index' %}">{% translate "Dashboard" %}</a>
+      <button type="button"
+              id="lucus-side-dashboard-collapse"
+              class="lucus-side-dashboard__collapse"
+              aria-controls="lucus-side-dashboard"
+              aria-expanded="true"
+              title="{% translate 'Hide navigation' %}">
+        <span aria-hidden="true">‹</span>
+      </button>
+    </div>
+    <nav class="lucus-side-dashboard__nav" aria-label="{% translate 'Sections' %}">
+      {% for col in lucus_dashboard_columns %}
+      <div class="lucus-side-dashboard__column-block" data-lucus-dashboard-column="{{ forloop.counter }}">
+        {% for sec in col.sections %}
+        <section class="lucus-side-dashboard__section">
+          <h2 class="lucus-side-dashboard__title">{{ sec.title }}</h2>
+          <ul class="lucus-side-dashboard__list">
+            {% for link in sec.links %}
+            <li>
+              <a class="lucus-side-dashboard__link{% if request.path == link.url|lucus_url_path %} is-active{% endif %}"
+                 href="{{ link.url }}">{{ link.label }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </nav>
+  </div>
+</aside>
+<!------------------ END Lucus side dashboard nav --------------------->

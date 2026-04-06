@@ -14,7 +14,8 @@
 {% block nav-breadcrumbs %}{% endblock %}
 
 {% block content %}
-<div id="content-main" class="lucus-content">
+<!---------------------------- Login form ----------------------------->
+<div id="content-main" class="lucus-page__main">
   {% if form.errors and not form.non_field_errors %}
     <p class="errornote">
       {% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
@@ -56,4 +57,5 @@
     </div>
   </form>
 </div>
+<!----------------------------- END LOGIN ----------------------------->
 {% endblock %}
