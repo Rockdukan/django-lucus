@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any
+from urllib.parse import urlparse
 
 from django.contrib import admin
 from django.conf import settings
@@ -25,27 +26,18 @@ class DashboardSection:
 @dataclass(frozen=True)
 class DashboardColumn:
     sections: tuple[DashboardSection, ...]
-    classes: str = "lucus-dashboard__col lucus-col lucus-col-3 lucus-col-md-6 lucus-col-sm-12"
+    classes: str = (
+        "lucus-dashboard__col lucus-grid__col lucus-grid__col--3 "
+        "lucus-grid__col--md-6 lucus-grid__col--sm-12"
+    )
 
 
-def _infer_app_label_from_admin_urlname(admin_urlname: str, known_app_labels: frozenset[str]) -> str | None:
-    """
-    Resolve ``app_label`` from ``admin:<app>_<model>_changelist`` against ``known_app_labels``.
-    Longer labels are matched first (e.g. ``foo_bar`` before ``foo``).
-    """
-    if not admin_urlname.startswith("admin:"):
-        return None
-    body = admin_urlname[6:]
-    suf = "_changelist"
-    if not body.endswith(suf):
-        return None
-    prefix = body[: -len(suf)]
-    if not prefix:
-        return None
-    for lab in sorted(known_app_labels, key=len, reverse=True):
-        if prefix == lab or prefix.startswith(f"{lab}_"):
-            return lab
-    return None
+def _normalize_admin_path(url: str) -> str:
+    """Normalize an admin URL to a single path form for set membership (trailing slash)."""
+    if not url:
+        return ""
+    path = urlparse(url).path or "/"
+    return path if path.endswith("/") else path + "/"
 
 
 def safe_reverse(admin_urlname: str) -> str | None:
@@ -188,6 +180,65 @@ def links_for_apps(
     return tuple(links)
 
 
+def _covered_admin_paths_from_dashboard_columns(
+    columns: tuple[DashboardColumn, ...],
+) -> set[str]:
+    """Normalized changelist paths already present on the dashboard (per-model coverage)."""
+    covered: set[str] = set()
+    for col in columns:
+        for sec in col.sections:
+            for link in sec.links:
+                p = _normalize_admin_path(link.url)
+                if p:
+                    covered.add(p)
+    return covered
+
+
+def _layout_dashboard_append_uncovered(
+    request,
+    columns: tuple[DashboardColumn, ...],
+) -> tuple[DashboardColumn, ...]:
+    """
+    For layout-style ``LUCUS_DASHBOARD`` (``sections`` / ``normalize_config``),
+    append any admin apps not referenced by existing links into the **last**
+    column — same idea as ``grouped_dashboard_from_app_list`` +
+    ``LUCUS_DASHBOARD_APPEND_UNCOVERED``.
+    """
+    if not getattr(settings, "LUCUS_DASHBOARD_APPEND_UNCOVERED", True):
+        return columns
+
+    app_list = _raw_admin_app_list(request)
+    covered_paths = _covered_admin_paths_from_dashboard_columns(columns)
+    extras: list[DashboardSection] = []
+
+    for app_item in app_list:
+        app_label = app_item.get("app_label") or ""
+        if not app_label:
+            continue
+        links: list[DashboardLink] = []
+        for m in app_item.get("models") or []:
+            url = m.get("admin_url")
+            if url and _normalize_admin_path(url) not in covered_paths:
+                links.append(DashboardLink(label=m.get("name", ""), url=url))
+        if links:
+            extras.append(
+                DashboardSection(title=app_item.get("name", ""), links=tuple(links))
+            )
+
+    if not extras:
+        return columns
+    if not columns:
+        return (DashboardColumn(sections=tuple(extras)),)
+
+    last = columns[-1]
+    return columns[:-1] + (
+        DashboardColumn(
+            sections=last.sections + tuple(extras),
+            classes=last.classes,
+        ),
+    )
+
+
 def looks_like_dashboard_layout(raw: Any) -> bool:
     """True if ``raw`` looks like ``[{ "classes"?, "sections": [...] }, ...]``."""
     if not isinstance(raw, (list, tuple)) or not raw:
@@ -263,10 +314,6 @@ def grouped_dashboard_from_app_list(
         ("constance", "Config"): _("Константы"),
     }
 
-    known_labels = frozenset(
-        (a.get("app_label") or "") for a in app_list if (a.get("app_label") or "")
-    )
-
     for g in groups:
         seen_urls: set[str] = set()
         merged: list[DashboardLink] = []
@@ -299,28 +346,31 @@ def grouped_dashboard_from_app_list(
         )
 
     if getattr(settings, "LUCUS_DASHBOARD_APPEND_UNCOVERED", True):
-        covered: set[str] = set()
+        explicit_covered_apps: set[str] = set()
+        covered_paths: set[str] = set()
         for g in groups:
             raw = g.get("app_labels")
             if isinstance(raw, (set, frozenset)):
-                covered.update(raw)
+                explicit_covered_apps.update(raw)
             elif isinstance(raw, (list, tuple)):
-                covered.update(raw)
+                explicit_covered_apps.update(raw)
             for link in g.get("links") or []:
-                an = link.get("admin_urlname")
-                if an and safe_reverse(an):
-                    lab = _infer_app_label_from_admin_urlname(an, known_labels)
-                    if lab:
-                        covered.add(lab)
+                url = link.get("url")
+                if not url and link.get("admin_urlname"):
+                    url = safe_reverse(link["admin_urlname"])
+                if url:
+                    p = _normalize_admin_path(url)
+                    if p:
+                        covered_paths.add(p)
 
         for app_item in app_list:
             app_label = (app_item.get("app_label") or "")
-            if not app_label or app_label in covered:
+            if not app_label or app_label in explicit_covered_apps:
                 continue
             links = []
             for m in (app_item.get("models") or []):
                 url = m.get("admin_url")
-                if url:
+                if url and _normalize_admin_path(url) not in covered_paths:
                     links.append(DashboardLink(label=m.get("name", ""), url=url))
             if links:
                 cols[-1].append(DashboardSection(title=app_item.get("name", ""), links=tuple(links)))
@@ -342,7 +392,8 @@ def get_dashboard_for_request(request) -> tuple[DashboardColumn, ...]:
     raw = getattr(settings, "LUCUS_DASHBOARD", None)
 
     if raw and looks_like_dashboard_layout(raw):
-        return normalize_config(raw)
+        cols = normalize_config(raw)
+        return _layout_dashboard_append_uncovered(request, cols)
 
     if raw and looks_like_groups_config(raw):
         return grouped_dashboard_from_app_list(request, groups=raw)

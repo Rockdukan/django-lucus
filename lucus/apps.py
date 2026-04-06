@@ -4,6 +4,8 @@ from typing import Any
 
 from django.apps import AppConfig
 
+from lucus.dashboard import get_dashboard_for_request
+
 
 def _install_staff_integrations_context_processor() -> None:
     """Theme + admin chrome on /logs/, /rosetta/, … (see lucus.context_processors)."""
@@ -55,7 +57,6 @@ class LucusConfig(AppConfig):
 
         from lucus import views as lucus_views
         from lucus.admin_list_patch import apply_admin_list_boolean_patch
-        from lucus.dashboard import get_dashboard_for_request
         from lucus.theme import lucus_admin_extra_context
 
         apply_admin_list_boolean_patch()
@@ -88,9 +89,19 @@ class LucusConfig(AppConfig):
                 def each_context_with_dashboard(
                     request, *, _orig=original_each_context
                 ):
+                    from django.conf import settings
+
                     ctx = _orig(request)
                     ctx["lucus_dashboard_columns"] = get_dashboard_for_request(request)
                     ctx.update(lucus_admin_extra_context(request))
+                    rm = getattr(request, "resolver_match", None)
+                    ctx["lucus_side_dashboard_nav"] = bool(
+                        getattr(settings, "LUCUS_SIDE_DASHBOARD_NAV", True)
+                        and ctx.get("has_permission")
+                        and not ctx.get("is_popup")
+                        and rm is not None
+                        and rm.url_name != "index"
+                    )
                     return ctx
 
                 admin_site.each_context = each_context_with_dashboard

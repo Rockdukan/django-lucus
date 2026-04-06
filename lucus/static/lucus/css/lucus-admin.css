@@ -858,6 +858,189 @@ a.deletelink:focus, a.deletelink:hover {
     max-width: 100%;
 }
 
+/* Lucus: side dashboard column (every admin page except index + popups) */
+#container > .lucus-below-header {
+    display: flex;
+    flex: 1 0 auto;
+    align-items: stretch;
+    min-width: 0;
+    min-height: 0;
+}
+
+#container .lucus-shell__main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#container .lucus-shell__main > .main {
+    display: flex;
+    flex: 1 0 auto;
+}
+
+.lucus-side-dashboard {
+    flex: 0 0 16.5rem;
+    width: 16.5rem;
+    max-width: 16.5rem;
+    box-sizing: border-box;
+    border-right: 1px solid var(--hairline-color);
+    background: var(--body-bg);
+    position: relative;
+    transition:
+        flex-basis 0.22s ease-out,
+        width 0.22s ease-out,
+        max-width 0.22s ease-out,
+        opacity 0.15s ease-out,
+        border-width 0.15s ease-out;
+    align-self: stretch;
+}
+
+.lucus-side-dashboard__inner {
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 0.75rem 1.25rem;
+    box-sizing: border-box;
+}
+
+.lucus-side-dashboard__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+    border-bottom: 1px solid var(--hairline-color);
+}
+
+.lucus-side-dashboard__dashboard {
+    font-weight: 600;
+    color: var(--color-brand-primary, var(--link-fg, var(--link-color)));
+    text-decoration: none;
+    font-size: 0.9375rem;
+}
+
+.lucus-side-dashboard__dashboard:hover,
+.lucus-side-dashboard__dashboard:focus {
+    text-decoration: underline;
+}
+
+.lucus-side-dashboard__collapse,
+.lucus-side-dashboard__reveal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: 0;
+    border: 1px solid var(--hairline-color);
+    border-radius: var(--lucus-radius-md, 8px);
+    background: var(--body-bg);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    font-size: 1.125rem;
+    line-height: 1;
+}
+
+.lucus-side-dashboard__reveal {
+    display: none;
+}
+
+html[data-lucus-side-dashboard="collapsed"] .lucus-side-dashboard {
+    flex-basis: 0;
+    width: 0;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    border-right-width: 0;
+    pointer-events: none;
+}
+
+html[data-lucus-side-dashboard="collapsed"] .lucus-side-dashboard__reveal {
+    display: inline-flex;
+    position: fixed;
+    left: 0.5rem;
+    top: 4.75rem;
+    z-index: 12;
+    box-shadow: var(--lucus-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.12));
+}
+
+.lucus-side-dashboard__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.lucus-side-dashboard__column-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.lucus-side-dashboard__section {
+    background: var(--module-bg, var(--body-bg));
+    border: 1px solid var(--hairline-color);
+    border-radius: var(--lucus-radius-md, 8px);
+    padding: 0.5rem 0.65rem 0.65rem;
+    box-shadow: var(--lucus-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.04));
+}
+
+.lucus-side-dashboard__title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 0.4rem;
+    color: var(--body-quiet-color);
+    line-height: 1.3;
+}
+
+.lucus-side-dashboard__list {
+    list-style: none;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Stock admin: `ul > li { list-style-type: square }` — kill markers here too. */
+.lucus-side-dashboard__list > li {
+    list-style: none !important;
+    list-style-type: none !important;
+    margin: 0;
+    padding: 0;
+}
+
+.lucus-side-dashboard__list li::marker {
+    content: none !important;
+    display: none !important;
+}
+
+.lucus-side-dashboard__link {
+    display: block;
+    padding: 0.35rem 0.25rem;
+    border-radius: var(--lucus-radius-sm, 6px);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.lucus-side-dashboard__link:hover,
+.lucus-side-dashboard__link:focus {
+    background: var(--hairline-color);
+    color: var(--color-text-primary);
+}
+
+.lucus-side-dashboard__link.is-active {
+    font-weight: 600;
+    background: var(--hairline-color);
+}
+
 .skip-to-content-link {
     position: absolute;
     top: -999px;
@@ -1745,25 +1928,22 @@ form .related-widget-wrapper ul {
     color: var(--breadcrumbs-fg);
 }
 
+.selector-available-title,
 .selector-chosen-title {
-    background: var(--secondary);
-    color: var(--header-link-color);
+    background: var(--color-surface-secondary, var(--darkened-bg));
+    color: var(--color-text-primary, var(--body-fg));
     padding: 8px;
 }
 
+.selector-available-title label,
 .selector-chosen-title label {
-    color: var(--header-link-color);
+    color: inherit;
     width: 100%;
 }
 
-.selector-available-title {
-    background: var(--darkened-bg);
-    color: var(--body-quiet-color);
-    padding: 8px;
-}
-
-.selector-available-title label {
-    width: 100%;
+.selector-available-title .helptext,
+.selector-chosen-title .helptext {
+    color: var(--color-text-muted, var(--body-quiet-color));
 }
 
 .selector .selector-filter {
@@ -1801,7 +1981,9 @@ form .related-widget-wrapper ul {
     border-radius: 10px;
     margin: 0;
     padding: 0;
-    transform: translateY(-17px);
+    /* Stock Django offset centers the control column on the list boxes; translate3d keeps a compositor layer to reduce 1px “seams” next to flex borders. */
+    transform: translate3d(0, -17px, 0);
+    isolation: isolate;
 }
 
 .selector-chooser li {
@@ -1995,7 +2177,7 @@ form .related-widget-wrapper ul {
 }
 
 .selector .selector-chosen .help-icon {
-    background: url(../img/icon-unknown-alt.svg) 0 0 no-repeat;
+    background: url(../img/icon-unknown.svg) 0 0 no-repeat;
 }
 
 .selector .search-label-icon {
@@ -2294,7 +2476,9 @@ ul.timelist, .timelist li {
     display: flex;
     gap: 0 10px;
     flex-grow: 1;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    min-width: min(100%, 18rem);
     margin-bottom: 5px;
 }
 
@@ -3655,10 +3839,14 @@ input[type="submit"], button {
 
     .selector-available, .selector-chosen {
         flex: 1 1 auto;
+        min-width: min(12rem, 100%);
     }
 
+    /* Don’t crush M2M filter widgets on tablet/narrow — was max-height: 96px (unusable). */
     .selector select {
-        max-height: 96px;
+        min-height: 14rem;
+        max-height: none;
+        height: auto;
     }
 
     .selector ul.selector-chooser {
@@ -4428,8 +4616,38 @@ html[dir="rtl"] #content #changelist table#result_list thead th .lucus-th-headin
   border-style: none !important;
 }
 
-body.lucus-admin-has-bg #container,
-body.lucus-admin-has-bg .main > .content,
-body.lucus-admin-has-bg #content {
+body.lucus-admin.lucus-admin--has-bg #container,
+body.lucus-admin.lucus-admin--has-bg .main > .content,
+body.lucus-admin.lucus-admin--has-bg #content {
   background-color: transparent !important;
+}
+
+/* --- Lucus: sortable tabular inlines --- */
+#content .lucus-inline-drag-col {
+  width: 2rem;
+  text-align: center;
+}
+
+#content .lucus-inline-drag-cell {
+  width: 2rem;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#content .lucus-inline-drag-handle {
+  cursor: grab;
+  padding: 0.25rem 0.35rem;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--body-quiet-color, #666);
+}
+
+#content .lucus-inline-drag-handle:active {
+  cursor: grabbing;
+}
+
+#content tr.lucus-inline-dragging {
+  opacity: 0.65;
 }

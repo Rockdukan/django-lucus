@@ -4,7 +4,7 @@
  */
 
 /* Constance / similar: #content-main + #changelist without .lucus-changelist */
-#content #content-main.lucus-content.constance,
+#content #content-main.lucus-page__main.constance,
 #content #content-main.constance {
   float: none !important;
   width: 100% !important;

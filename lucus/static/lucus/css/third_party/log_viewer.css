@@ -2,23 +2,23 @@
  * django-log-viewer: Lucus changelist chrome (.lucus-changelist) + DataTables.
  * Vendor log-viewer.css uses float + margin-right for the sidebar; we use flex layout.
  */
-body.log-viewer-page .django__log__viewer .results {
+body.log-viewer-page .lucus-log-viewer .results {
   margin-right: 0 !important;
   width: 100% !important;
 }
 
 /* Inset content inside the rounded surface (changelist table gets padding from cells; log viewer does not). */
-body.log-viewer-page .django__log__viewer .lucus-results-scroll {
+body.log-viewer-page .lucus-log-viewer .lucus-results-scroll {
   padding: var(--m) var(--l);
   box-sizing: border-box;
 }
 
-body.log-viewer-page .django__log__viewer .lucus-changelist__aside-body {
+body.log-viewer-page .lucus-log-viewer .lucus-changelist__aside-body {
   padding: var(--s);
   box-sizing: border-box;
 }
 
-body.log-viewer-page .django__log__viewer .headers {
+body.log-viewer-page .lucus-log-viewer .headers {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -29,8 +29,8 @@ body.log-viewer-page .django__log__viewer .headers {
   box-sizing: border-box;
 }
 
-body.log-viewer-page .django__log__viewer .headers h1,
-body.log-viewer-page .django__log__viewer .headers .lucus-changelist__title {
+body.log-viewer-page .lucus-log-viewer .headers h1,
+body.log-viewer-page .lucus-log-viewer .headers .lucus-changelist__title {
   margin: 0;
   font-size: var(--l);
   font-weight: 600;
@@ -38,12 +38,12 @@ body.log-viewer-page .django__log__viewer .headers .lucus-changelist__title {
   color: var(--color-brand-primary);
 }
 
-body.log-viewer-page .django__log__viewer .pull-left,
-body.log-viewer-page .django__log__viewer .pull-right {
+body.log-viewer-page .lucus-log-viewer .pull-left,
+body.log-viewer-page .lucus-log-viewer .pull-right {
   float: none !important;
 }
 
-body.log-viewer-page .django__log__viewer .download-buttons {
+body.log-viewer-page .lucus-log-viewer .download-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s);
@@ -54,7 +54,7 @@ body.log-viewer-page .django__log__viewer .download-buttons {
  * Beat style.css `#content .lucus-changelist a { color: … !important }` (same hue as button bg → invisible label).
  */
 body.log-viewer-page #content .lucus-changelist a.btn-download,
-body.log-viewer-page #content .django__log__viewer a.btn-download {
+body.log-viewer-page #content .lucus-log-viewer a.btn-download {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -72,8 +72,8 @@ body.log-viewer-page #content .django__log__viewer a.btn-download {
 
 body.log-viewer-page #content .lucus-changelist a.btn-download:hover,
 body.log-viewer-page #content .lucus-changelist a.btn-download:focus,
-body.log-viewer-page #content .django__log__viewer a.btn-download:hover,
-body.log-viewer-page #content .django__log__viewer a.btn-download:focus {
+body.log-viewer-page #content .lucus-log-viewer a.btn-download:hover,
+body.log-viewer-page #content .lucus-log-viewer a.btn-download:focus {
   filter: brightness(1.06);
   color: #fff !important;
   text-decoration: none !important;

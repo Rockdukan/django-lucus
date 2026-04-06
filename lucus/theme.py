@@ -43,6 +43,9 @@ LUCUS_STAFF_THEME_PATH_PREFIXES
     Optional iterable of URL path prefixes (strings). For authenticated staff,
     :func:`lucus.context_processors.staff_integrations_theme` merges
     ``AdminSite.each_context`` (Lucus theme, header tools) on matching paths.
+    Matching uses ``request.path`` after stripping an optional leading
+    ``SCRIPT_NAME`` and an optional first URL segment when it equals a configured
+    language code (e.g. ``/en/rosetta/…`` matches ``/rosetta/``).
     Default: ``/logs/``, ``/rosetta/``, ``/explorer/`` (not ``/admin/`` — already wired).
     Set to ``()`` to disable.
 
@@ -63,9 +66,21 @@ LUCUS_UI
     - ``high_contrast_toggle`` — show “High contrast” in the user menu (uses
       ``localStorage`` + ``data-lucus-contrast="high"`` on ``<html>``;
       default ``False`` if omitted).
+    - ``clean_input_types`` — if ``True``, load a script that sets many HTML5
+      ``<input>`` types (``search``, ``email``, ``url``, ``tel``, ``number``,
+      ``range``, ``date``, ``month``, ``week``, ``time``, ``datetime``,
+      ``datetime-local``, ``color``) to ``text``, like Grappelli’s
+      ``GRAPPELLI_CLEAN_INPUT_TYPES`` (avoids inconsistent browser widgets and
+      client-side validation in the admin). Default ``False`` if omitted.
 
     Change-form save/delete bar and changelist actions bar are fixed to the
     viewport bottom.
+
+LUCUS_SIDE_DASHBOARD_NAV
+    If ``True`` (default), staff pages other than the admin **index** show a
+    collapsible left column that lists the same dashboard sections and links as
+    ``LUCUS_DASHBOARD`` (column ``1`` first, then ``2``, …). Popups and users
+    without admin permission never see it. Set ``False`` to disable.
 
 Color scheme is chosen from bundled schemes (and optional extra entries) and
 stored per user in ``LucusAdminUiPreference``. There is no ``LUCUS_COLOR_SCHEME``
@@ -265,6 +280,7 @@ def lucus_admin_extra_context(request: HttpRequest) -> dict[str, Any]:
         "lucus_selected_appearance": appearance,
         "lucus_ui_help_as_icon": _ui_flag(ui_raw, "help_as_icon", True),
         "lucus_ui_high_contrast_toggle": _ui_flag(ui_raw, "high_contrast_toggle", False),
+        "lucus_ui_clean_input_types": _ui_flag(ui_raw, "clean_input_types", False),
         "lucus_admin_background_image_url": bg_url,
         "lucus_admin_background_scrim_opacity": _admin_background_scrim_opacity_css()
         if bg_url

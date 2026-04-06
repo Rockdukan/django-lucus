@@ -16,7 +16,7 @@
     var form = document.getElementById('changelist-form');
     var resultList = document.getElementById('result_list');
     var counter = document.querySelector('span.action-counter');
-    var clearBtn = document.querySelector('.lucus-action-deselect');
+    var clearBtn = document.querySelector('.lucus-changelist-actions__deselect');
     if (
       !form ||
       !resultList ||
