@@ -37,12 +37,14 @@
 {% block extrastyle %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+  {% for css in media.render_css %}
+  {{ css }}
+  {% endfor %}
 {% endblock %}
 
 {% block extrahead %}
   {{ block.super }}
   <script src="{% url 'admin:jsi18n' %}"></script>
-  {{ media }}
   <script src="{% static 'lucus/js/lucus-inline-placeholders.js' %}" defer></script>
   <script src="{% static 'lucus/js/lucus-sortable-inlines.js' %}" defer></script>
   {% if adminform and add %}
@@ -123,6 +125,14 @@
       {% prepopulated_fields_js %}
     </form>
   </div>
-<!-------------------------- END CHANGE FORM -------------------------->
+<!---------------- END CHANGE FORM -------------------------->
+{% endblock %}
+
+{# Форма admin: JS формы после jQuery из base extrabody (galleryfield, prose editor, CKEditor, …). #}
+{% block extrabody %}
+{{ block.super }}
+{% for js in media.render_js %}
+{{ js }}
+{% endfor %}
 {% endblock %}
 

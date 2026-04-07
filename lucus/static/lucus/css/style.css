@@ -230,6 +230,15 @@ small {
   z-index: 60;
 }
 
+/*
+ * В lucus-admin.css для #header при ≤1024px заданы flex + column + align-items: center.
+ * У Lucus единственный ребёнок — .lucus-header__inner; при center он сжимается по ширине
+ * контента (не на 100%), из‑за этого «крошки | пользователь» визуально ломаются.
+ */
+#header.lucus-header {
+  display: block;
+}
+
 .lucus-header__inner {
   display: flex;
   align-items: center;
@@ -250,6 +259,51 @@ small {
   flex-wrap: wrap;
   min-width: 0;
   overflow: visible;
+  gap: var(--s);
+}
+
+/* Mobile menu toggle (side dashboard): hidden on wide viewports */
+.lucus-admin-nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-shrink: 0;
+  width: 28px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: var(--lucus-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  position: relative;
+  z-index: 120;
+}
+
+.lucus-admin-nav-toggle:focus-visible {
+  outline: 2px solid var(--lucus-accent, var(--color-brand-primary));
+  outline-offset: 2px;
+}
+
+.lucus-admin-nav-toggle__line {
+  display: block;
+  height: 2px;
+  width: 100%;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform var(--lucus-transition-med), opacity var(--lucus-transition-fast);
+}
+
+.lucus-admin-nav-toggle[aria-expanded="true"] .lucus-admin-nav-toggle__line:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.lucus-admin-nav-toggle[aria-expanded="true"] .lucus-admin-nav-toggle__line:nth-child(2) {
+  opacity: 0;
+}
+
+.lucus-admin-nav-toggle[aria-expanded="true"] .lucus-admin-nav-toggle__line:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
 }
 
 .lucus-header__breadcrumbs {
@@ -412,6 +466,144 @@ small {
   display: block;
   padding: 6px 12px !important;
   box-sizing: border-box;
+}
+
+/* ------------------------------------------------------------------ */
+/*        Admin shell: narrow viewports (side nav + header wrap)       */
+/* ------------------------------------------------------------------ */
+
+.lucus-mobile-nav-backdrop {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  body.lucus-admin--mobile-nav-enabled:not(.popup) .lucus-admin-nav-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-self: center;
+    margin: 0;
+  }
+
+  /*
+   * Одна строка фиксированной высоты: гамбургер слева, пользователь справа — строго по центру по вертикали.
+   * Крошки в шапке на мобильных не показываем (навигация в выезжающем меню).
+   */
+  #header.lucus-header,
+  body.lucus-admin:not(.popup) #header.lucus-header {
+    height: var(--xl);
+    min-height: var(--xl);
+    max-height: var(--xl);
+    overflow: visible;
+  }
+
+  /*
+   * Гамбургер слева, пользователь справа; оба по вертикали по центру строки (align-items: center).
+   */
+  #header.lucus-header .lucus-header__inner {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+    padding: 0 var(--l);
+    box-sizing: border-box;
+    gap: var(--m);
+  }
+
+  #header.lucus-header .lucus-header__left {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+  }
+
+  #header.lucus-header .lucus-header__right {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    max-width: 100%;
+    margin-left: 0 !important;
+    margin-inline-start: auto !important;
+  }
+
+  #header.lucus-header .lucus-header__user {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
+  #header.lucus-header .lucus-header__user-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+    margin: 0;
+    max-height: 100%;
+  }
+
+  #header.lucus-header .lucus-header__user-name {
+    line-height: 1.2;
+    max-width: min(42vw, 11rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #header.lucus-header .lucus-header__breadcrumbs {
+    display: none !important;
+  }
+
+  /* Дублирующая полоса крошек под шапкой (напр. app_index) */
+  .lucus-breadcrumbs {
+    display: none !important;
+  }
+
+  /* Селекты темы / сайта / языка — в выезжающем меню (≤900px), не в шапке. */
+  #header.lucus-header .lucus-header__toolbar {
+    display: none !important;
+  }
+
+  /*
+   * Затемнение поверх контента страницы (ниже шапки и ниже выезжающей панели z-index 96).
+   */
+  body.lucus-admin--mobile-nav-enabled:not(.popup).lucus-admin--mobile-nav-open .lucus-mobile-nav-backdrop {
+    display: block;
+    position: fixed;
+    top: var(--xl);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 78;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body.lucus-admin--mobile-nav-enabled:not(.popup).lucus-admin--mobile-nav-open #header.lucus-header {
+    z-index: 110;
+  }
+}
+
+body.lucus-admin--scroll-lock {
+  overflow: hidden;
 }
 
 /* Lucus: no nav sidebar — content uses full width of .main */
@@ -843,7 +1035,7 @@ body.lucus-admin--with-side-dashboard #container #content-main {
 #content .submit-row input[type="submit"],
 #content .submit-row input.default,
 #content .submit-row button[type="submit"],
-#content form button:not(.lucus-header__user-trigger):not(.selector-add):not(.selector-remove):not(.selector-chooseall):not(.selector-clearall) {
+#content form button:not(.lucus-header__user-trigger):not(.selector-add):not(.selector-remove):not(.selector-chooseall):not(.selector-clearall):not(:is(.gallery-widget *)) {
   height: 32px !important;
   min-height: 32px !important;
   line-height: 32px !important;
@@ -898,6 +1090,47 @@ body.lucus-admin--with-side-dashboard #container #content-main {
   margin-bottom: var(--m);
   gap: var(--m);
 }
+
+/* django-galleryfield: сетка Bootstrap + кнопки не должны сжиматься flex-рядом админки (32px / center). */
+#content .form-row:has(.gallery-widget):not(tr) {
+  display: block !important;
+  align-items: stretch !important;
+  min-height: 0 !important;
+}
+#content .form-row:has(.gallery-widget) label {
+  display: block !important;
+  flex: none !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin-bottom: var(--s) !important;
+  line-height: 1.35 !important;
+}
+#content .form-row:has(.gallery-widget) .lucus-field__control-row {
+  display: block !important;
+}
+#content .form-row:has(.gallery-widget) .lucus-field__control-row > .flex-container {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+#content .gallery-widget {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+#content .gallery-widget .row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  margin-left: calc(var(--bs-gutter-x, 1.5rem) * -0.5) !important;
+  margin-right: calc(var(--bs-gutter-x, 1.5rem) * -0.5) !important;
+}
+#content .gallery-widget .row > [class*="col-"] {
+  padding-left: calc(var(--bs-gutter-x, 1.5rem) * 0.5) !important;
+  padding-right: calc(var(--bs-gutter-x, 1.5rem) * 0.5) !important;
+}
+
 #content .aligned label,
 #content .form-row:not(tr) label {
   flex: 0 0 160px;
@@ -1166,8 +1399,9 @@ body.login {
   padding: 0 !important;
   width: 100%;
 }
+/* Admin flash messages — цвета из активной схемы (читаемый текст на фоне surface) */
 #content ul.messagelist li {
-  color: yellow !important;
+  color: var(--color-text-primary) !important;
   width: 100%;
   height: var(--xl);
   min-height: var(--xl);
@@ -1182,24 +1416,28 @@ body.login {
 }
 #content ul.messagelist li.success {
   background: var(--color-surface-secondary) !important;
-  color: yellow !important;
-  border: 1px solid var(--lucus-accent);
+  color: var(--color-text-primary) !important;
+  border: 1px solid color-mix(in srgb, var(--lucus-accent) 55%, var(--color-border));
 }
-
-
-#content ul.messagelist li.success a[href*="/flights/vehicle/"][href*="/change/"] {
-  background: transparent !important;
-  color: #D3A200 !important;
+#content ul.messagelist li.success a:link,
+#content ul.messagelist li.success a:visited {
+  color: var(--lucus-accent) !important;
 }
+#content ul.messagelist li.success a:hover,
+#content ul.messagelist li.success a:focus {
+  color: var(--lucus-accent-hover, var(--lucus-accent)) !important;
+  text-decoration: underline;
+}
+/* Light / авто-светлая: ошибка и предупреждение */
 #content ul.messagelist li.error {
-  background: #F2E6E6 !important;
-  color: #A64444;
-  border: 1px solid #A64444;
+  background: color-mix(in srgb, #c62828 12%, var(--color-surface-secondary)) !important;
+  color: color-mix(in srgb, #5d1010 92%, var(--color-text-primary)) !important;
+  border: 1px solid color-mix(in srgb, #b71c1c 65%, var(--color-border));
 }
 #content ul.messagelist li.warning {
-  background: #F2E6E6 !important;
-  color: #A64444;
-  border: 1px solid #A64444;
+  background: color-mix(in srgb, #e65100 14%, var(--color-surface-secondary)) !important;
+  color: color-mix(in srgb, #6d3600 82%, var(--color-text-primary)) !important;
+  border: 1px solid color-mix(in srgb, #ef6c00 55%, var(--color-border));
 }
 #content .errornote {
   width: 100%;
@@ -1210,10 +1448,37 @@ body.login {
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
-  background: #F2E6E6 !important;
-  color: #A64444;
-  border: 1px solid #A64444;
+  background: color-mix(in srgb, #c62828 12%, var(--color-surface-secondary)) !important;
+  color: color-mix(in srgb, #5d1010 92%, var(--color-text-primary)) !important;
+  border: 1px solid color-mix(in srgb, #b71c1c 65%, var(--color-border));
   margin-bottom: var(--m) !important;
+}
+/* Тёмная тема: более светлый текст на приглушённом фоне */
+html[data-theme="dark"] #content ul.messagelist li.error,
+html[data-theme="dark"] #content .errornote {
+  background: color-mix(in srgb, #ff5252 24%, var(--color-surface)) !important;
+  color: #ffebee !important;
+  border-color: color-mix(in srgb, #ff8a80 60%, var(--color-border));
+}
+html[data-theme="dark"] #content ul.messagelist li.warning {
+  background: color-mix(in srgb, #ffc107 22%, var(--color-surface)) !important;
+  color: #fff8e1 !important;
+  border-color: color-mix(in srgb, #ffd54f 55%, var(--color-border));
+}
+html[data-theme="dark"] #content ul.messagelist li.error a:link,
+html[data-theme="dark"] #content ul.messagelist li.error a:visited,
+html[data-theme="dark"] #content .errornote a:link,
+html[data-theme="dark"] #content .errornote a:visited {
+  color: #ffe082 !important;
+}
+html[data-theme="dark"] #content ul.messagelist li.warning a:link,
+html[data-theme="dark"] #content ul.messagelist li.warning a:visited {
+  color: #fff59d !important;
+}
+
+/* django-prose-editor: рабочая высота редактора в админке (по умолчанию слишком низкая). */
+.change-form-page .prose-editor .ProseMirror {
+  min-height: 280px;
 }
 
 #content .lucus-empty-state {
@@ -1641,10 +1906,11 @@ html[dir="rtl"] #content #result_list thead th .lucus-th-heading-inner {
 /* Changelist: actions row — counter + clear selection */
 .lucus-changelist-actions__counter-row {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: var(--s);
   vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .lucus-changelist-actions__deselect {
@@ -2101,14 +2367,83 @@ html[dir="rtl"] #content #result_list thead th .lucus-th-heading-inner {
   margin-left: 0 !important;
 }
 
-@media (max-width: 700px) {
-  #content #changelist .lucus-changelist__toolbar {
-    flex-wrap: wrap;
+@media (max-width: 1024px) {
+  /* lucus-admin задаёт #toolbar { padding: 15px } — в полосе Lucus не раздуваем */
+  #content #changelist .lucus-changelist__toolbar-search #toolbar.lucus-changelist-search-toolbar {
+    padding: 0 !important;
+    border: none !important;
   }
-  #content #changelist .lucus-changelist__toolbar-search {
-    max-width: 100%;
-    margin-inline-start: 0;
+}
+
+@media (max-width: 767px) {
+  /* Перебивает lucus-admin @767px `#toolbar { padding: 10px }` внутри полосы Lucus */
+  #content #changelist .lucus-changelist__toolbar-search #toolbar.lucus-changelist-search-toolbar {
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  /* Счётчик + поиск + «Найти» в одну строку (без переноса блока поиска вниз) */
+  #content #changelist .lucus-changelist__toolbar {
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+  }
+
+  #content #changelist .lucus-changelist__toolbar-pagination {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 40%;
+  }
+
+  #content #changelist .lucus-changelist__toolbar-pagination .paginator {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
     width: 100%;
+  }
+
+  #content #changelist .lucus-changelist__toolbar-pagination .paginator__pages {
+    flex: 0 0 auto;
+  }
+
+  #content #changelist .lucus-changelist__toolbar-pagination .paginator__meta {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+    line-height: 1.25;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  #content #changelist .lucus-changelist__toolbar-search {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+    width: auto;
+    margin-inline-start: 0;
+  }
+
+  #content #changelist .lucus-changelist__toolbar-search #searchbar {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  /* lucus-admin ≤1024px: max-width: 480px на #changelist-search > div */
+  #content #changelist .lucus-changelist__toolbar-search #changelist-search > div {
+    max-width: none !important;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Убираем второй счётчик из стандартной разметки search_form (дублирует paginator__meta) */
+  #content #changelist .lucus-changelist__toolbar-search .small.quiet {
+    display: none !important;
   }
 }
 
@@ -2117,22 +2452,31 @@ html[dir="rtl"] #content #result_list thead th .lucus-th-heading-inner {
   display: flex;
   flex-direction: row;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 12px;
   margin: 0 0 10px;
   padding: 10px 12px;
   box-sizing: border-box;
   width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   background: var(--color-surface-secondary) !important;
   border: 1px solid var(--color-border) !important;
   border-radius: 10px !important;
 }
 
+#changelist-form .lucus-changelist__topbar .lucus-changelist__actions {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 #changelist-form .lucus-changelist__topbar .lucus-changelist__actions .actions {
   width: auto !important;
-  max-width: 100%;
+  max-width: none;
   display: inline-flex !important;
-  flex-wrap: wrap !important;
+  flex-wrap: nowrap !important;
   align-items: center;
   gap: 8px;
   box-sizing: border-box;
@@ -2144,10 +2488,23 @@ html[dir="rtl"] #content #result_list thead th .lucus-th-heading-inner {
 
 #changelist-form .lucus-changelist__topbar .lucus-changelist__actions .actions label {
   display: inline-flex !important;
-  flex-wrap: wrap !important;
+  flex-wrap: nowrap !important;
   align-items: center;
   gap: 6px;
   margin: 0 !important;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+#changelist-form .lucus-changelist__topbar .lucus-changelist__actions .actions select {
+  max-width: min(40vw, 15rem);
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+#changelist-form .lucus-changelist__topbar .lucus-changelist__actions .actions > .button,
+#changelist-form .lucus-changelist__bottombar .lucus-changelist__actions .actions > .button {
+  flex-shrink: 0;
 }
 
 /* Strip default Django/Lucus panel fill from the inner actions box (parent bars provide chrome). */
@@ -2178,9 +2535,14 @@ html[dir="rtl"] #content #result_list thead th .lucus-th-heading-inner {
   #content #changelist .lucus-changelist__layout {
     flex-direction: column;
   }
+  /* Фильтры выше основной колонки (поиск и таблица), а не внизу страницы */
   #content #changelist .lucus-changelist__aside {
     flex: 1 1 auto;
     width: 100%;
+    order: 1;
+  }
+  #content #changelist .lucus-changelist__main-column {
+    order: 2;
   }
 }
 
@@ -2931,27 +3293,35 @@ body.change-list-page .lucus-changelist .results thead th {
   box-sizing: border-box !important;
   z-index: auto;
   margin: 10px 0 0 !important;
-  padding: 0 !important;
+  padding: 10px 12px !important;
   background: var(--color-surface-secondary) !important;
   border: 1px solid var(--color-border) !important;
   border-radius: 10px !important;
   box-shadow: none;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-start;
   gap: 12px;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 #changelist-form .lucus-changelist__bottombar .lucus-changelist__actions .actions {
   width: auto !important;
-  max-width: 100%;
+  max-width: none;
   display: inline-flex !important;
   flex-wrap: nowrap !important;
   align-items: center;
   gap: 8px;
   box-sizing: border-box;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 #changelist-form .lucus-changelist__bottombar .lucus-changelist__actions .actions label {
@@ -2960,38 +3330,18 @@ body.change-list-page .lucus-changelist .results thead th {
   align-items: center;
   gap: 6px;
   margin: 0 !important;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 #changelist-form .lucus-changelist__bottombar .lucus-changelist__actions .actions select {
-  max-width: min(56vw, 22rem);
+  max-width: min(40vw, 15rem);
   min-width: 0;
   flex: 0 1 auto;
-}
-
-#changelist-form .lucus-changelist__bottombar .paginator {
-  flex: 0 1 auto;
-  margin: 0 0 0 auto !important;
-  width: auto !important;
-  max-width: 100% !important;
-  min-width: 0;
-  flex-wrap: nowrap !important;
-  white-space: nowrap !important;
-  overflow-x: auto !important;
-  overflow-y: visible !important;
-  padding-top: 4px !important;
-  padding-bottom: 4px !important;
-  position: relative;
-  z-index: 1;
-}
-
-#changelist-form .lucus-changelist__bottombar .paginator input {
-  margin-left: 4px !important;
-  margin-right: 0 !important;
-  flex-shrink: 0;
 }
 
 #changelist-form .lucus-changelist__bottombar .lucus-changelist__actions {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-width: 0;
   position: relative;
   z-index: 2;
@@ -3069,10 +3419,6 @@ div.calendar {
 /* Dark theme: baseline fixes for Lucus chrome (per-scheme palettes in *.css) */
 html[data-theme="dark"] .lucus-header {
   border-bottom-color: var(--color-border);
-}
-
-html[data-theme="dark"] #content .messagelist li.success {
-  color: var(--color-text-primary) !important;
 }
 
 html[data-theme="dark"] .lucus-field-help__body {

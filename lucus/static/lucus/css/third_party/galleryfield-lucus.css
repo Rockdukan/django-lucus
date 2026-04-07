@@ -1,0 +1,47 @@
+/* django-galleryfield: аналог jquery.fileupload.css для .fileinput-button; после media, только .gallery-widget */
+
+#content .gallery-widget .fileinput-button {
+  position: relative;
+  overflow: hidden;
+}
+
+#content .gallery-widget .fileinput-button input[type="file"] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  height: 100%;
+  opacity: 0;
+  font-size: 200px !important;
+  direction: ltr;
+  cursor: pointer;
+  max-width: none !important;
+  width: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  line-height: normal !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Lucus тянет кнопки формы к 32px — возвращаем Bootstrap .btn внутри виджета */
+#content .gallery-widget .btn,
+#content .gallery-widget button.btn {
+  height: auto !important;
+  min-height: 0 !important;
+  line-height: 1.5 !important;
+  padding: 0.375rem 0.75rem !important;
+  border-radius: 0.25rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35em;
+  white-space: nowrap;
+}
+
+#content .gallery-widget .fileupload-buttonbar .btn span {
+  line-height: inherit;
+}

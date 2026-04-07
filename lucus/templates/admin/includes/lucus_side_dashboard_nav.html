@@ -23,6 +23,7 @@
         <span aria-hidden="true">‹</span>
       </button>
     </div>
+    {% include "admin/includes/lucus_mobile_menu_settings.html" %}
     <nav class="lucus-side-dashboard__nav" aria-label="{% translate 'Sections' %}">
       {% for col in lucus_dashboard_columns %}
       <div class="lucus-side-dashboard__column-block" data-lucus-dashboard-column="{{ forloop.counter }}">

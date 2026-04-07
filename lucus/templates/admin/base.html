@@ -46,6 +46,7 @@
     <link rel="stylesheet" href="{% static 'lucus/css/third_party/constance.css' %}">
     <link rel="stylesheet" href="{% static 'lucus/css/third_party/filer.css' %}">
     <link rel="stylesheet" href="{% static 'lucus/css/third_party/parler.css' %}">
+    <link rel="stylesheet" href="{% static 'lucus/css/third_party/galleryfield-lucus.css' %}">
 
     {% block responsive %}
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -118,12 +119,19 @@
 <!----------------------------- END HEAD ------------------------------>
   </head>
 
-  <body class="{% if is_popup %}popup {% endif %}lucus-admin {% block bodyclass %}{% endblock %}{% if lucus_admin_background_image_url and not is_popup %} lucus-admin--has-bg{% endif %}{% if lucus_side_dashboard_nav %} lucus-admin--with-side-dashboard{% endif %}">
+  <body class="{% if is_popup %}popup {% endif %}lucus-admin {% block bodyclass %}{% endblock %}{% if lucus_admin_background_image_url and not is_popup %} lucus-admin--has-bg{% endif %}{% if lucus_side_dashboard_nav %} lucus-admin--with-side-dashboard{% endif %}{% if has_permission and not is_popup %} lucus-admin--mobile-nav-enabled{% endif %}">
 <!----------------------------- Skip link ----------------------------->
     <a href="#content-start" class="skip-to-content-link">{% translate 'Skip to main content' %}</a>
 
 <!---------------------- Page shell (#container) ---------------------->
     <div id="container">
+      {% if has_permission and not is_popup %}
+      <button type="button"
+              class="lucus-mobile-nav-backdrop"
+              id="lucus-mobile-nav-backdrop"
+              aria-hidden="true"
+              tabindex="-1"></button>
+      {% endif %}
 <!------------------------ Optional wallpaper ------------------------->
       {% if lucus_admin_background_image_url and not is_popup %}
       {# Inside #container so it stacks under header/main; sibling-before-container stayed under z-index:1 and never showed through. #}
@@ -139,6 +147,18 @@
           <header id="header" class="lucus-header">
             <div class="lucus-header__inner">
               <div class="lucus-header__left">
+                {% if has_permission and not is_popup %}
+                <button type="button"
+                        id="lucus-admin-nav-toggle"
+                        class="lucus-admin-nav-toggle"
+                        aria-controls="{% if lucus_side_dashboard_nav %}lucus-side-dashboard{% else %}lucus-mobile-nav-panel{% endif %}"
+                        aria-expanded="false"
+                        aria-label="{% translate 'Menu' %}">
+                  <span class="lucus-admin-nav-toggle__line" aria-hidden="true"></span>
+                  <span class="lucus-admin-nav-toggle__line" aria-hidden="true"></span>
+                  <span class="lucus-admin-nav-toggle__line" aria-hidden="true"></span>
+                </button>
+                {% endif %}
                 <nav class="lucus-header__breadcrumbs" aria-label="{% translate 'Breadcrumbs' %}">
                   {% block breadcrumbs %}{% endblock %}
                 </nav>
@@ -217,6 +237,10 @@
 <!-------------------------- END SITE HEADER -------------------------->
       {% endif %}
 
+      {% if has_permission and not is_popup and not lucus_side_dashboard_nav %}
+        {% include "admin/includes/lucus_mobile_nav_panel.html" %}
+      {% endif %}
+
 <!---------------- Main layout (Django admin regions) ----------------->
       {% if lucus_side_dashboard_nav %}
       <div class="lucus-below-header">
@@ -290,6 +314,9 @@
       {% endif %}
       {% if lucus_side_dashboard_nav %}
       <script src="{% static 'lucus/js/lucus-side-dashboard-nav.js' %}" defer></script>
+      {% endif %}
+      {% if has_permission and not is_popup %}
+      <script src="{% static 'lucus/js/lucus-mobile-nav.js' %}" defer></script>
       {% endif %}
       <script src="{% static 'lucus/js/lucus-ui.js' %}" defer></script>
     {% endblock extrabody %}

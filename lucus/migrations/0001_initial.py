@@ -37,6 +37,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "Lucus admin UI preference",
                 "verbose_name_plural": "Lucus admin UI preferences",
+                "db_table": "lucus_admin_lucusadminuipreference",
             },
         ),
     ]

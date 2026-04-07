@@ -1041,6 +1041,312 @@ html[data-lucus-side-dashboard="collapsed"] .lucus-side-dashboard__reveal {
     background: var(--hairline-color);
 }
 
+/* Only used when side dashboard is off; hidden on wide screens via rules inside @media below. */
+.lucus-mobile-nav-panel {
+    display: none;
+}
+
+/* Side dashboard + fallback mobile panel: off-canvas ≤900px (lucus-mobile-nav.js) */
+@media (max-width: 900px) {
+    /*
+     * Затемнение должно лечь ПОВЕРХ контента (.main), но НИЖЕ выезжающей панели.
+     * Раньше .lucus-below-header имел z-index: 1 внутри isolate #container, а мы поднимали
+     * всю колонку до 80 — контент оказывался над dimmer. Сбрасываем stacking у колонки при
+     * открытом меню, чтобы fixed-панель (z-index 96) и dimmer (78) сравнивались на уровне #container.
+     */
+    body.lucus-admin--mobile-nav-open.lucus-admin--has-bg:not(.popup) #container > .lucus-below-header,
+    body.lucus-admin--mobile-nav-open.lucus-admin--has-bg:not(.popup) #container > .main {
+        z-index: auto !important;
+    }
+
+    body.lucus-admin--with-side-dashboard:not(.popup) .lucus-below-header {
+        display: block;
+    }
+
+    body.lucus-admin--with-side-dashboard:not(.popup) .lucus-shell__main {
+        width: 100%;
+        min-width: 0;
+    }
+
+    body.lucus-admin--with-side-dashboard:not(.popup) .lucus-side-dashboard {
+        position: fixed;
+        top: var(--xl);
+        left: 0;
+        bottom: 0;
+        width: min(17.5rem, 88vw);
+        max-width: none;
+        flex: none !important;
+        z-index: 96;
+        display: flex;
+        flex-direction: column;
+        transform: translate3d(-102%, 0, 0);
+        transition: transform 0.22s ease-out, box-shadow 0.22s ease-out;
+        box-shadow: none;
+        border-right: 1px solid var(--hairline-color);
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        overflow: hidden;
+        background: var(--body-bg);
+    }
+
+    html[dir="rtl"] body.lucus-admin--with-side-dashboard:not(.popup) .lucus-side-dashboard {
+        left: auto;
+        right: 0;
+        transform: translate3d(102%, 0, 0);
+    }
+
+    body.lucus-admin--with-side-dashboard:not(.popup).lucus-admin--mobile-nav-open .lucus-side-dashboard {
+        transform: translate3d(0, 0, 0);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+    }
+
+    html[dir="rtl"] body.lucus-admin--with-side-dashboard:not(.popup).lucus-admin--mobile-nav-open .lucus-side-dashboard {
+        box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Desktop “collapsed” ribbon: hide in favor of header hamburger */
+    html[data-lucus-side-dashboard="collapsed"] body.lucus-admin--with-side-dashboard:not(.popup) .lucus-side-dashboard__reveal {
+        display: none !important;
+    }
+
+    /* Панель off-canvas: закрытие — гамбургер, backdrop, Escape (как у lucus-mobile-nav-panel) */
+    body.lucus-admin--with-side-dashboard:not(.popup) .lucus-side-dashboard__collapse {
+        display: none !important;
+    }
+
+    body.lucus-admin--with-side-dashboard:not(.popup) .lucus-side-dashboard__inner {
+        position: static;
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+        height: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+
+    /* Undo desktop “collapsed” flex shrink on small screens (off-canvas uses transform). */
+    html[data-lucus-side-dashboard="collapsed"] body.lucus-admin--with-side-dashboard:not(.popup) .lucus-side-dashboard {
+        flex-basis: auto !important;
+        width: min(17.5rem, 88vw) !important;
+        max-width: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        overflow: hidden !important;
+        border-right-width: 1px !important;
+    }
+
+    /* Fallback panel when side dashboard is disabled (available_apps) */
+    body.lucus-admin--mobile-nav-enabled:not(.popup):not(.lucus-admin--with-side-dashboard) .lucus-mobile-nav-panel {
+        display: flex !important;
+        flex-direction: column;
+        position: fixed;
+        top: var(--xl);
+        left: 0;
+        bottom: 0;
+        width: min(17.5rem, 88vw);
+        z-index: 96;
+        transform: translate3d(-102%, 0, 0);
+        transition: transform 0.22s ease-out, box-shadow 0.22s ease-out;
+        box-shadow: none;
+        border-right: 1px solid var(--hairline-color);
+        background: var(--body-bg);
+        overflow: hidden;
+    }
+
+    html[dir="rtl"] body.lucus-admin--mobile-nav-enabled:not(.popup):not(.lucus-admin--with-side-dashboard) .lucus-mobile-nav-panel {
+        left: auto;
+        right: 0;
+        transform: translate3d(102%, 0, 0);
+    }
+
+    body.lucus-admin--mobile-nav-enabled:not(.popup):not(.lucus-admin--with-side-dashboard).lucus-admin--mobile-nav-open .lucus-mobile-nav-panel {
+        transform: translate3d(0, 0, 0);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+    }
+
+    html[dir="rtl"] body.lucus-admin--mobile-nav-enabled:not(.popup):not(.lucus-admin--with-side-dashboard).lucus-admin--mobile-nav-open .lucus-mobile-nav-panel {
+        box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .lucus-mobile-nav-panel__inner {
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 0.75rem 0.75rem 1.25rem;
+        box-sizing: border-box;
+    }
+
+    .lucus-mobile-nav-panel__toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
+        border-bottom: 1px solid var(--hairline-color);
+        flex-shrink: 0;
+    }
+
+    .lucus-mobile-nav-panel__dashboard {
+        font-weight: 600;
+        color: var(--color-brand-primary, var(--link-fg, var(--link-color)));
+        text-decoration: none;
+        font-size: 0.9375rem;
+    }
+
+    /* Селекты в меню: уровень 1 — summary, уровень 2 — select */
+    .lucus-nav-settings {
+        flex-shrink: 0;
+        margin: 0 0 0.5rem;
+        padding: 0 0 0.35rem;
+        border-bottom: 1px solid var(--hairline-color);
+    }
+
+    .lucus-side-dashboard .lucus-nav-settings {
+        margin-top: 0.15rem;
+    }
+
+    .lucus-nav-settings__item {
+        border-bottom: 1px solid var(--hairline-color);
+    }
+
+    .lucus-nav-settings__item:last-child {
+        border-bottom: none;
+    }
+
+    .lucus-nav-settings__summary {
+        cursor: pointer;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        padding: 0.5rem 0.35rem;
+        color: var(--body-fg, var(--color-text-primary));
+        list-style: none;
+        user-select: none;
+    }
+
+    .lucus-nav-settings__summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .lucus-nav-settings__summary::marker {
+        content: "";
+    }
+
+    .lucus-nav-settings__item[open] > .lucus-nav-settings__summary {
+        color: var(--color-brand-primary, var(--link-fg, var(--link-color)));
+    }
+
+    .lucus-nav-settings__level2 {
+        padding: 0 0.35rem 0.65rem 0.5rem;
+    }
+
+    .lucus-nav-settings__form {
+        margin: 0;
+    }
+
+    .lucus-nav-settings__select {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 0.45rem 0.5rem;
+        font-size: 0.8125rem;
+        line-height: 1.25;
+        color: var(--body-fg, var(--color-text-primary));
+        background: var(--body-bg);
+        border: 1px solid var(--hairline-color);
+        border-radius: var(--lucus-radius-md, 8px);
+    }
+
+    .lucus-nav-settings__select:focus {
+        outline: 2px solid var(--lucus-accent, var(--link-fg, var(--link-color)));
+        outline-offset: 1px;
+    }
+
+    .lucus-mobile-nav-panel__nav {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .lucus-mobile-nav-panel__section {
+        background: var(--module-bg, var(--body-bg));
+        border: 1px solid var(--hairline-color);
+        border-radius: var(--lucus-radius-md, 8px);
+        padding: 0.5rem 0.65rem 0.65rem;
+    }
+
+    .lucus-mobile-nav-panel__title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin: 0 0 0.4rem;
+        color: var(--body-quiet-color);
+    }
+
+    .lucus-mobile-nav-panel__title a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .lucus-mobile-nav-panel__list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .lucus-mobile-nav-panel__list > li {
+        list-style: none !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    .lucus-mobile-nav-panel__link {
+        display: block;
+        padding: 0.35rem 0.25rem;
+        border-radius: var(--lucus-radius-sm, 6px);
+        color: var(--color-text-primary);
+        text-decoration: none;
+        font-size: 0.875rem;
+    }
+
+    .lucus-mobile-nav-panel__link.is-active {
+        font-weight: 600;
+        background: var(--hairline-color);
+    }
+
+    .lucus-mobile-nav-panel__muted {
+        display: block;
+        padding: 0.35rem 0.25rem;
+        font-size: 0.875rem;
+        color: var(--body-quiet-color);
+    }
+
+    .lucus-mobile-nav-panel__empty {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--body-quiet-color);
+    }
+}
+
+/* Широкий экран: дублировать селекты в боковом дашборде не нужно — они в шапке. */
+@media (min-width: 901px) {
+    .lucus-side-dashboard .lucus-nav-settings {
+        display: none !important;
+    }
+}
+
 .skip-to-content-link {
     position: absolute;
     top: -999px;
@@ -3265,9 +3571,9 @@ input[type="submit"], button {
         padding: 10px 30px;
     }
 
-    /* Header */
+    /* Header (stock admin only — Lucus uses #header.lucus-header + .lucus-header__inner) */
 
-    #header {
+    #header:not(.lucus-header) {
         flex-direction: column;
         padding: 15px 30px;
         justify-content: flex-start;
@@ -3354,29 +3660,30 @@ input[type="submit"], button {
         margin: 5px 0 0 25px;
     }
 
-    #changelist .actions {
+    /* Lucus changelist uses .lucus-changelist__topbar / __bottombar — skip stock flex hacks */
+    #changelist:not(.lucus-changelist) .actions {
         display: flex;
         flex-wrap: wrap;
         padding: 15px 0;
     }
 
-    #changelist .actions label {
+    #changelist:not(.lucus-changelist) .actions label {
         display: flex;
     }
 
-    #changelist .actions select {
+    #changelist:not(.lucus-changelist) .actions select {
         background: var(--body-bg);
     }
 
-    #changelist .actions .button {
+    #changelist:not(.lucus-changelist) .actions .button {
         min-width: 48px;
         margin: 0 10px;
     }
 
-    #changelist .actions span.all,
-    #changelist .actions span.clear,
-    #changelist .actions span.question,
-    #changelist .actions span.action-counter {
+    #changelist:not(.lucus-changelist) .actions span.all,
+    #changelist:not(.lucus-changelist) .actions span.clear,
+    #changelist:not(.lucus-changelist) .actions span.question,
+    #changelist:not(.lucus-changelist) .actions span.action-counter {
         font-size: 0.6875rem;
         margin: 0 10px 0 0;
     }
@@ -3617,7 +3924,11 @@ input[type="submit"], button {
 @media (max-width: 767px) {
     /* Layout */
 
-    #header, #content {
+    #header:not(.lucus-header) {
+        padding: 15px;
+    }
+
+    #content {
         padding: 15px;
     }
 
@@ -3660,16 +3971,16 @@ input[type="submit"], button {
         margin-left: 0;
     }
 
-    #changelist .actions label {
+    #changelist:not(.lucus-changelist) .actions label {
         flex: 1 1;
     }
 
-    #changelist .actions select {
+    #changelist:not(.lucus-changelist) .actions select {
         flex: 1 0;
         width: 100%;
     }
 
-    #changelist .actions span {
+    #changelist:not(.lucus-changelist) .actions span {
         flex: 1 0 100%;
     }
 
@@ -4147,12 +4458,12 @@ input[type="submit"], button {
         text-align: right;
     }
 
-    [dir="rtl"] #changelist .actions label {
+    [dir="rtl"] #changelist:not(.lucus-changelist) .actions label {
         padding-left: 10px;
         padding-right: 0;
     }
 
-    [dir="rtl"] #changelist .actions select {
+    [dir="rtl"] #changelist:not(.lucus-changelist) .actions select {
         margin-left: 0;
         margin-right: 15px;
     }

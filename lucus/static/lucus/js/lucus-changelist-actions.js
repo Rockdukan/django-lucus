@@ -15,13 +15,12 @@
   ready(function () {
     var form = document.getElementById('changelist-form');
     var resultList = document.getElementById('result_list');
-    var counter = document.querySelector('span.action-counter');
-    var clearBtn = document.querySelector('.lucus-changelist-actions__deselect');
+    var counters = document.querySelectorAll('span.action-counter');
+    var clearBtns = document.querySelectorAll('.lucus-changelist-actions__deselect');
     if (
       !form ||
       !resultList ||
-      !counter ||
-      !clearBtn ||
+      !counters.length ||
       typeof window.interpolate !== 'function' ||
       typeof window.ngettext !== 'function'
     ) {
@@ -76,8 +75,8 @@
       var sel = boxes.filter(function (el) {
         return el.checked;
       }).length;
-      var actionsIcnt = Number(counter.dataset.actionsIcnt || 0);
-      counter.textContent = interpolate(
+      var actionsIcnt = Number(counters[0].dataset.actionsIcnt || 0);
+      var text = interpolate(
         ngettext(
           '%(sel)s of %(cnt)s selected',
           '%(sel)s of %(cnt)s selected',
@@ -86,30 +85,38 @@
         { sel: sel, cnt: actionsIcnt },
         true
       );
+      counters.forEach(function (c) {
+        c.textContent = text;
+      });
       var allToggle = document.getElementById(options.allToggleId);
       if (allToggle) {
         allToggle.checked = sel === boxes.length && boxes.length > 0;
       }
-      clearBtn.hidden = sel === 0 && (!allToggle || !allToggle.checked);
+      var hideClear = sel === 0 && (!allToggle || !allToggle.checked);
       if (allToggle && allToggle.checked) {
-        clearBtn.hidden = false;
+        hideClear = false;
       }
+      clearBtns.forEach(function (btn) {
+        btn.hidden = hideClear;
+      });
     }
 
-    clearBtn.addEventListener('click', function () {
-      var allToggle = document.getElementById(options.allToggleId);
-      if (allToggle) {
-        allToggle.checked = false;
-      }
-      clearAcross();
-      actionCheckboxes().forEach(function (el) {
-        el.checked = false;
-        var tr = el.closest('tr');
-        if (tr) {
-          tr.classList.remove(options.selectedClass);
+    clearBtns.forEach(function (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        var allToggle = document.getElementById(options.allToggleId);
+        if (allToggle) {
+          allToggle.checked = false;
         }
+        clearAcross();
+        actionCheckboxes().forEach(function (el) {
+          el.checked = false;
+          var tr = el.closest('tr');
+          if (tr) {
+            tr.classList.remove(options.selectedClass);
+          }
+        });
+        updateCounter();
       });
-      updateCounter();
     });
 
     resultList.addEventListener('change', function (ev) {

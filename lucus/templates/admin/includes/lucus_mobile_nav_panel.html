@@ -1,0 +1,41 @@
+{% load i18n %}
+<!---------------- Lucus: mobile nav (no side dashboard) ---------------->
+<aside id="lucus-mobile-nav-panel"
+       class="lucus-mobile-nav-panel"
+       aria-label="{% translate 'Admin navigation' %}">
+  <div class="lucus-mobile-nav-panel__inner">
+    <div class="lucus-mobile-nav-panel__toolbar">
+      {# Закрытие: гамбургер в шапке (превращается в «×»), затемнение, Escape. #}
+      <a class="lucus-mobile-nav-panel__dashboard" href="{% url 'admin:index' %}">{% translate "Dashboard" %}</a>
+    </div>
+    {% include "admin/includes/lucus_mobile_menu_settings.html" %}
+    <nav class="lucus-mobile-nav-panel__nav" aria-label="{% translate 'Applications' %}">
+      {% for app in available_apps %}
+        <section class="lucus-mobile-nav-panel__section">
+          <h2 class="lucus-mobile-nav-panel__title">
+            {% if app.app_url %}
+              <a href="{{ app.app_url }}">{{ app.name }}</a>
+            {% else %}
+              {{ app.name }}
+            {% endif %}
+          </h2>
+          <ul class="lucus-mobile-nav-panel__list">
+            {% for model in app.models %}
+              <li>
+                {% if model.admin_url %}
+                  <a class="lucus-mobile-nav-panel__link{% if model.admin_url in request.path|urlencode %} is-active{% endif %}"
+                     href="{{ model.admin_url }}">{{ model.name }}</a>
+                {% else %}
+                  <span class="lucus-mobile-nav-panel__muted">{{ model.name }}</span>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% empty %}
+        <p class="lucus-mobile-nav-panel__empty">{% translate "You don’t have permission to view or edit anything." %}</p>
+      {% endfor %}
+    </nav>
+  </div>
+</aside>
+<!---------------- END Lucus mobile nav panel --------------------------->

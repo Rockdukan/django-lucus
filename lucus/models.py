@@ -25,6 +25,7 @@ class LucusAdminUiPreference(models.Model):
     )
 
     class Meta:
+        db_table = "lucus_admin_lucusadminuipreference"
         verbose_name = _("Lucus admin UI preference")
         verbose_name_plural = _("Lucus admin UI preferences")
 

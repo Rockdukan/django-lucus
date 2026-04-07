@@ -1,0 +1,75 @@
+{% load i18n %}
+{# Селекты интерфейса в выезжающем меню: уровень 1 — подпись (summary), уровень 2 — значение (select). #}
+{% if lucus_color_scheme_choices or lucus_admin_set_language_url or lucus_admin_site_choices %}
+<div class="lucus-nav-settings" role="navigation" aria-label="{% translate 'Interface settings' %}">
+  {% if lucus_color_scheme_choices %}
+  <details class="lucus-nav-settings__item">
+    <summary class="lucus-nav-settings__summary">{% translate "Color scheme" %}</summary>
+    <div class="lucus-nav-settings__level2">
+      <form method="post" action="{% url 'admin:lucus_save_ui' %}" class="lucus-nav-settings__form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <input type="hidden" name="appearance" value="{{ lucus_selected_appearance }}">
+        <label class="visually-hidden" for="lucus-theme-scheme-mobile">{% translate "Color scheme" %}</label>
+        <select name="color_scheme" id="lucus-theme-scheme-mobile" class="lucus-nav-settings__select" aria-label="{% translate 'Color scheme' %}" onchange="this.form.submit()">
+          {% for slug, label in lucus_color_scheme_choices %}
+            <option value="{{ slug }}" {% if slug == lucus_selected_color_scheme %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  </details>
+  <details class="lucus-nav-settings__item">
+    <summary class="lucus-nav-settings__summary">{% translate "Appearance" %}</summary>
+    <div class="lucus-nav-settings__level2">
+      <form method="post" action="{% url 'admin:lucus_save_ui' %}" class="lucus-nav-settings__form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <input type="hidden" name="color_scheme" value="{{ lucus_selected_color_scheme }}">
+        <label class="visually-hidden" for="lucus-theme-appearance-mobile">{% translate "Appearance" %}</label>
+        <select name="appearance" id="lucus-theme-appearance-mobile" class="lucus-nav-settings__select" aria-label="{% translate 'Appearance' %}" onchange="this.form.submit()">
+          {% for slug, label in lucus_appearance_choices %}
+            <option value="{{ slug }}" {% if slug == lucus_selected_appearance %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  </details>
+  {% endif %}
+  {% if lucus_admin_site_choices %}
+  <details class="lucus-nav-settings__item">
+    <summary class="lucus-nav-settings__summary">{% translate "Site" %}</summary>
+    <div class="lucus-nav-settings__level2">
+      <form method="post" action="{% url 'admin:lucus_save_site' %}" class="lucus-nav-settings__form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <label class="visually-hidden" for="lucus-admin-site-mobile">{% translate "Site" %}</label>
+        <select id="lucus-admin-site-mobile" name="site_id" class="lucus-nav-settings__select" aria-label="{% translate 'Site' %}" onchange="this.form.submit()">
+          {% for sid, label in lucus_admin_site_choices %}
+            <option value="{{ sid }}" {% if sid == lucus_selected_site_id %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  </details>
+  {% endif %}
+  {% if lucus_admin_set_language_url %}
+  {% get_available_languages as lucus_mobile_menu_languages %}
+  <details class="lucus-nav-settings__item">
+    <summary class="lucus-nav-settings__summary">{% translate "Language" %}</summary>
+    <div class="lucus-nav-settings__level2">
+      <form action="{{ lucus_admin_set_language_url }}" method="post" class="lucus-nav-settings__form">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+        <label class="visually-hidden" for="lucus-lang-toolbar-mobile">{% translate "Language" %}</label>
+        <select id="lucus-lang-toolbar-mobile" name="language" class="lucus-nav-settings__select" aria-label="{% translate 'Language' %}" onchange="this.form.submit()">
+          {% for code, name in lucus_mobile_menu_languages %}
+            <option value="{{ code }}" {% if LANGUAGE_CODE == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  </details>
+  {% endif %}
+</div>
+{% endif %}

@@ -28,7 +28,7 @@ class DashboardColumn:
     sections: tuple[DashboardSection, ...]
     classes: str = (
         "lucus-dashboard__col lucus-grid__col lucus-grid__col--3 "
-        "lucus-grid__col--md-6 lucus-grid__col--sm-12"
+        "lucus-grid__col--md-6 lucus-grid__col--sm-12 lucus-grid__col--xs-12"
     )
 
 
@@ -314,6 +314,10 @@ def grouped_dashboard_from_app_list(
         ("constance", "Config"): _("Константы"),
     }
 
+    # Only apps whose group actually rendered a non-empty section count as
+    # ``app_labels``-covered for APPEND_UNCOVERED. Empty groups must not hide apps.
+    rendered_explicit_app_labels: set[str] = set()
+
     for g in groups:
         seen_urls: set[str] = set()
         merged: list[DashboardLink] = []
@@ -344,22 +348,28 @@ def grouped_dashboard_from_app_list(
         cols[int(g.get("column", 1)) - 1].append(
             DashboardSection(title=g.get("title", ""), links=links_tuple)
         )
+        if raw_labels is not None:
+            if isinstance(raw_labels, (set, frozenset)):
+                rendered_explicit_app_labels.update(raw_labels)
+            elif isinstance(raw_labels, (list, tuple)):
+                rendered_explicit_app_labels.update(raw_labels)
 
     if getattr(settings, "LUCUS_DASHBOARD_APPEND_UNCOVERED", True):
-        explicit_covered_apps: set[str] = set()
+        explicit_covered_apps: set[str] = set(rendered_explicit_app_labels)
         covered_paths: set[str] = set()
         for g in groups:
-            raw = g.get("app_labels")
-            if isinstance(raw, (set, frozenset)):
-                explicit_covered_apps.update(raw)
-            elif isinstance(raw, (list, tuple)):
-                explicit_covered_apps.update(raw)
             for link in g.get("links") or []:
                 url = link.get("url")
                 if not url and link.get("admin_urlname"):
                     url = safe_reverse(link["admin_urlname"])
                 if url:
                     p = _normalize_admin_path(url)
+                    if p:
+                        covered_paths.add(p)
+        for sec_tup in cols:
+            for sec in sec_tup:
+                for dl in sec.links:
+                    p = _normalize_admin_path(dl.url)
                     if p:
                         covered_paths.add(p)
 

@@ -47,7 +47,6 @@ def _lucus_admin_site_instances() -> tuple[Any, ...]:
 class LucusConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "lucus"
-    label = "lucus_admin"
 
     def ready(self) -> None:
         from django.conf import settings

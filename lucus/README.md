@@ -1,4 +1,1 @@
-# Lucus package
-
-- English: [`README.md`](../README.md) (default for PyPI)
-- Русский: [`README.ru.md`](../README.ru.md)
+Package metadata lives in the repo root: [`README.md`](../README.md) (PyPI), [`README.ru.md`](../README.ru.md).
