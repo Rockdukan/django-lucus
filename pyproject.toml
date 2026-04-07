@@ -80,7 +80,8 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["lucus"]
+# ``include = ["lucus"]`` omits subpackages — wheels lacked ``lucus.templatetags`` (``lucus_nav``) and ``lucus.migrations``.
+include = ["lucus*"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
