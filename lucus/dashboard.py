@@ -16,6 +16,14 @@ class DashboardLink:
     label: Any
     url: str
 
+    @property
+    def url_path(self) -> str:
+        """Path segment of ``url`` for comparing to ``request.path`` (no template tag required)."""
+        if not self.url:
+            return ""
+        p = urlparse(str(self.url))
+        return p.path or str(self.url)
+
 
 @dataclass(frozen=True)
 class DashboardSection:

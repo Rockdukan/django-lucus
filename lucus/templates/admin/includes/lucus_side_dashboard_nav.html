@@ -1,4 +1,4 @@
-{% load i18n lucus_nav %}
+{% load i18n %}
 <!--------------------- Lucus: side dashboard nav --------------------->
 <button type="button"
         id="lucus-side-dashboard-reveal"
@@ -33,7 +33,7 @@
           <ul class="lucus-side-dashboard__list">
             {% for link in sec.links %}
             <li>
-              <a class="lucus-side-dashboard__link{% if request.path == link.url|lucus_url_path %} is-active{% endif %}"
+              <a class="lucus-side-dashboard__link{% if request.path == link.url_path %} is-active{% endif %}"
                  href="{{ link.url }}">{{ link.label }}</a>
             </li>
             {% endfor %}
