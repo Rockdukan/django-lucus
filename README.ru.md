@@ -1,27 +1,31 @@
-# Lucus
+# django-lucus
 
 [English](README.md)
 
-Lucus — пакет для Django, который переоформляет `django.contrib.admin`: свой `base.html`, CSS вёрстки и один общий лист админки (`lucus/css/lucus-admin.css`) вместо подключения стандартных `admin/css/`. Палитра и режим отображения (светлая, тёмная или как в системе) выбираются в шапке и сохраняются для каждого пользователя в модели `LucusAdminUiPreference`. Главная страница `/admin/` поддерживает настраиваемый многоколоночный дашборд.
+**django-lucus** — кастомная тема оформления для встроенной админки Django (`django.contrib.admin`): другой внешний вид страниц, набор цветовых схем, на главной `/admin/` — всегда многоколоночный дашборд (не «плоский» список приложений как в стоке). Как именно разложены колонки и ссылки, задаётся **`LUCUS_DASHBOARD`**; если настройку не задавать, Lucus сам строит колонки из ваших зарегистрированных приложений. В проект добавляется приложение **`lucus`**. Адрес админки в браузере тот же, что был до подключения (часто **`/admin/`** — зависит от вашего `urls.py`).
 
-Боковая панель навигации Django в админке отключена. На страницах списка объектов и редактирования записи основные действия закреплены у нижней границы окна просмотра, чтобы оставаться доступными при прокрутке.
+- **Оформление:** подменяются шаблоны «оболочки» админки; стили подключаются по цепочке: `lucus/css/style.css` → `lucus-admin.css` → файл выбранной палитры `lucus/css/schemes/<slug>.css`.
+- **Навигация:** встроенная боковая панель списка приложений Django в админке отключена (`AdminSite.enable_nav_sidebar = False`).
+- **Для каждого пользователя:** выбранная цветовая схема и режим «светло / тёмно / как в системе» хранятся в модели **`LucusAdminUiPreference`**.
+- **Меню на внутренних страницах:** если **`LUCUS_SIDE_DASHBOARD_NAV`** включён (по умолчанию да), на страницах админки кроме главной показывается боковое или выезжающее меню в том же духе, что и дашборд на главной.
+- **Списки объектов и формы редактирования:** по умолчанию блок массовых действий показывается и над таблицей, и под ней; на форме объекта кнопки сохранения и удаления могут быть закреплены внизу экрана. Глобальные переключатели — в настройках **`LUCUS_ACTIONS_ON_TOP`** и **`LUCUS_ACTIONS_ON_BOTTOM`** (таблица ниже); для отдельных моделей всё это можно изменить в своём классе админки (**`ModelAdmin`**), как в обычном Django.
 
-![Главная админки — тема Dune, светлое оформление, фон на весь экран](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_1.jpg)
+![Главная админки — палитра Dune, светлое оформление, фон на весь экран](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_1.jpg)
 
-*Индекс: многоколоночный дашборд с карточками приложений (примеры: Education, Logistics, Support и др.), в шапке — палитра, оформление, сайт, язык, пользователь.*
+*Индекс: многоколоночный `LUCUS_DASHBOARD`; шапка — палитра, оформление, опционально сайт / язык, меню пользователя.*
 
-![Список объектов — тема Slate (модель Instructors)](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_2.jpg)
+![Список объектов — палитра Slate (пример модели)](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_2.jpg)
 
-*Changelist: «хлебные крошки», поиск, массовые действия, таблица результатов, фильтры справа.*
+*Changelist: крошки, тулбар (пагинация + поиск), массовые действия, таблица, блок фильтров.*
 
-![Форма объекта — тема Dracula, тёмное оформление](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_3.jpg)
+![Форма объекта — палитра Dracula, тёмное оформление](https://raw.githubusercontent.com/Rockdukan/django-lucus/main/screenshots/screenshot_3.jpg)
 
-*Форма изменения: поля, закреплённая нижняя панель (сохранение и удаление). На кадре — тёмный режим; палитра и режим задаются настройками пользователя.*
+*Форма изменения: филдсеты; нижняя панель действий. Палитра и режим — на пользователя (`LucusAdminUiPreference`).*
 
 ## Требования
 
-- Python 3.10+
-- Django `>=5.2,<7` (`pyproject.toml`)
+- Python ≥ 3.10  
+- Django: `>=5.2,<7` (`pyproject.toml`)
 
 ## Установка
 
@@ -29,9 +33,9 @@ Lucus — пакет для Django, который переоформляет `d
 pip install django-lucus
 ```
 
-На PyPI пакет называется **django-lucus**, в коде приложение подключается как `lucus`.
-
 ## Подключение
+
+Добавьте **`lucus`** в `INSTALLED_APPS` и поставьте его **выше** `django.contrib.admin`:
 
 ```python
 INSTALLED_APPS = [
@@ -41,55 +45,81 @@ INSTALLED_APPS = [
 ]
 ```
 
+Если в проекте есть другое приложение с **тем же путём шаблона**, что и в Lucus, **`lucus` должен стоять раньше него**. Иначе Django подставит чужой файл. Типичный пример — **Rosetta**: в пакете лежат `lucus/templates/rosetta/…`; если `rosetta` окажется выше в списке, тема Lucus на страницах Rosetta не применится.
+
+Затем:
+
 ```bash
-python manage.py migrate lucus_admin
+python manage.py migrate lucus
 ```
 
-В продакшене выполните `collectstatic`, чтобы статика админки отдавалась так же, как остальные файлы.
+В продакшене выполните **`collectstatic`**, чтобы отдавались файлы из `lucus/static/`.
 
 ## Настройки
 
 | Настройка | Тип | По умолчанию | Назначение |
 |-----------|-----|--------------|------------|
-| `SITE_NAME` | `str` | `"Site"` | Шаблон заголовка / `site_title` |
-| `LUCUS_ADMIN_SITE_HEADER_TEMPLATE` | `str` | `"Administration — {site}"` | `admin.site.site_header` = `.format(site=SITE_NAME)`; безопасно только `{site}`, остальные `{}` экранировать |
+| `SITE_NAME` | `str` | `"Site"` | `LUCUS_ADMIN_SITE_HEADER_TEMPLATE` / `site_title` |
+| `LUCUS_ADMIN_SITE_HEADER_TEMPLATE` | `str` | `"Administration — {site}"` | `admin.site.site_header` = `.format(site=SITE_NAME)`; только `{site}` или экранировать прочие `{}` |
 | `LUCUS_ADMIN_SITE_TITLE_USE_SITE_NAME` | `bool` | `True` | При `True`: `admin.site.site_title` = `SITE_NAME` |
-| `LUCUS_ADMIN_BACKGROUND_IMAGE` | `str` / `Path` | `""` | Фон на весь экран: `http(s)://`, `//`, путь сайта `/…` или static (без `..`) |
-| `LUCUS_ADMIN_BACKGROUND_SCRIM_OPACITY` | `float` | `0.88` | Непрозрачность цветной подложки поверх картинки, `0.0`…`1.0` |
-| `LUCUS_ADMIN_LANGUAGE_SELECTOR` | `bool` | *(авто)* | `False` — скрыть выбор языка в шапке. Иначе показ только при `USE_I18N`, `len(LANGUAGES) > 1`, `LocaleMiddleware`, URL `set_language` |
-| `LUCUS_ADMIN_SITE_SELECTOR` | `bool` | *(авто)* | `False` — скрыть переключатель сайтов. Иначе при `sites` и ≥2 `Site` |
+| `LUCUS_ADMIN_BACKGROUND_IMAGE` | `str` / `Path` | `""` | Фон: `http(s)://`, `//`, путь `/…` или static (без `..`) |
+| `LUCUS_ADMIN_BACKGROUND_SCRIM_OPACITY` | `float` | `0.88` | Подложка поверх изображения, `0.0`…`1.0` |
+| `LUCUS_ADMIN_LANGUAGE_SELECTOR` | `bool` | *(авто)* | `False` — скрыть `<select>` языка. Иначе при `USE_I18N`, `len(LANGUAGES) > 1`, `LocaleMiddleware`, URL `set_language` |
+| `LUCUS_ADMIN_SITE_SELECTOR` | `bool` | *(авто)* | `False` — скрыть переключатель сайтов; иначе при `sites` и ≥2 `Site` |
+| `LUCUS_ADMIN_SITES` | `AdminSite` / `list` / `tuple` | `None` | Экземпляры `AdminSite` для патча (`each_context`, `get_urls`, заголовки, …). По умолчанию только `django.contrib.admin.site`. Пример: `LUCUS_ADMIN_SITES = (admin.site, my_site)`. Формы в `base.html` — `{% url 'admin:lucus_save_ui' %}`; другой namespace может потребовать свой шаблон. |
+| `LUCUS_STAFF_THEME_PATH_PREFIXES` | `tuple` / `list` / `str` | *см. ниже* | Staff: подмешивать `each_context` на префиксах URL (шаблоны админки без `admin_view`). По умолчанию: `/logs/`, `/rosetta/`, `/explorer/`. `()` — отключить. |
 | `LUCUS_UI` | `dict` | `{}` | См. ниже |
 | `LUCUS_EXTRA_STATIC_CSS` | `str` / `list` / `tuple` | `()` | Доп. CSS после палитры; без `..` и без ведущего `/` |
-| `LUCUS_EMPTY_VALUE_DISPLAY_WRAP` | `bool` | `True` | Оборачивать пустые ячейки changelist в `lucus-admin-empty` |
+| `LUCUS_EMPTY_VALUE_DISPLAY_WRAP` | `bool` | `True` | Пустые ячейки changelist — обёртка `lucus-admin-empty` |
 | `LUCUS_EMPTY_VALUE_PLACEHOLDER` | `str` | `"—"` | Текст `empty_value_display` |
-| `LUCUS_ACTIONS_ON_BOTTOM` | `bool` | `True` | `ModelAdmin.actions_on_bottom` на классе |
-| `LUCUS_ACTIONS_ON_TOP` | `bool` | `True` | `ModelAdmin.actions_on_top` на классе |
+| `LUCUS_ACTIONS_ON_BOTTOM` | `bool` | `True` | Дефолт `ModelAdmin.actions_on_bottom` на уровне **класса**; переопределение в подклассе |
+| `LUCUS_ACTIONS_ON_TOP` | `bool` | `True` | Дефолт `ModelAdmin.actions_on_top` на уровне **класса** |
 | `LUCUS_DASHBOARD` | `list` / `None` | `None` | Дашборд; `None` — встроенная групповая сетка |
 | `LUCUS_DASHBOARD_APPEND_UNCOVERED` | `bool` | `True` | Групповой режим: непокрытые приложения в последнюю колонку |
+| `LUCUS_SIDE_DASHBOARD_NAV` | `bool` | `True` | Не индекс: сворачиваемое левое меню по колонкам `LUCUS_DASHBOARD`. Выкл. на индексе, в popup, без прав |
 
-**Палитра и оформление** не задаются в `settings`: значения хранятся в `LucusAdminUiPreference`. Встроенные слаги: `olivia`, `grey`, `slate`, `dune`, `midnight`, `nord`, `dracula`, `github`, `catppuccin`, `tokyo` — файлы `lucus/static/lucus/css/<slug>.css`. Данные для шаблонов добавляет `lucus.theme.lucus_admin_extra_context` через `admin.site.each_context`.
+Палитра / оформление не в `settings`; в `LucusAdminUiPreference`. Слаги → `lucus/static/lucus/css/schemes/<slug>.css`. Контекст: `lucus.theme.lucus_admin_extra_context` через `admin.site.each_context`.
 
 ### `LUCUS_UI`
 
 | Ключ | По умолчанию | Назначение |
 |------|----------------|------------|
-| `help_as_icon` | `True` | `help_text` поля за `?` / `<details>` |
-| `high_contrast_toggle` | `False` | Пункт меню «High contrast» (`localStorage`, `data-lucus-contrast` на `<html>`) |
+| `help_as_icon` | `True` | `help_text` за `?` / `<details>` |
+| `high_contrast_toggle` | `False` | Меню пользователя: высокий контраст (`localStorage`, `data-lucus-contrast` на `<html>`) |
+| `clean_input_types` | `False` | Подмена HTML5-типов у `<input>` на `text` (аналог `GRAPPELLI_CLEAN_INPUT_TYPES`) |
 
 ```python
 LUCUS_UI = {
     "help_as_icon": True,
     "high_contrast_toggle": False,
+    "clean_input_types": False,
 }
 ```
 
+## Табличные инлайны: сортировка и placeholder
+
+1. **Перетаскивание строк** — `lucus.inlines.LucusSortableTabularInline` или `LucusSortableTabularInlineMixin` + `admin.TabularInline`. `sortable_field_name`, опционально `sortable_excludes`. Докстринг: `lucus/inlines.py`.
+2. **Инлайн между fieldsets** — филдсет с `fields: ()`, в `classes` — `"placeholder"` и id обёртки инлайна (`<prefix>-group`, напр. `items_set-group`).
+
+## Сторонние пакеты: CSS (`lucus/static/lucus/css/third_party/`)
+
+Отдельных Python-зависимостей нет. Виды без `admin/base.html`: `LUCUS_STAFF_THEME_PATH_PREFIXES` + `lucus.context_processors.staff_integrations_theme`.
+
+| Пакет | Файл | Подключение из |
+|--------|------|----------------|
+| django-constance | `lucus/css/third_party/constance.css` | `admin/base.html` |
+| django-filer | `lucus/css/third_party/filer.css` | `admin/base.html` |
+| django-parler | `lucus/css/third_party/parler.css` | `admin/base.html` |
+| django-rosetta | `lucus/css/third_party/rosetta.css` | `rosetta/base.html` |
+| django-log-viewer (совместимый) | `lucus/css/third_party/log_viewer.css` | `log_viewer/logfile_viewer.html` |
+
 ## `LUCUS_DASHBOARD`
 
-Контекст: `lucus_dashboard_columns` из `get_dashboard_for_request`. Ссылка секции: `{"label", "url"}` или `{"label", "admin_urlname"}` (напр. `admin:app_model_changelist`). Секция без рабочих ссылок не показывается.
+Контекст: `lucus_dashboard_columns` из `get_dashboard_for_request`. Ссылка секции: `{"label", "url"}` или `{"label", "admin_urlname"}`. Секция без валидных ссылок не рендерится.
 
-**Режим layout:** `[{ "column"?: 1–4, "classes"?: str, "sections": [{ "title", "links": [...] }] }, …]`. Одинаковый `column` — объединение секций; `classes` из первого словаря.
+**Layout:** `[{ "column"?: 1–4, "classes"?: str, "sections": [{ "title", "links": [...] }] }, …]`. Один `column` — слияние секций; `classes` из первого словаря.
 
-**Режим групп:** `[{ "column", "title", "links"?: [...], "app_labels"?: set|list|tuple|frozenset }, …]`. Сначала `links`, затем модели из `app_labels`; дубликаты URL убираются. Для `list`/`tuple` порядок приложений как в списке; для `set` — как в `get_app_list`.
+**Группы:** `[{ "column", "title", "links"?: [...], "app_labels"?: set|list|tuple|frozenset }, …]`. Сначала `links`, затем модели из `app_labels`; дубликаты URL удаляются. Для `list`/`tuple` порядок из списка; для `set` — как в `get_app_list`.
 
 `LUCUS_DASHBOARD_APPEND_UNCOVERED`: `True` — остальные приложения в последнюю колонку; `False` — только заданные группы.
 
@@ -97,7 +127,7 @@ LUCUS_UI = {
 LUCUS_DASHBOARD = [
     {
         "column": 1,
-        "classes": "lucus-dashboard__col lucus-col lucus-col-3 lucus-col-md-6 lucus-col-sm-12",
+        "classes": "lucus-dashboard__col lucus-grid__col lucus-grid__col--3 lucus-grid__col--md-6 lucus-grid__col--sm-12 lucus-grid__col--xs-12",
         "sections": [
             {
                 "title": "Обучение",
@@ -128,24 +158,31 @@ LUCUS_DASHBOARD = [
 ]
 ```
 
-## Стили
+## Порядок стилей
 
-Подключаются по порядку: `lucus/css/style.css`, `lucus/css/lucus-admin.css`, выбранная палитра `lucus/css/<slug>.css`, затем пути из `LUCUS_EXTRA_STATIC_CSS`. JavaScript виджетов, инлайнов и действий по-прежнему из `django.contrib.admin`.
+`lucus/css/style.css` → `lucus/css/lucus-admin.css` → `lucus/css/schemes/<slug>.css` → `LUCUS_EXTRA_STATIC_CSS`. JS виджетов / инлайнов / действий — из `django.contrib.admin`.
 
-Свою палитру можно добавить, положив в static файл `lucus/css/<slug>.css` и дописав пару `(slug, подпись)` в `lucus.theme.BUNDLED_COLOR_SCHEMES` в проекте.
+Своя палитра: static `lucus/css/<slug>.css` + расширение `lucus.theme.BUNDLED_COLOR_SCHEMES`.
 
-## Модули
+Переопределён `admin/change_list_results.html`: `.text` затем `.sortoptions` внутри `.lucus-th-heading-inner` (вместо stock `float` у иконки сортировки).
 
-| Модуль | Назначение |
-|--------|------------|
-| `lucus.apps.LucusConfig` | `ready()`: `site_header` / `site_title`, подключение `each_context`, контекст дашборда, маршруты `lucus_save_ui` и `lucus_save_site`, `enable_nav_sidebar = False`, `empty_value_display`, размещение действий `ModelAdmin` |
-| `lucus.dashboard` | Разбор `LUCUS_DASHBOARD` в структуру колонок |
-| `lucus.models` | `LucusAdminUiPreference` (палитра и оформление на пользователя) |
-| `lucus.theme` | Встроенные схемы, `lucus_admin_extra_context(request)` |
-| `lucus.views` | Обработчики POST для сохранения UI и выбора сайта |
+## Тесты
 
-Версия пакета: `lucus.__version__`.
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
 
-Если используется переключатель сайтов в шапке и нужно, чтобы внутри `/admin/` объект `request.site` совпадал с выбором, зарегистрируйте `lucus.sites_panel.LucusAdminSiteMiddleware` сразу после `SessionMiddleware` (см. `lucus.sites_panel`).
+## Модули Python
 
-Поддерживаемые версии Django указаны в `pyproject.toml` (ориентир — 5.2 и совместимая линия 6.x).
+| Модуль | Роль |
+|--------|------|
+| `lucus.apps.LucusConfig` | `ready()`: заголовки, `each_context`, дашборд, `lucus_save_ui` / `lucus_save_site`, `enable_nav_sidebar`, `empty_value_display`, дефолты действий `ModelAdmin` |
+| `lucus.dashboard` | Нормализация `LUCUS_DASHBOARD` |
+| `lucus.models` | `LucusAdminUiPreference` |
+| `lucus.theme` | Схемы, `lucus_admin_extra_context` |
+| `lucus.views` | POST: UI и сайт |
+
+Если в шапке админки переключают сайт и нужно, чтобы **`request.site`** внутри запросов совпадал с этим выбором, подключите middleware **`lucus.sites_panel.LucusAdminSiteMiddleware`** сразу после **`SessionMiddleware`**. Как именно — описано в модуле **`lucus.sites_panel`**.
+
+В репозитории для демонстрации интеграций есть приложение **`integration/`** и файл **`requirements-integration.txt`**; при необходимости: **`pip install -e ".[integration]"`**. Запуск демо-сайта — корневой **`manage.py`** с **`core.settings`**; часть сценариев зависит от установленного **`sorl.thumbnail`**.

@@ -3,11 +3,11 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 # Только метаданные пакета lucus для PyPI / python -m build.
-# Зависимости демо-сайта — в requirements.txt (не дублировать сюда).
+# Песочница интеграций: optional-dependencies «integration» и requirements-integration.txt.
 
 [project]
 name = "django-lucus"
-version = "0.1.6"
+version = "0.1.7"
 description = "Lucus enhances Django Admin with custom templates, static theming, and a multi-column dashboard."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -27,6 +27,48 @@ classifiers = [
 ]
 dependencies = [
     "django>=5.2,<7",
+]
+
+[project.optional-dependencies]
+integration = [
+    "celery",
+    "redis",
+    "django-celery-beat",
+    "django-celery-results",
+    "django-dynamic-preferences",
+    "django-extensions",
+    "django-health-check",
+    "django-import-export",
+    "django-modeltranslation",
+    "django-reversion",
+    "django-reversion-compare",
+    "django-silk",
+    "django-attachments",
+    "python-fsutil",
+    "python-fontbro",
+    "django-cabinet",
+    "Pillow",
+    "django-imagekit",
+    "sorl-thumbnail",
+    "easy-thumbnails",
+    "django-pictures",
+    "django-versatileimagefield",
+    "django-thumbnails",
+    "django-lazy-srcset",
+    "django-photologue",
+    "django-sortedm2m",
+    "django-starcross-gallery",
+    "django-galleryfield",
+    "django-ckeditor",
+    "django-easy-select2",
+    "django-ckeditor-5",
+    "django-prose-editor",
+    "nh3",
+    "django-tinymce",
+    "martor",
+    "django-markdownx",
+    "django-froala-editor",
+    "sentry-sdk",
 ]
 
 [project.urls]
