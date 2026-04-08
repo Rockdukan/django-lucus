@@ -120,7 +120,7 @@ small {
 }
 
 /* ------------------------------------------------------------------ */
-/*                  LUCUS LAYOUT + GRID (strict BEM)                   */
+/*                  LUCUS LAYOUT + GRID                               */
 /* ------------------------------------------------------------------ */
 /* Block lucus-wrapper — document root fragment for full-height shell */
 .lucus-wrapper {
@@ -1439,15 +1439,17 @@ body.login {
   color: color-mix(in srgb, #6d3600 82%, var(--color-text-primary)) !important;
   border: 1px solid color-mix(in srgb, #ef6c00 55%, var(--color-border));
 }
+/* No fixed height: long translated strings wrap without overlapping the form below. */
 #content .errornote {
   width: 100%;
-  height: var(--xl);
-  min-height: var(--xl);
-  line-height: var(--xl);
-  padding: 0 var(--m) !important;
+  box-sizing: border-box;
+  min-height: 0;
+  line-height: 1.45;
+  padding: var(--s) var(--m) !important;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
+  overflow-wrap: break-word;
   background: color-mix(in srgb, #c62828 12%, var(--color-surface-secondary)) !important;
   color: color-mix(in srgb, #5d1010 92%, var(--color-text-primary)) !important;
   border: 1px solid color-mix(in srgb, #b71c1c 65%, var(--color-border));
