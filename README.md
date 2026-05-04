@@ -96,6 +96,38 @@ LUCUS_UI = {
 }
 ```
 
+With `help_as_icon: True`, inline `?` help closes when you click outside the popover (Lucus JS on all admin pages).
+
+## Changelist pagehead actions
+
+Lucus renders the changelist title row in `admin/change_list.html` (`.lucus-changelist__pagehead`). Extra controls belong there, not in the stock `object-tools` block (which Lucus leaves empty by default).
+
+**Without overriding templates:** set a **class attribute** on your `ModelAdmin`:
+
+| Key | Meaning |
+|-----|---------|
+| `label` | Visible caption |
+| `method` | `"get"` (default) or `"post"` |
+| `url` | Absolute or site-relative URL for GET / POST target |
+| `urlname` | Django URL name passed to `{% url %}` (e.g. `admin:myapp_mymodel_myaction`) |
+| `js_handler` | Name of a global `window.<name>(button, event)` for a `<button type="button">` |
+| `event` | If set, clicking dispatches `CustomEvent("lucus:pagehead-action", { detail: { action, element } })` on `document` |
+
+POST actions render a small form with `{% csrf_token %}`. For layout next to links, you may add CSS class `lucus-changelist__pagehead-form--contents` on `<form>` (`display: contents`) when you inject markup via `{% block object-tools-items %}`.
+
+**Template hook:** override `{% block object-tools-items %}` in `admin/change_list.html` (same row as “Add”, inside `.lucus-changelist__pagehead-actions`). Use class `lucus-changelist__addlink` on `<a>` / `<button>` for matching chrome.
+
+```python
+class MyModelAdmin(admin.ModelAdmin):
+    lucus_changelist_pagehead_actions = (
+        {"label": "Export CSV", "method": "get", "urlname": "admin:myapp_mymodel_export"},
+        {"label": "Rebuild", "method": "post", "urlname": "admin:myapp_mymodel_rebuild"},
+        {"label": "Client action", "js_handler": "myPageheadHandler"},
+    )
+```
+
+Run `python manage.py migrate lucus` so `LucusAdminUiPreference` exists; if the table is missing, Lucus still saves palette / appearance via **cookies** for `POST /admin/lucus/save-ui/`, but DB persistence needs the migration applied.
+
 ## Sortable tabular inlines & placeholder inlines
 
 1. **Drag-sort rows** — `lucus.inlines.LucusSortableTabularInline` or `LucusSortableTabularInlineMixin` + `admin.TabularInline`. `sortable_field_name`, optional `sortable_excludes`. Docstring: `lucus/inlines.py`.
@@ -177,7 +209,7 @@ pytest
 
 | Module | Role |
 |--------|------|
-| `lucus.apps.LucusConfig` | `ready()`: headers, `each_context`, dashboard context, `lucus_save_ui` / `lucus_save_site`, `enable_nav_sidebar`, `empty_value_display`, `ModelAdmin` action defaults |
+| `lucus.apps.LucusConfig` | `ready()`: headers, `each_context`, dashboard context, `lucus_save_ui` / `lucus_save_site`, `enable_nav_sidebar`, `empty_value_display`, `ModelAdmin` action defaults, `changelist_view` injects `lucus_changelist_pagehead_actions` |
 | `lucus.dashboard` | Normalize `LUCUS_DASHBOARD` |
 | `lucus.models` | `LucusAdminUiPreference` |
 | `lucus.theme` | Bundled schemes, `lucus_admin_extra_context` |

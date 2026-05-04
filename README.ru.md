@@ -96,6 +96,38 @@ LUCUS_UI = {
 }
 ```
 
+При `help_as_icon: True` всплывающая подсказка `?` закрывается по клику вне неё (скрипт Lucus на всех страницах админки).
+
+## Действия в шапке changelist (pagehead)
+
+Lucus рисует строку заголовка списка в `admin/change_list.html` (`.lucus-changelist__pagehead`). Дополнительные кнопки и ссылки нужно размещать **там**, а не в стандартном блоке `object-tools` (Lucus по умолчанию оставляет его пустым).
+
+**Без переопределения шаблонов:** задайте на классе **`ModelAdmin`** атрибут **`lucus_changelist_pagehead_actions`** — кортеж или список словарей:
+
+| Ключ | Назначение |
+|------|------------|
+| `label` | Подпись на кнопке / ссылке |
+| `method` | `"get"` (по умолчанию) или `"post"` |
+| `url` | Абсолютный или относительный URL для GET / POST |
+| `urlname` | Имя URL для `{% url %}` (например `admin:myapp_mymodel_myaction`) |
+| `js_handler` | Имя глобальной функции `window.<имя>(button, event)` для кнопки `<button type="button">` |
+| `event` | Если задано, по клику на кнопку на `document` уходит `CustomEvent("lucus:pagehead-action", { detail: { action, element } })` |
+
+Для `method: "post"` рендерится форма с `{% csrf_token %}`. Если вы добавляете свою разметку через **`{% block object-tools-items %}`**, к `<form>` можно повесить класс **`lucus-changelist__pagehead-form--contents`** (`display: contents`), чтобы не ломать flex-ряд рядом со ссылками.
+
+**Шаблонный хук:** переопределите **`{% block object-tools-items %}`** в `admin/change_list.html` (та же строка, что и «Добавить», внутри `.lucus-changelist__pagehead-actions`). Для единого вида используйте класс **`lucus-changelist__addlink`** на `<a>` и `<button>`.
+
+```python
+class MyModelAdmin(admin.ModelAdmin):
+    lucus_changelist_pagehead_actions = (
+        {"label": "Экспорт CSV", "method": "get", "urlname": "admin:myapp_mymodel_export"},
+        {"label": "Пересчёт", "method": "post", "urlname": "admin:myapp_mymodel_rebuild"},
+        {"label": "Действие в браузере", "js_handler": "myPageheadHandler"},
+    )
+```
+
+Выполните **`python manage.py migrate lucus`**, чтобы существовала таблица **`LucusAdminUiPreference`**. Если миграции ещё не применены, **`POST /admin/lucus/save-ui/`** не падает с 500: тема и оформление сохраняются в **cookies**, но запись в БД появится только после `migrate lucus`.
+
 ## Табличные инлайны: сортировка и placeholder
 
 1. **Перетаскивание строк** — `lucus.inlines.LucusSortableTabularInline` или `LucusSortableTabularInlineMixin` + `admin.TabularInline`. `sortable_field_name`, опционально `sortable_excludes`. Докстринг: `lucus/inlines.py`.
@@ -177,7 +209,7 @@ pytest
 
 | Модуль | Роль |
 |--------|------|
-| `lucus.apps.LucusConfig` | `ready()`: заголовки, `each_context`, дашборд, `lucus_save_ui` / `lucus_save_site`, `enable_nav_sidebar`, `empty_value_display`, дефолты действий `ModelAdmin` |
+| `lucus.apps.LucusConfig` | `ready()`: заголовки, `each_context`, дашборд, `lucus_save_ui` / `lucus_save_site`, `enable_nav_sidebar`, `empty_value_display`, дефолты действий `ModelAdmin`, патч `changelist_view` для `lucus_changelist_pagehead_actions` |
 | `lucus.dashboard` | Нормализация `LUCUS_DASHBOARD` |
 | `lucus.models` | `LucusAdminUiPreference` |
 | `lucus.theme` | Схемы, `lucus_admin_extra_context` |
