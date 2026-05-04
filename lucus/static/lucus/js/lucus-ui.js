@@ -6,6 +6,10 @@
 
   var STORAGE_KEY = "lucus-high-contrast";
 
+  window.lucusDemoPageheadAction = function () {
+    alert("Lucus demo JS action executed.");
+  };
+
   function applyContrast(on) {
     var root = document.documentElement;
     if (on) {

@@ -131,4 +131,19 @@ class LucusConfig(AppConfig):
         if getattr(settings, "LUCUS_ACTIONS_ON_TOP", True):
             ModelAdmin.actions_on_top = True
 
+        if not getattr(ModelAdmin, "lucus_changelist_pagehead_actions_patched", False):
+            original_changelist_view = ModelAdmin.changelist_view
+
+            def changelist_view_with_pagehead_actions(self, request, extra_context=None):
+                ctx = dict(extra_context or {})
+                ctx["lucus_changelist_pagehead_actions"] = getattr(
+                    self,
+                    "lucus_changelist_pagehead_actions",
+                    (),
+                )
+                return original_changelist_view(self, request, extra_context=ctx)
+
+            ModelAdmin.changelist_view = changelist_view_with_pagehead_actions
+            ModelAdmin.lucus_changelist_pagehead_actions_patched = True
+
         _install_staff_integrations_context_processor()

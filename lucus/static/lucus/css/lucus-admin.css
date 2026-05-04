@@ -1693,12 +1693,39 @@ form .form-row p {
     display: flex;
 }
 
-.form-multiline {
-    flex-wrap: wrap;
+.flex-container.form-multiline {
+    display: grid;
+    gap: 18px 22px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+}
+
+.flex-container.form-multiline:has(> div:nth-child(1):last-child) {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.flex-container.form-multiline:has(> div:nth-child(2):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.flex-container.form-multiline:has(> div:nth-child(3):last-child) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.flex-container.form-multiline:has(> div:nth-child(4):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.flex-container.form-multiline:has(> div:nth-child(5):last-child) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.flex-container.form-multiline:has(> div:nth-child(6):last-child) {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .form-multiline > div {
-    padding-bottom: 10px;
+    padding-bottom: 0;
+    min-width: 0;
 }
 
 /* FORM LABELS */

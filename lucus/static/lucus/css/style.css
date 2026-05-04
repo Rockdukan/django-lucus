@@ -662,8 +662,38 @@ body.change-list-page #content .lucus-changelist__title {
 }
 
 body.change-list-page #content .lucus-changelist__pagehead-actions {
+  display: inline-flex;
   flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s);
   margin-inline-start: auto;
+}
+
+body.change-list-page #content .lucus-changelist__pagehead-actions ul.object-tools {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body.change-list-page #content .lucus-changelist__pagehead-actions ul.object-tools li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body.change-list-page #content .lucus-changelist__pagehead-actions form {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+}
+
+body.change-list-page #content .lucus-changelist__pagehead-actions form.lucus-changelist__pagehead-form--contents {
+  display: contents;
 }
 
 body.change-list-page #content .lucus-changelist__addlink {
@@ -675,11 +705,20 @@ body.change-list-page #content .lucus-changelist__addlink {
   border-radius: 8px;
   font-weight: 600;
   font-size: 13px;
+  font-family: inherit;
+  line-height: 1.2;
   text-decoration: none !important;
   background: var(--lucus-accent, var(--color-brand-primary)) !important;
   color: #fff !important;
   border: none;
   box-shadow: none;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+body.change-list-page #content button.lucus-changelist__addlink {
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 body.change-list-page #content .lucus-changelist__addlink:hover,
@@ -887,7 +926,7 @@ body.lucus-admin--with-side-dashboard #container #content-main {
   line-height: var(--phi);
 }
 
-#content .collapse summary {
+#content .collapse summary:not(.lucus-field-help__summary) {
   display: flex !important;
   align-items: center !important;
   flex-wrap: nowrap;
@@ -905,17 +944,17 @@ body.lucus-admin--with-side-dashboard #container #content-main {
   list-style-type: none;
 }
 
-#content .collapse summary::-webkit-details-marker {
+#content .collapse summary:not(.lucus-field-help__summary)::-webkit-details-marker {
   display: none;
 }
 
-#content .collapse summary::before {
+#content .collapse summary:not(.lucus-field-help__summary)::before {
   content: '\2192';
   font-weight: bold;
   flex-shrink: 0;
 }
 
-#content .collapse details[open] > summary::before {
+#content .collapse details[open] > summary:not(.lucus-field-help__summary)::before {
   content: '\2193';
 }
 
@@ -2889,8 +2928,8 @@ body.change-form-page #content .lucus-change-form__sections .module:last-child .
   border-bottom: none !important;
 }
 
-body.change-list-page .object-tools,
-#content .object-tools {
+/* Legacy: object-tools only when rendered as #content direct child (not inside pagehead-actions). */
+body.change-list-page #content > .object-tools {
   margin: 0 0 12px 0 !important;
   padding: 0 !important;
   display: flex !important;
@@ -2899,15 +2938,48 @@ body.change-list-page .object-tools,
   top: -10px;
 }
 
-body.change-list-page .object-tools li,
+body.change-list-page #content > .object-tools li {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.change-list-page #content > .object-tools a.addlink,
+body.change-list-page #content > .object-tools a.addlink:link,
+body.change-list-page #content > .object-tools a.addlink:visited {
+  height: 32px !important;
+  min-height: 32px !important;
+  line-height: 32px !important;
+  padding: 0 12px !important;
+  background: var(--lucus-accent) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+}
+
+body.change-list-page #content > .object-tools a.addlink:hover,
+body.change-list-page #content > .object-tools a.addlink:focus {
+  background: var(--lucus-accent-hover) !important;
+  color: #fff !important;
+  text-decoration: none !important;
+}
+
+#content .object-tools {
+  margin: 0 0 12px 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  gap: 8px;
+  position: relative;
+}
+
 #content .object-tools li {
   margin: 0 !important;
   padding: 0 !important;
 }
 
-body.change-list-page .object-tools a.addlink,
-body.change-list-page .object-tools a.addlink:link,
-body.change-list-page .object-tools a.addlink:visited,
 #content .object-tools a.addlink,
 #content .object-tools a.addlink:link,
 #content .object-tools a.addlink:visited {
@@ -2925,8 +2997,6 @@ body.change-list-page .object-tools a.addlink:visited,
   box-shadow: none !important;
 }
 
-body.change-list-page .object-tools a.addlink:hover,
-body.change-list-page .object-tools a.addlink:focus,
 #content .object-tools a.addlink:hover,
 #content .object-tools a.addlink:focus {
   background: var(--lucus-accent-hover) !important;
@@ -3089,29 +3159,56 @@ body.delete-confirmation form > div:has(input[type="submit"]) .cancel-link {
   outline-offset: 1px;
 }
 
-/* Label + widget + “?” on one row (see admin/includes/fieldset.html .lucus-field__control-row). */
+/* Control + help “?”: grid keeps “?” in a fixed column; inner row keeps label beside input. */
 #content .aligned .form-row .lucus-field__control-row {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: flex-start;
-  gap: var(--s);
-  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px;
+  align-items: center;
   min-width: 0;
   width: 100%;
 }
 
+#content .aligned .form-row .lucus-field__control-row:has(.selector) {
+  align-items: flex-start;
+}
+
 #content .aligned .form-row .lucus-field__control-row > .flex-container {
-  flex: 1 1 auto;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
   min-width: 0;
+  width: 100%;
 }
 
-#content .aligned .form-row .lucus-field__control-row:has(.checkbox-row) {
-  align-items: center;
+#content .aligned .form-row .lucus-field__control-row > .flex-container > label {
+  display: inline-block !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 160px !important;
+  line-height: 1.25 !important;
 }
 
-#content .aligned .form-row .lucus-field__control-row:not(:has(.selector)) .lucus-field-help {
-  align-self: center;
+#content .aligned .form-multiline .lucus-field__control-row > .flex-container > label {
+  max-width: min(9.5rem, 46%) !important;
+}
+
+#content .aligned .form-row .lucus-field__control-row > .flex-container > *:not(label) {
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#content .aligned .form-row .lucus-field__control-row > .flex-container.checkbox-row > input[type="checkbox"] {
+  flex: 0 0 auto !important;
+}
+
+#content .aligned .form-row .lucus-field__control-row .lucus-field-help {
+  flex-shrink: 0;
 }
 
 /* Tall filter-horizontal widgets: don’t vertically center the whole row. */
@@ -3190,8 +3287,7 @@ body.delete-confirmation form > div:has(input[type="submit"]) .cancel-link {
 /* Field help: “?” inline; body is a floating layer (no layout jump when opening details). */
 .lucus-field-help {
   position: relative;
-  flex: 0 0 auto;
-  margin-top: 0;
+  margin-top: 2px;
   max-width: none;
   align-self: flex-start;
 }
@@ -3228,6 +3324,23 @@ body.delete-confirmation form > div:has(input[type="submit"]) .cancel-link {
 .lucus-field-help__summary:focus-visible {
   background: var(--color-surface);
   transform: scale(1.05);
+}
+
+/* Collapsible fieldset body: help “?” must match the same chrome as on the main form. */
+#content fieldset.module.collapse .lucus-field-help__summary,
+#content fieldset.module.aligned.collapse .lucus-field-help__summary {
+  background: var(--color-surface-secondary) !important;
+  color: var(--color-brand-primary) !important;
+  border: 1px solid var(--color-border) !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  line-height: 20px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  width: 22px !important;
+  height: 22px !important;
+  box-sizing: border-box !important;
 }
 
 .lucus-field-help__body {

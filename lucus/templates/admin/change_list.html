@@ -44,14 +44,52 @@
 <!---------------- Changelist: page head (title + add) ---------------->
   <div class="lucus-changelist__pagehead">
     <h1 class="lucus-changelist__title">{{ cl.opts.verbose_name_plural|capfirst }}</h1>
-    {% if has_add_permission %}
-      <div class="lucus-changelist__pagehead-actions">
+    <div class="lucus-changelist__pagehead-actions">
+      {% if has_add_permission %}
         {% url cl.opts|admin_urlname:'add' as add_url %}
         <a href="{% add_preserved_filters add_url is_popup to_field %}" class="lucus-changelist__addlink addlink">
           {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
         </a>
-      </div>
-    {% endif %}
+      {% endif %}
+      {% if lucus_changelist_pagehead_actions %}
+        {% for action in lucus_changelist_pagehead_actions %}
+          {% if action.js_handler or action.event %}
+            <button
+              type="button"
+              class="lucus-changelist__addlink"
+              data-lucus-pagehead-action="{{ action.event|default:'' }}"
+              data-lucus-pagehead-handler="{{ action.js_handler|default:'' }}"
+            >
+              {{ action.label }}
+            </button>
+          {% else %}
+          {% if action.urlname %}
+            {% url action.urlname as lucus_action_url %}
+            {% if action.method|default:"get"|lower == "post" %}
+              <form method="post" action="{{ lucus_action_url }}" class="lucus-changelist__pagehead-form--contents">
+                {% csrf_token %}
+                <button type="submit" class="lucus-changelist__addlink">{{ action.label }}</button>
+              </form>
+            {% else %}
+              <a href="{{ lucus_action_url }}" class="lucus-changelist__addlink">{{ action.label }}</a>
+            {% endif %}
+          {% else %}
+            {% with action.url as lucus_action_url %}
+              {% if action.method|default:"get"|lower == "post" %}
+                <form method="post" action="{{ lucus_action_url }}" class="lucus-changelist__pagehead-form--contents">
+                  {% csrf_token %}
+                  <button type="submit" class="lucus-changelist__addlink">{{ action.label }}</button>
+                </form>
+              {% else %}
+                <a href="{{ lucus_action_url }}" class="lucus-changelist__addlink">{{ action.label }}</a>
+              {% endif %}
+            {% endwith %}
+          {% endif %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% block object-tools-items %}{% endblock %}
+    </div>
   </div>
 {% endblock %}
 

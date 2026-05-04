@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from urllib.parse import urlsplit, urlunsplit
 
+from django.db import OperationalError, ProgrammingError
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
 
@@ -32,14 +33,18 @@ def save_admin_ui(request):
     if not is_valid_scheme_slug(scheme):
         scheme = bundled_scheme_slugs()[0]
     appearance = normalize_appearance(request.POST.get("appearance"))
-    LucusAdminUiPreference.objects.update_or_create(
-        user=request.user,
-        defaults={"color_scheme": scheme, "appearance": appearance},
-    )
     resp = HttpResponseRedirect(next_url)
     age = 365 * 24 * 60 * 60
     resp.set_cookie("lucus_color_scheme", scheme, max_age=age, samesite="Lax", path="/")
     resp.set_cookie("lucus_appearance", appearance, max_age=age, samesite="Lax", path="/")
+
+    try:
+        LucusAdminUiPreference.objects.update_or_create(
+            user=request.user,
+            defaults={"color_scheme": scheme, "appearance": appearance},
+        )
+    except (OperationalError, ProgrammingError):
+        return resp
     return resp
 
 
